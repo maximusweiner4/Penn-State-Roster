@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penn State Football Depth Chart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 min-h-screen">
+  <div id="app"></div>
+
+  <script>
+    const POSITIONS = {
+      offense: [
+        { code: 'WR-X', name: 'X Receiver', depth: 3, x: 5, y: 45 },
+        { code: 'OT', name: 'LT', depth: 4, x: 30, y: 45 },
+        { code: 'OG', name: 'LG', depth: 4, x: 40, y: 48 },
+        { code: 'C', name: 'Center', depth: 3, x: 50, y: 50 },
+        { code: 'OG', name: 'RG', depth: 4, x: 60, y: 48, isRight: true },
+        { code: 'OT', name: 'RT', depth: 4, x: 70, y: 45, isRight: true },
+        { code: 'TE', name: 'TE', depth: 2, x: 78, y: 48 },
+        { code: 'WR-SLOT', name: 'Slot', depth: 3, x: 85, y: 45 },
+        { code: 'WR-Y', name: 'Y Receiver', depth: 3, x: 95, y: 45 },
+        { code: 'QB', name: 'QB', depth: 2, x: 50, y: 65 },
+        { code: 'RB', name: 'RB', depth: 3, x: 50, y: 80 }
+      ],
+      defense: [
+        { code: 'CB-X', name: 'CB (X)', depth: 3, x: 5, y: 40 },
+        { code: 'DE-1', name: 'DE', depth: 3, x: 35, y: 40 },
+        { code: 'DT-1', name: 'DT', depth: 3, x: 45, y: 42 },
+        { code: 'DT-2', name: 'DT', depth: 3, x: 55, y: 42 },
+        { code: 'DE-2', name: 'DE', depth: 3, x: 65, y: 40 },
+        { code: 'CB-SLOT', name: 'Slot CB', depth: 3, x: 75, y: 40 },
+        { code: 'CB-Y', name: 'CB (Y)', depth: 3, x: 95, y: 40 },
+        { code: 'LB-OLB', name: 'OLB', depth: 4, x: 30, y: 55 },
+        { code: 'LB-ILB', name: 'ILB', depth: 4, x: 50, y: 58 },
+        { code: 'LB-OLB', name: 'OLB', depth: 4, x: 70, y: 55, isRight: true },
+        { code: 'S-FS', name: 'FS', depth: 3, x: 40, y: 75 },
+        { code: 'S-SS', name: 'SS', depth: 3, x: 60, y: 75 }
+      ],
+      special: [
+        { code: 'K', name: 'Kicker', depth: 2, x: 50, y: 50 },
+        { code: 'P', name: 'Punter', depth: 2, x: 50, y: 65 },
+        { code: 'LS', name: 'Long Snapper', depth: 2, x: 50, y: 35 }
+      ]
+    };
+
+    const DEFAULT_ROSTER = [
+      { name: 'Jack Lambert', number: 19, position: 'QB', year: 'RJr' },
+      { name: 'Peyton Falzone', number: 0, position: 'QB', year: 'Fr' },
+      { name: 'Rocco Becht', number: 0, position: 'QB', year: 'RSr' },
+      { name: 'Alex Manske', number: 0, position: 'QB', year: 'RFr' },
+      { name: 'Kase Evans', number: 0, position: 'QB', year: 'Fr' },
+      { name: 'Quinton Martin Jr.', number: 25, position: 'RB', year: 'RSo' },
+      { name: 'Cam Wallace', number: 26, position: 'RB', year: 'RSo' },
+      { name: 'James Peoples', number: 0, position: 'RB', year: 'Jr' },
+      { name: 'Carson Hansen', number: 0, position: 'RB', year: 'Sr' },
+      { name: "D'Antae Sheffey", number: 0, position: 'RB', year: 'Fr' },
+      { name: 'Koby Howard', number: 6, position: 'WR', year: 'So' },
+      { name: 'Lyrick Samuel', number: 11, position: 'WR', year: 'RFr' },
+      { name: 'Logan Cunningham', number: 31, position: 'WR', year: 'RSr' },
+      { name: 'Ethan Black', number: 82, position: 'WR', year: 'RJr' },
+      { name: 'Peter Gonzalez', number: 84, position: 'WR', year: 'RSo' },
+      { name: 'Karon Brookins', number: 0, position: 'WR', year: 'RFr' },
+      { name: 'Brett Eskildsen', number: 0, position: 'WR', year: 'Jr' },
+      { name: 'Keith Jones Jr.', number: 0, position: 'WR', year: 'RSo' },
+      { name: 'Zay Robinson', number: 0, position: 'WR', year: 'RFr' },
+      { name: 'Chase Sowell', number: 0, position: 'WR', year: 'RSr' },
+      { name: 'Ben Whitver', number: 0, position: 'WR', year: 'Fr' },
+      { name: 'Andrew Rappleyea', number: 87, position: 'TE', year: 'RJr' },
+      { name: 'Finn Furmanek', number: 89, position: 'TE', year: 'RJr' },
+      { name: 'Brian Kortovich', number: 83, position: 'TE', year: 'RFr' },
+      { name: 'Cooper Alexander', number: 0, position: 'TE', year: 'RSo' },
+      { name: 'Benjamin Brahmer', number: 0, position: 'TE', year: 'Sr' },
+      { name: 'Gabe Burkle', number: 0, position: 'TE', year: 'RSr' },
+      { name: 'Cooper Cousins', number: 50, position: 'OL', year: 'Jr' },
+      { name: 'Dominic Rulli', number: 52, position: 'OL', year: 'RSr' },
+      { name: 'Chimdy Onoh', number: 55, position: 'OL', year: 'RJr' },
+      { name: 'Jim Fitzgerald', number: 65, position: 'OL', year: 'RSr' },
+      { name: 'Henry Boehme', number: 67, position: 'OL', year: 'RJr' },
+      { name: 'Anthony Donkoh', number: 68, position: 'OL', year: 'RJr' },
+      { name: 'Garrett Sexton', number: 71, position: 'OL', year: 'RSo' },
+      { name: 'Caleb Brewer', number: 73, position: 'OL', year: 'RSo' },
+      { name: 'Liam Horan', number: 61, position: 'OL', year: 'RSo' },
+      { name: 'Owen Aliciene', number: 77, position: 'OL', year: 'RFr' },
+      { name: 'Malachi Goodman', number: 78, position: 'OL', year: 'RFr' },
+      { name: 'Donnie Harbour', number: 79, position: 'OL', year: 'RSo' },
+      { name: 'Hunter Albright', number: 0, position: 'OL', year: 'RFr' },
+      { name: 'Trevor Buhr', number: 0, position: 'OL', year: 'RJr' },
+      { name: 'Tyshon Huff', number: 0, position: 'OL', year: 'RJr' },
+      { name: 'Kuol Kuol II', number: 0, position: 'OL', year: 'RFr' },
+      { name: 'Vaea Ikakoula', number: 0, position: 'OL', year: 'RFr' },
+      { name: 'Brock Riker', number: 0, position: 'OL', year: 'RSo' },
+      { name: 'Will Tompkins', number: 0, position: 'OL', year: 'RFr' },
+      { name: 'Mason Bandhauer', number: 0, position: 'OL', year: 'Fr' },
+      { name: 'Max Granville', number: 18, position: 'DE', year: 'RSo' },
+      { name: 'Mason Robinson', number: 42, position: 'DE', year: 'RJr' },
+      { name: 'Dayshaun Burnett', number: 43, position: 'DE', year: 'RFr' },
+      { name: 'Aidan Probst', number: 47, position: 'DE', year: 'RSo' },
+      { name: 'Bobby Mears', number: 93, position: 'DE', year: 'RJr' },
+      { name: 'Jordan Mayer', number: 95, position: 'DE', year: 'RJr' },
+      { name: 'Yvan Kemajou', number: 99, position: 'DE', year: 'So' },
+      { name: 'Jackson Ford', number: 0, position: 'DE', year: 'Fr' },
+      { name: 'Ty Blanding', number: 39, position: 'DT', year: 'RJr' },
+      { name: 'Liam Andrews', number: 90, position: 'DT', year: 'RSo' },
+      { name: "De'Andre Cook", number: 94, position: 'DT', year: 'RSo' },
+      { name: 'Alijah Carnell', number: 0, position: 'DT', year: 'RSo' },
+      { name: 'Ike Ezeogu', number: 0, position: 'DT', year: 'RSr' },
+      { name: 'Alexander McPherson', number: 0, position: 'DT', year: 'So' },
+      { name: 'Armstrong Nnodim', number: 0, position: 'DT', year: 'RSo' },
+      { name: 'Siale Taupaki', number: 0, position: 'DT', year: 'RSr' },
+      { name: 'Dallas Vakalahi', number: 0, position: 'DT', year: 'Jr' },
+      { name: 'Keanu Williams', number: 0, position: 'DT', year: 'RSr' },
+      { name: 'LaVar Arrington II', number: 11, position: 'LB', year: 'So' },
+      { name: 'Tony Rojas', number: 13, position: 'LB', year: 'RJr' },
+      { name: 'Alex Tatsch', number: 25, position: 'LB', year: 'So' },
+      { name: 'Cam Smith', number: 26, position: 'LB', year: 'RFr' },
+      { name: 'Caleb Bacon', number: 0, position: 'LB', year: 'RSr' },
+      { name: 'Cael Brezina', number: 0, position: 'LB', year: 'Jr' },
+      { name: 'Kooper Ebel', number: 0, position: 'LB', year: 'Sr' },
+      { name: 'John Klosterman', number: 0, position: 'LB', year: 'RSr' },
+      { name: 'Audavion Collins', number: 2, position: 'CB', year: 'RSr' },
+      { name: 'Daryus Dixson', number: 5, position: 'CB', year: 'So' },
+      { name: 'Zion Tracy', number: 7, position: 'CB', year: 'Sr' },
+      { name: 'Xxavier Thomas', number: 12, position: 'CB', year: 'RFr' },
+      { name: 'Joshua Johnson', number: 15, position: 'CB', year: 'RFr' },
+      { name: 'Donte Nastasi', number: 16, position: 'CB', year: 'RJr' },
+      { name: 'Jahmir Joseph', number: 23, position: 'CB', year: 'RFr' },
+      { name: 'Tyler Armstead', number: 35, position: 'CB', year: 'RSo' },
+      { name: 'Max Heffner', number: 37, position: 'CB', year: 'RFr' },
+      { name: 'Jeremiah Cooper', number: 0, position: 'CB', year: 'Fifth' },
+      { name: 'Omarion Davis', number: 0, position: 'CB', year: 'So' },
+      { name: 'Chris Fileppo', number: 0, position: 'CB', year: 'So' },
+      { name: 'Ibn McDaniels', number: 0, position: 'CB', year: 'RSo' },
+      { name: 'Marcus Neal Jr.', number: 0, position: 'CB', year: 'Jr' },
+      { name: 'Jamison Patton', number: 0, position: 'CB', year: 'Sr' },
+      { name: 'Hunter Sowell', number: 0, position: 'CB', year: 'RFr' },
+      { name: 'Christian Askew', number: 0, position: 'CB', year: 'Fr' },
+      { name: 'Tyrell Chatman', number: 0, position: 'CB', year: 'Fr' },
+      { name: 'Bryson Williams', number: 0, position: 'CB', year: 'Fr' },
+      { name: 'Josiah Zayas', number: 0, position: 'CB', year: 'Fr' },
+      { name: 'Vaboue Toure', number: 21, position: 'S', year: 'RSo' },
+      { name: 'Jashaun Green', number: 39, position: 'S', year: 'RSr' },
+      { name: 'Ryan Barker', number: 94, position: 'K', year: 'RJr' },
+      { name: 'Matthew Parker', number: 98, position: 'K', year: 'RFr' },
+      { name: 'Cristiano Rosa', number: 0, position: 'K', year: 'RSr' },
+      { name: 'Nathan Tiyce', number: 0, position: 'P', year: 'So' },
+      { name: 'Blaise Sokach-Minnick', number: 35, position: 'LS', year: 'RSr' },
+      { name: 'Andrew Dufault', number: 92, position: 'LS', year: 'RSo' }
+    ];
+
+    class DepthChartApp {
+      constructor() {
+        this.depthChart = {};
+        this.roster = DEFAULT_ROSTER;
+        this.activeTab = 'offense';
+        this.depthLevel = 0;
+        this.selectedSlot = null;
+        this.showPlayerModal = false;
+        this.showImportModal = false;
+        this.importText = '';
+        this.importMessage = '';
+        this.saving = false;
+        
+        this.init();
+      }
+
+      init() {
+        this.loadDepthChart();
+        this.loadRoster();
+        this.render();
+      }
+
+      loadDepthChart() {
+        const saved = localStorage.getItem('psu-depth-chart');
+        if (saved) {
+          this.depthChart = JSON.parse(saved);
+        } else {
+          this.initializeEmptyChart();
+        }
+      }
+
+      loadRoster() {
+        const saved = localStorage.getItem('psu-roster');
+        if (saved) {
+          this.roster = JSON.parse(saved);
+        }
+      }
+
+      initializeEmptyChart() {
+        Object.values(POSITIONS).flat().forEach(pos => {
+          const key = pos.isRight ? `${pos.code}-R` : pos.code;
+          if (!this.depthChart[key]) {
+            this.depthChart[key] = Array(pos.depth).fill(null);
+          }
+        });
+      }
+
+      saveDepthChart() {
+        this.saving = true;
+        localStorage.setItem('psu-depth-chart', JSON.stringify(this.depthChart));
+        this.render();
+        setTimeout(() => {
+          this.saving = false;
+          this.render();
+        }, 1000);
+      }
+
+      exportDepthChart() {
+        let text = 'PENN STATE FOOTBALL DEPTH CHART\n================================\n\n';
+        
+        const sections = {
+          'OFFENSE': ['QB', 'RB', 'WR-X', 'WR-Y', 'WR-SLOT', 'TE', 'OT', 'OT-R', 'OG', 'OG-R', 'C'],
+          'DEFENSE': ['DE-1', 'DE-2', 'DT-1', 'DT-2', 'LB-ILB', 'LB-OLB', 'LB-OLB-R', 'CB-X', 'CB-Y', 'CB-SLOT', 'S-FS', 'S-SS'],
+          'SPECIAL TEAMS': ['K', 'P', 'LS']
+        };
+        
+        for (const [section, positions] of Object.entries(sections)) {
+          text += `${section}\n${'-'.repeat(section.length)}\n\n`;
+          
+          for (const pos of positions) {
+            const players = this.depthChart[pos] || [];
+            const filled = players.filter(p => p !== null);
+            
+            if (filled.length > 0) {
+              const posLabel = pos.replace('-R', ' (Right)').replace('-', ' ');
+              text += `${posLabel}:\n`;
+              filled.forEach((p, i) => {
+                text += `  ${i + 1}. #${p.number} ${p.name} (${p.year})\n`;
+              });
+              text += '\n';
+            }
+          }
+          text += '\n';
+        }
+
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `penn-state-depth-chart-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      resetDepthChart() {
+        if (confirm('Reset the entire depth chart? This cannot be undone.')) {
+          this.initializeEmptyChart();
+          this.saveDepthChart();
+        }
+      }
+
+      importRoster() {
+        try {
+          const lines = this.importText.split('\n').filter(line => line.trim());
+          const newRoster = [];
+          
+          for (const line of lines) {
+            const commaFormat = line.match(/(\d+),?\s*([^,]+),?\s*([A-Z]{1,3}),?\s*(.+)/);
+            const hashFormat = line.match(/#(\d+)\s+([A-Za-z\s'.]+?)\s+([A-Z]{1,3})\s+(.+)/);
+            
+            let match = commaFormat || hashFormat;
+            
+            if (match) {
+              const number = parseInt(match[1]);
+              const name = match[2].trim();
+              const position = match[3].trim();
+              const year = match[4].trim();
+              
+              const validPositions = ['QB', 'RB', 'WR', 'TE', 'OL', 'DE', 'DT', 'LB', 'CB', 'S', 'K', 'P', 'LS'];
+              if (validPositions.includes(position) && !isNaN(number)) {
+                newRoster.push({ name, number, position, year });
+              }
+            }
+          }
+          
+          if (newRoster.length > 0) {
+            this.roster = newRoster;
+            localStorage.setItem('psu-roster', JSON.stringify(newRoster));
+            this.importMessage = `✓ Successfully imported ${newRoster.length} players!`;
+            setTimeout(() => {
+              this.showImportModal = false;
+              this.importText = '';
+              this.importMessage = '';
+              this.render();
+            }, 2000);
+          } else {
+            this.importMessage = '✗ No valid players found. Please check the format.';
+          }
+          this.render();
+        } catch (error) {
+          this.importMessage = '✗ Error parsing roster data. Please check the format.';
+          this.render();
+        }
+      }
+
+      getAvailablePlayers(posCode) {
+        let positionToSearch = posCode.replace('-R', '');
+        if (positionToSearch.startsWith('WR-')) positionToSearch = 'WR';
+        else if (['OT', 'OG', 'C'].includes(positionToSearch)) positionToSearch = 'OL';
+        else if (positionToSearch.startsWith('CB-')) positionToSearch = 'CB';
+        else if (positionToSearch.startsWith('S-')) positionToSearch = 'S';
+        else if (positionToSearch.startsWith('LB-')) positionToSearch = 'LB';
+        else if (positionToSearch.startsWith('DE-')) positionToSearch = 'DE';
+        else if (positionToSearch.startsWith('DT-')) positionToSearch = 'DT';
+        
+        const allPlayers = this.roster.filter(p => p.position === positionToSearch);
+        const assigned = this.depthChart[posCode] || [];
+        return allPlayers.filter(p => !assigned.some(a => a?.number === p.number));
+      }
+
+      addPlayer(position, depth, player) {
+        if (!this.depthChart[position]) {
+          this.depthChart[position] = [];
+        }
+        this.depthChart[position] = [...this.depthChart[position]];
+        this.depthChart[position][depth] = player;
+        this.showPlayerModal = false;
+        this.selectedSlot = null;
+        this.render();
+      }
+
+      removePlayer(pos, depth) {
+        this.depthChart[pos] = [...this.depthChart[pos]];
+        this.depthChart[pos][depth] = null;
+        this.render();
+      }
+
+      render() {
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <div class="max-w-7xl mx-auto p-4">
+            ${this.renderHeader()}
+            ${this.renderButtons()}
+            ${this.renderTabs()}
+            ${this.activeTab !== 'special' ? this.renderDepthSelector() : ''}
+            ${this.renderField()}
+          </div>
+          ${this.showPlayerModal ? this.renderPlayerModal() : ''}
+          ${this.showImportModal ? this.renderImportModal() : ''}
+        `;
+        this.attachEventListeners();
+      }
+
+      renderHeader() {
+        return `
+          <div class="bg-white text-blue-900 rounded-lg shadow-lg p-6 mb-6 border-4 border-blue-900">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+                PSU
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold mb-1">Penn State Football Depth Chart</h1>
+                <p class="text-blue-700">Click on any position to manage players</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      renderButtons() {
+        return `
+          <div class="flex flex-wrap gap-3 mb-6">
+            <button onclick="app.saveDepthChart()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-blue-900 border-2 border-blue-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              ${this.saving ? 'Saved!' : 'Save'}
+            </button>
+            <button onclick="app.showImportModal = true; app.render()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-blue-900 border-2 border-blue-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+              Import Roster
+            </button>
+            <button onclick="app.exportDepthChart()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-blue-900 border-2 border-blue-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              Export Chart
+            </button>
+            <button onclick="app.resetDepthChart()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-blue-900 border-2 border-blue-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+              </svg>
+              Reset
+            </button>
+          </div>
+        `;
+      }
+
+      renderTabs() {
+        const tabs = [
+          { key: 'offense', label: 'Offense' },
+          { key: 'defense', label: 'Defense' },
+          { key: 'special', label: 'Special Teams' }
+        ];
+        
+        return `
+          <div class="flex gap-2 mb-4">
+            ${tabs.map(tab => `
+              <button 
+                onclick="app.activeTab = '${tab.key}'; app.render()"
+                class="px-6 py-3 rounded-t-lg font-semibold transition-colors border-2 ${
+                  this.activeTab === tab.key
+                    ? 'bg-white text-blue-900 border-blue-900 shadow-md'
+                    : 'bg-blue-700 text-white border-blue-700 hover:bg-blue-600'
+                }"
+              >
+                ${tab.label}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      renderDepthSelector() {
+        return `
+          <div class="bg-white rounded-lg shadow-md p-4 mb-4 border-2 border-blue-900">
+            <div class="flex items-center gap-4">
+              <span class="font-semibold text-blue-900">Depth Level:</span>
+              <div class="flex gap-2">
+                ${[0, 1, 2].map(level => `
+                  <button
+                    onclick="app.depthLevel = ${level}; app.render()"
+                    class="px-4 py-2 rounded-lg font-semibold transition-colors border-2 ${
+                      this.depthLevel === level
+                        ? 'bg-blue-900 text-white border-blue-900'
+                        : 'bg-white text-blue-900 border-blue-900 hover:bg-blue-50'
+                    }"
+                  >
+                    ${level === 0 ? 'Starters' : `${level + 1}${level === 1 ? 'nd' : 'rd'} String`}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      renderField() {
+        const positions = POSITIONS[this.activeTab];
+        
+        return `
+          <div class="bg-green-700 rounded-lg shadow-lg p-8 relative" style="min-height: 600px;">
+            <div class="absolute inset-0 opacity-20">
+              ${[...Array(10)].map((_, i) => `
+                <div class="absolute left-0 right-0 border-t-2 border-white" style="top: ${(i + 1) * 10}%"></div>
+              `).join('')}
+            </div>
+            
+            ${positions.map((pos, index) => this.renderPosition(pos, index)).join('')}
+            
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-opacity-30 text-2xl font-bold">
+              ${this.activeTab === 'offense' ? 'OFFENSE' : this.activeTab === 'defense' ? 'DEFENSE' : 'SPECIAL TEAMS'}
+            </div>
+          </div>
+        `;
+      }
+
+      renderPosition(pos, index) {
+        const posKey = pos.isRight ? `${pos.code}-R` : pos.code;
+        const player = this.depthChart[posKey]?.[this.depthLevel];
+        
+        return `
+          <div 
+            class="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+            style="left: ${pos.x}%; top: ${pos.y}%;"
+            onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.depthLevel} }; app.showPlayerModal = true; app.render()"
+          >
+            <div class="${player ? 'bg-blue-900 hover:bg-blue-800' : 'bg-white hover:bg-blue-50 border-2 border-blue-900'} ${player ? 'text-white' : 'text-blue-900'} rounded-lg shadow-lg transition-all hover:scale-105 min-w-[80px] text-center">
+              <div class="px-2 py-1 ${player ? 'border-b border-white border-opacity-30' : 'border-b-2 border-blue-900'}">
+                <div class="text-xs font-bold">${pos.name}</div>
+              </div>
+              ${player ? `
+                <div class="px-2 py-2">
+                  <div class="font-bold text-sm">#${player.number}</div>
+                  <div class="text-xs truncate">${player.name.split(' ').pop()}</div>
+                </div>
+              ` : `
+                <div class="px-2 py-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }
+
+      renderPlayerModal() {
+        if (!this.selectedSlot) return '';
+        
+        const { position, depth } = this.selectedSlot;
+        const availablePlayers = this.getAvailablePlayers(position);
+        const currentPlayer = this.depthChart[position]?.[depth];
+        
+        return `
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
+              <div class="p-4 border-b flex items-center justify-between bg-blue-900 text-white">
+                <h2 class="text-xl font-bold">
+                  ${position.replace('-R', ' (Right)')} - ${depth === 0 ? 'Starter' : `${depth + 1}${depth === 1 ? 'nd' : depth === 2 ? 'rd' : 'th'} String`}
+                </h2>
+                <button onclick="app.showPlayerModal = false; app.selectedSlot = null; app.render()" class="text-white hover:text-gray-300">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="p-4 overflow-y-auto flex-1">
+                ${currentPlayer ? `
+                  <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="text-xs font-semibold text-blue-900 mb-1">Current Player</div>
+                    <div class="font-bold text-blue-900">#${currentPlayer.number} ${currentPlayer.name}</div>
+                    <div class="text-sm text-blue-700">${currentPlayer.year}</div>
+                    <button onclick="app.removePlayer('${position}', ${depth}); app.render()" class="mt-2 text-xs text-red-600 hover:text-red-800 font-semibold">
+                      Remove Player
+                    </button>
+                  </div>
+                ` : ''}
+
+                ${availablePlayers.length === 0 ? `
+                  <div class="text-center text-gray-500 py-8">No available players for this position</div>
+                ` : `
+                  <div class="space-y-2">
+                    ${availablePlayers.map(player => `
+                      <button
+                        onclick="app.addPlayer('${position}', ${depth}, ${JSON.stringify(player).replace(/"/g, '&quot;')})"
+                        class="w-full text-left bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-400 rounded-lg p-3 transition-colors"
+                      >
+                        <div class="font-semibold text-gray-900">#${player.number} ${player.name}</div>
+                        <div class="text-sm text-gray-600">${player.position} • ${player.year}</div>
+                      </button>
+                    `).join('')}
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      renderImportModal() {
+        return `
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+              <div class="p-4 border-b flex items-center justify-between bg-blue-900 text-white">
+                <h2 class="text-xl font-bold">Import Roster</h2>
+                <button onclick="app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render()" class="text-white hover:text-gray-300">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="p-4 overflow-y-auto flex-1">
+                <div class="mb-4">
+                  <p class="text-sm text-gray-700 mb-2">Paste roster data below. Each line should contain:</p>
+                  <div class="bg-gray-100 p-3 rounded text-sm font-mono mb-2">#19 Jack Lambert QB RJr</div>
+                  <p class="text-xs text-gray-600">Format: #Number Name Position Year (or use commas: 19, Jack Lambert, QB, RJr)</p>
+                </div>
+
+                <textarea
+                  id="importTextarea"
+                  placeholder="Paste roster data here..."
+                  class="w-full h-64 p-3 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none"
+                >${this.importText}</textarea>
+
+                ${this.importMessage ? `
+                  <div class="mt-3 p-3 rounded-lg ${
+                    this.importMessage.startsWith('✓') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                  }">
+                    ${this.importMessage}
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="p-4 border-t bg-gray-50 flex gap-3">
+                <button
+                  onclick="app.importRoster()"
+                  class="flex-1 bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Import Roster
+                </button>
+                <button
+                  onclick="app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render()"
+                  class="px-4 py-2 bg-white border-2 border-blue-900 text-blue-900 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      attachEventListeners() {
+        const textarea = document.getElementById('importTextarea');
+        if (textarea) {
+          textarea.addEventListener('input', (e) => {
+            this.importText = e.target.value;
+          });
+        }
+      }
+    }
+
+    const app = new DepthChartApp();
+  </script>
+</body>
+</html>

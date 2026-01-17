@@ -224,7 +224,7 @@
         { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 45, isRight: true },
         { code: 'TE', name: 'TE', fullName: 'Tight End', depth: 2, x: 78, y: 48 },
         { code: 'WR-SLOT', name: 'Slot', fullName: 'Slot Receiver', depth: 3, x: 85, y: 45 },
-        { code: 'WR-Y', name: 'Y', fullName: 'Flanker (Y Receiver)', depth: 3, x: 95, y: 45 },
+        { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
         { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 65 },
         { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 80 }
       ],
@@ -562,7 +562,7 @@
         text += `Generated: ${new Date().toLocaleDateString()}\n\n`;
         
         const sections = {
-          'OFFENSE': ['QB', 'RB', 'WR-X', 'WR-Y', 'WR-SLOT', 'TE', 'OT', 'OT-R', 'OG', 'OG-R', 'C'],
+          'OFFENSE': ['QB', 'RB', 'WR-X', 'WR-Z', 'WR-SLOT', 'TE', 'OT', 'OT-R', 'OG', 'OG-R', 'C'],
           'DEFENSE': ['DE-1', 'DE-2', 'DT-1', 'DT-2', 'LB-ILB', 'LB-OLB', 'LB-OLB-R', 'CB-X', 'CB-Y', 'CB-SLOT', 'S-FS', 'S-SS'],
           'SPECIAL TEAMS': ['K', 'P', 'LS']
         };

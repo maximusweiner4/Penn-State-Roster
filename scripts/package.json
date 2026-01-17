@@ -1,0 +1,13 @@
+{
+  "name": "psu-roster-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for Penn State football roster",
+  "scripts": {
+    "scrape": "node scrape-roster.js",
+    "update": "node update-html.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.6.0",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}

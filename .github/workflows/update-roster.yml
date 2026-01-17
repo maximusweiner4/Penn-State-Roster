@@ -1,0 +1,49 @@
+name: Update Penn State Roster
+
+on:
+  schedule:
+    # Run daily at 6 AM EST (11 AM UTC)
+    - cron: '0 11 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-roster:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: maximusweiner4.github.io
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install puppeteer cheerio
+
+      - name: Scrape roster
+        run: node scripts/scrape-roster.js
+
+      - name: Update HTML
+        run: node scripts/update-html.js
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet index.html || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Update roster from gopsusports.com
+
+          Automated update on $(date -u +%Y-%m-%d)"
+          git push

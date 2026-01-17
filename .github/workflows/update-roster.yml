@@ -29,6 +29,18 @@ jobs:
       - name: Scrape roster
         run: node scripts/scrape-roster.js
 
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-debug
+          path: |
+            scripts/page-debug.html
+            scripts/page-content.txt
+            scripts/roster.json
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Update HTML
         run: node scripts/update-html.js
 

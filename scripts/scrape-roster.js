@@ -35,6 +35,23 @@ const positionMap = {
   'SNP': 'LS'
 };
 
+// Map full year names to abbreviated codes
+const yearMap = {
+  'freshman': 'Fr.',
+  'sophomore': 'So.',
+  'junior': 'Jr.',
+  'senior': 'Sr.',
+  'redshirt freshman': 'R-Fr.',
+  'redshirt sophomore': 'R-So.',
+  'redshirt junior': 'R-Jr.',
+  'redshirt senior': 'R-Sr.',
+  'graduate': 'Grad',
+  'graduate student': 'Grad',
+  'grad': 'Grad',
+  '5th year': 'Sr.',
+  '6th year': 'Grad'
+};
+
 async function scrapeRoster() {
   console.log('Launching browser...');
   const browser = await puppeteer.launch({
@@ -68,111 +85,71 @@ async function scrapeRoster() {
     const players = await page.evaluate(() => {
       const playerList = [];
 
-      // Sidearm Sports specific selectors
-      const sidearmSelectors = [
-        // List view selectors
-        '.sidearm-roster-player-name a',
-        '.s-person-details__personal-single-line a',
-        '.s-person-card__content a[href*="/roster/"]',
-        // Table view selectors
-        'table.sidearm-table tbody tr',
-        '.sidearm-roster-table tbody tr',
-        // Card view selectors
-        '.s-person-card',
-        '.sidearm-roster-player',
-        // Generic roster selectors
-        '[class*="roster-player"]',
-        '[class*="roster"] li',
-        '[class*="roster"] article'
-      ];
-
-      // Try to find player links first (most reliable)
-      const playerLinks = document.querySelectorAll('a[href*="/sports/football/roster/"]');
-      console.log(`Found ${playerLinks.length} player links`);
-
-      if (playerLinks.length > 0) {
-        playerLinks.forEach(link => {
-          // Get the parent container
-          let container = link.closest('li, tr, article, [class*="card"], [class*="player"]');
-          if (!container) container = link.parentElement?.parentElement || link.parentElement;
-
-          const text = container ? container.textContent : '';
-          const name = link.textContent.trim();
-
-          if (name && name.length > 2 && name.length < 50 && !name.includes('Roster') && !name.includes('Full Bio')) {
-            // Try to find number - look for # followed by digits or just digits in a specific element
-            let number = 0;
-            const numberMatch = text.match(/#(\d+)/);
-            if (numberMatch) {
-              number = parseInt(numberMatch[1]);
-            } else {
-              // Look for standalone number
-              const numEl = container?.querySelector('[class*="number"], [class*="jersey"]');
-              if (numEl) {
-                const numText = numEl.textContent.replace(/\D/g, '');
-                if (numText && numText.length <= 2) number = parseInt(numText);
-              }
-            }
-
-            // Try to find position
-            let position = '';
-            const posMatch = text.match(/\b(QB|RB|FB|WR|TE|OL|OT|OG|DL|DT|NT|DE|LB|ILB|OLB|MLB|DB|CB|S|SS|FS|K|PK|P|LS|SNP|C)\b/i);
-            if (posMatch) {
-              position = posMatch[1].toUpperCase();
-            }
-
-            // Try to find year/class
-            let year = '';
-            const yearMatch = text.match(/\b(Fr\.|So\.|Jr\.|Sr\.|Freshman|Sophomore|Junior|Senior|R-Fr\.|R-So\.|R-Jr\.|R-Sr\.|Graduate|Grad|RS|GR)\b/i);
-            if (yearMatch) {
-              year = yearMatch[1];
-            }
-
-            playerList.push({ name, number, position, year });
-          }
-        });
+      // Target the roster table specifically (not staff table)
+      // The roster table is inside .roster-players section
+      const rosterSection = document.querySelector('.roster-players');
+      if (!rosterSection) {
+        console.log('No .roster-players section found');
+        return { raw: document.body.innerText.substring(0, 100000) };
       }
 
-      // If we found players with links, return them
+      const tableRows = rosterSection.querySelectorAll('table tbody tr');
+      console.log(`Found ${tableRows.length} player rows in roster table`);
+
+      tableRows.forEach(row => {
+        // Get all cells (td and th)
+        const cells = row.querySelectorAll('td, th');
+        if (cells.length < 4) return;
+
+        // Cell structure:
+        // 0: Jersey number
+        // 1: Name (th with link)
+        // 2: Position
+        // 3: Year/Class
+        // 4+: Height, Weight, Hometown, etc.
+
+        // Get jersey number from first cell
+        const numberText = cells[0]?.textContent?.trim() || '';
+        const number = parseInt(numberText) || 0;
+
+        // Get name from the link in cell 1
+        const nameLink = cells[1]?.querySelector('a.table__roster-name');
+        const name = nameLink?.textContent?.trim() || '';
+
+        // Get position from cell 2
+        const position = cells[2]?.textContent?.trim() || '';
+
+        // Get year from cell 3
+        const year = cells[3]?.textContent?.trim() || '';
+
+        if (name && name.length > 2 && name.length < 50) {
+          playerList.push({ name, number, position, year });
+        }
+      });
+
       if (playerList.length > 0) {
         return playerList;
       }
 
-      // Try table rows
-      const tableRows = document.querySelectorAll('table tbody tr');
-      console.log(`Found ${tableRows.length} table rows`);
+      // Fallback: try finding player links if table extraction fails
+      const playerLinks = document.querySelectorAll('.roster-players a[href*="/sports/football/roster/player/"]');
+      console.log(`Fallback: Found ${playerLinks.length} player links`);
 
-      if (tableRows.length > 0) {
-        tableRows.forEach(row => {
-          const cells = row.querySelectorAll('td');
-          if (cells.length >= 3) {
-            const text = row.textContent;
+      playerLinks.forEach(link => {
+        const row = link.closest('tr');
+        if (!row) return;
 
-            // Find name (usually in a link)
-            const nameLink = row.querySelector('a');
-            const name = nameLink ? nameLink.textContent.trim() : '';
+        const cells = row.querySelectorAll('td, th');
+        const numberText = cells[0]?.textContent?.trim() || '';
+        const number = parseInt(numberText) || 0;
+        const name = link.textContent?.trim() || '';
+        const position = cells[2]?.textContent?.trim() || '';
+        const year = cells[3]?.textContent?.trim() || '';
 
-            // Find number
-            let number = 0;
-            const numMatch = text.match(/#?(\d{1,2})\b/);
-            if (numMatch) number = parseInt(numMatch[1]);
-
-            // Find position
-            let position = '';
-            const posMatch = text.match(/\b(QB|RB|FB|WR|TE|OL|OT|OG|DL|DT|NT|DE|LB|ILB|OLB|MLB|DB|CB|S|SS|FS|K|PK|P|LS|SNP|C)\b/i);
-            if (posMatch) position = posMatch[1].toUpperCase();
-
-            // Find year
-            let year = '';
-            const yearMatch = text.match(/\b(Fr\.|So\.|Jr\.|Sr\.|Freshman|Sophomore|Junior|Senior|R-Fr\.|R-So\.|R-Jr\.|R-Sr\.|Graduate|Grad)\b/i);
-            if (yearMatch) year = yearMatch[1];
-
-            if (name && name.length > 2 && name.length < 50) {
-              playerList.push({ name, number, position, year });
-            }
-          }
-        });
-      }
+        if (name && name.length > 2 && name.length < 50) {
+          playerList.push({ name, number, position, year });
+        }
+      });
 
       if (playerList.length > 0) {
         return playerList;
@@ -238,12 +215,18 @@ async function scrapeRoster() {
     // Clean up and normalize the data
     const cleanedPlayers = players
       .filter(p => p.name && p.name.length > 2)
-      .map(p => ({
-        name: p.name.replace(/\s+/g, ' ').trim(),
-        number: p.number || 0,
-        position: positionMap[p.position] || p.position || 'Unknown',
-        year: p.year || 'Unknown'
-      }));
+      .map(p => {
+        // Normalize year - try lowercase lookup first
+        const yearLower = (p.year || '').toLowerCase().trim();
+        const normalizedYear = yearMap[yearLower] || p.year || 'Unknown';
+
+        return {
+          name: p.name.replace(/\s+/g, ' ').trim(),
+          number: p.number || 0,
+          position: positionMap[p.position] || p.position || 'Unknown',
+          year: normalizedYear
+        };
+      });
 
     // Remove duplicates
     const uniquePlayers = [];

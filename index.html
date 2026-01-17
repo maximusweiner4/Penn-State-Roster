@@ -175,12 +175,37 @@
     /* Mobile responsive field */
     @media (max-width: 768px) {
       .field-container {
-        min-height: 500px;
+        min-height: auto;
+        padding: 1rem;
       }
       .position-card-inner {
-        min-width: 60px !important;
+        min-width: 56px !important;
+        font-size: 9px;
+      }
+      .position-card-inner .text-xs {
+        font-size: 8px;
+      }
+      .position-card-inner .text-sm {
         font-size: 10px;
       }
+      .position-card-inner .w-8 {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+    
+    /* Portrait mode on mobile - switch to list view */
+    @media (max-width: 640px) and (orientation: portrait) {
+      .field-view {
+        display: none;
+      }
+      .mobile-list-view {
+        display: block !important;
+      }
+    }
+    
+    .mobile-list-view {
+      display: none;
     }
   </style>
 </head>
@@ -1023,7 +1048,8 @@
         const positions = POSITIONS[this.activeTab];
         
         return `
-          <div class="field-container bg-gradient-to-b from-field-green to-field-light rounded-lg shadow-lg p-4 md:p-8 relative overflow-hidden" style="min-height: 600px;">
+          <!-- Desktop/Landscape Field View -->
+          <div class="field-view field-container bg-gradient-to-b from-field-green to-field-light rounded-lg shadow-lg p-4 md:p-8 relative overflow-hidden" style="min-height: 600px;">
             <!-- Field markings -->
             <div class="field-lines absolute inset-0 pointer-events-none"></div>
             
@@ -1040,6 +1066,18 @@
             <!-- Print header -->
             <div class="print-only absolute top-2 left-2 text-sm text-gray-600">
               Penn State Football Depth Chart - ${new Date().toLocaleDateString()}
+            </div>
+          </div>
+          
+          <!-- Mobile Portrait List View -->
+          <div class="mobile-list-view bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-field-green p-3 text-center">
+              <span class="text-white font-display text-xl font-bold tracking-widest">
+                ${this.activeTab === 'offense' ? 'OFFENSE' : this.activeTab === 'defense' ? 'DEFENSE' : 'SPECIAL TEAMS'}
+              </span>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+              ${positions.map((pos, index) => this.renderMobilePosition(pos, index)).join('')}
             </div>
           </div>
         `;
@@ -1090,6 +1128,51 @@
                   </svg>
                 </div>
               `}
+            </div>
+          </div>
+        `;
+      }
+
+      renderMobilePosition(pos, index) {
+        const posKey = pos.isRight ? `${pos.code}-R` : pos.code;
+        const player = this.depthChart[posKey]?.[this.depthLevel];
+        
+        return `
+          <div 
+            class="flex items-center p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors"
+            onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.depthLevel} }; app.showPlayerModal = true; app.render()"
+          >
+            <div class="w-16 flex-shrink-0">
+              <div class="bg-psu-blue dark:bg-psu-light text-white text-center py-1 px-2 rounded font-display font-bold text-sm">
+                ${pos.name}
+              </div>
+            </div>
+            <div class="flex-1 ml-3">
+              <div class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">${pos.fullName}</div>
+              ${player ? `
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-psu-blue dark:bg-psu-light text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    ${this.getPlayerInitials(player.name)}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-900 dark:text-white text-sm">#${player.number} ${player.name}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">${player.year}</div>
+                  </div>
+                </div>
+              ` : `
+                <div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  <span class="text-sm">Tap to assign player</span>
+                </div>
+              `}
+            </div>
+            <div class="flex-shrink-0 text-gray-400 dark:text-gray-500">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
             </div>
           </div>
         `;

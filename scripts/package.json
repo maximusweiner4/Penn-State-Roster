@@ -7,7 +7,7 @@
     "update": "node update-html.js"
   },
   "dependencies": {
-    "puppeteer": "^21.6.0",
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0-rc.12",
+    "puppeteer": "^24.35.0"
   }
 }

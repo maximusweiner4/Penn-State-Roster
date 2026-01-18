@@ -106,15 +106,20 @@ async function scrapeRoster() {
         // 1: Name (th with link)
         // 2: Position
         // 3: Year/Class
-        // 4+: Height, Weight, Hometown, etc.
+        // 4: Height
+        // 5: Weight
+        // 6: Hometown
+        // 7: High School
+        // 8: Previous School
 
         // Get jersey number from first cell
         const numberText = cells[0]?.textContent?.trim() || '';
         const number = parseInt(numberText) || 0;
 
-        // Get name from the link in cell 1
+        // Get name and URL from the link in cell 1
         const nameLink = cells[1]?.querySelector('a.table__roster-name');
         const name = nameLink?.textContent?.trim() || '';
+        const playerUrl = nameLink?.getAttribute('href') || '';
 
         // Get position from cell 2
         const position = cells[2]?.textContent?.trim() || '';
@@ -122,8 +127,34 @@ async function scrapeRoster() {
         // Get year from cell 3
         const year = cells[3]?.textContent?.trim() || '';
 
+        // Get height from cell 4
+        const height = cells[4]?.textContent?.trim() || '';
+
+        // Get weight from cell 5
+        const weight = cells[5]?.textContent?.trim() || '';
+
+        // Get hometown from cell 6
+        const hometown = cells[6]?.textContent?.trim() || '';
+
+        // Get high school from cell 7
+        const highSchool = cells[7]?.textContent?.trim() || '';
+
+        // Get previous school from cell 8 (for transfers)
+        const previousSchool = cells[8]?.textContent?.trim() || '';
+
         if (name && name.length > 2 && name.length < 50) {
-          playerList.push({ name, number, position, year });
+          playerList.push({
+            name,
+            number,
+            position,
+            year,
+            height,
+            weight,
+            hometown,
+            highSchool,
+            previousSchool,
+            playerUrl
+          });
         }
       });
 
@@ -143,11 +174,28 @@ async function scrapeRoster() {
         const numberText = cells[0]?.textContent?.trim() || '';
         const number = parseInt(numberText) || 0;
         const name = link.textContent?.trim() || '';
+        const playerUrl = link.getAttribute('href') || '';
         const position = cells[2]?.textContent?.trim() || '';
         const year = cells[3]?.textContent?.trim() || '';
+        const height = cells[4]?.textContent?.trim() || '';
+        const weight = cells[5]?.textContent?.trim() || '';
+        const hometown = cells[6]?.textContent?.trim() || '';
+        const highSchool = cells[7]?.textContent?.trim() || '';
+        const previousSchool = cells[8]?.textContent?.trim() || '';
 
         if (name && name.length > 2 && name.length < 50) {
-          playerList.push({ name, number, position, year });
+          playerList.push({
+            name,
+            number,
+            position,
+            year,
+            height,
+            weight,
+            hometown,
+            highSchool,
+            previousSchool,
+            playerUrl
+          });
         }
       });
 
@@ -220,11 +268,20 @@ async function scrapeRoster() {
         const yearLower = (p.year || '').toLowerCase().trim();
         const normalizedYear = yearMap[yearLower] || p.year || 'Unknown';
 
+        // Build full player URL
+        const fullUrl = p.playerUrl ? `https://gopsusports.com${p.playerUrl}` : '';
+
         return {
           name: p.name.replace(/\s+/g, ' ').trim(),
           number: p.number || 0,
           position: positionMap[p.position] || p.position || 'Unknown',
-          year: normalizedYear
+          year: normalizedYear,
+          height: p.height || '',
+          weight: p.weight || '',
+          hometown: p.hometown || '',
+          highSchool: p.highSchool || '',
+          previousSchool: p.previousSchool || '',
+          url: fullUrl
         };
       });
 

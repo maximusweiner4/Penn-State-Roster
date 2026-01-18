@@ -23,9 +23,14 @@ function updateHtml() {
 
   // Format roster as JavaScript array
   const rosterJs = roster.map(player => {
-    // Escape single quotes in names
+    // Escape single quotes in names and other string fields
     const safeName = player.name.replace(/'/g, "\\'");
-    return `      { name: '${safeName}', number: ${player.number}, position: '${player.position}', year: '${player.year}' }`;
+    const safeHometown = (player.hometown || '').replace(/'/g, "\\'");
+    const safeHighSchool = (player.highSchool || '').replace(/'/g, "\\'");
+    const safePreviousSchool = (player.previousSchool || '').replace(/'/g, "\\'");
+    const safeUrl = player.url || '';
+
+    return `      { name: '${safeName}', number: ${player.number}, position: '${player.position}', year: '${player.year}', height: '${player.height || ''}', weight: '${player.weight || ''}', hometown: '${safeHometown}', highSchool: '${safeHighSchool}', previousSchool: '${safePreviousSchool}', url: '${safeUrl}' }`;
   }).join(',\n');
 
   const newRosterBlock = `const DEFAULT_ROSTER = [\n${rosterJs}\n    ];`;

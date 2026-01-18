@@ -606,20 +606,31 @@
         else if (positionToSearch.startsWith('LB-')) positionToSearch = 'LB';
         else if (positionToSearch.startsWith('DE-')) positionToSearch = 'DE';
         else if (positionToSearch.startsWith('DT-')) positionToSearch = 'DT';
-        
+
         const allPlayers = this.roster.filter(p => p.position === positionToSearch);
-        const assigned = this.depthChart[posCode] || [];
-        let available = allPlayers.filter(p => !assigned.some(a => a?.number === p.number));
-        
+
+        // Get all players assigned to ANY position in the entire depth chart
+        const allAssigned = [];
+        Object.values(this.depthChart).forEach(depthArray => {
+          depthArray.forEach(player => {
+            if (player) allAssigned.push(player);
+          });
+        });
+
+        // Filter out players already assigned anywhere
+        let available = allPlayers.filter(p =>
+          !allAssigned.some(a => a.number === p.number && a.name === p.name)
+        );
+
         // Apply search filter
         if (this.searchQuery.trim()) {
           const query = this.searchQuery.toLowerCase();
-          available = available.filter(p => 
-            p.name.toLowerCase().includes(query) || 
+          available = available.filter(p =>
+            p.name.toLowerCase().includes(query) ||
             p.number.toString().includes(query)
           );
         }
-        
+
         return available;
       }
 

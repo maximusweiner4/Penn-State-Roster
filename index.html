@@ -607,10 +607,10 @@
         else if (positionToSearch.startsWith('DE-')) positionToSearch = 'DE';
         else if (positionToSearch.startsWith('DT-')) positionToSearch = 'DT';
 
-        // Allow DB players to be placed at both CB and Safety positions
+        // Allow CB, S, and DB players to be placed at any defensive back position (CB or Safety)
         let positionsToInclude = [positionToSearch];
         if (positionToSearch === 'CB' || positionToSearch === 'S') {
-          positionsToInclude.push('DB');
+          positionsToInclude = ['CB', 'S', 'DB'];
         }
 
         const allPlayers = this.roster.filter(p => positionsToInclude.includes(p.position));

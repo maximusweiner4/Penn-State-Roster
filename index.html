@@ -458,9 +458,7 @@
       initializeEmptyChart() {
         Object.values(POSITIONS).flat().forEach(pos => {
           const key = pos.isRight ? `${pos.code}-R` : pos.code;
-          if (!this.depthChart[key]) {
-            this.depthChart[key] = Array(pos.depth).fill(null);
-          }
+          this.depthChart[key] = Array(pos.depth).fill(null);
         });
       }
 

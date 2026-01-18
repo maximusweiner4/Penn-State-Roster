@@ -1,0 +1,6 @@
+node_modules/
+scripts/node_modules/
+scripts/page-debug.html
+scripts/page-content.txt
+debug-artifacts/
+*.log

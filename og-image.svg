@@ -1,0 +1,49 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#041E42"/>
+      <stop offset="100%" style="stop-color:#1E407C"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D5A27"/>
+      <stop offset="100%" style="stop-color:#1E4A1E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Field representation -->
+  <rect x="50" y="180" width="500" height="350" rx="10" fill="url(#field)" opacity="0.9"/>
+
+  <!-- Field lines -->
+  <line x1="50" y1="250" x2="550" y2="250" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="320" x2="550" y2="320" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="390" x2="550" y2="390" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="460" x2="550" y2="460" stroke="white" stroke-width="2" opacity="0.3"/>
+
+  <!-- Position dots -->
+  <circle cx="300" cy="280" r="20" fill="white"/>
+  <circle cx="150" cy="250" r="15" fill="white" opacity="0.8"/>
+  <circle cx="450" cy="250" r="15" fill="white" opacity="0.8"/>
+  <circle cx="200" cy="320" r="15" fill="white" opacity="0.8"/>
+  <circle cx="400" cy="320" r="15" fill="white" opacity="0.8"/>
+  <circle cx="300" cy="380" r="18" fill="white"/>
+  <circle cx="300" cy="460" r="16" fill="white" opacity="0.9"/>
+
+  <!-- Text content -->
+  <text x="850" y="200" font-family="Arial Black, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">PENN STATE</text>
+  <text x="850" y="290" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" opacity="0.9">FOOTBALL</text>
+  <text x="850" y="380" font-family="Arial, sans-serif" font-size="42" fill="white" text-anchor="middle">DEPTH CHART</text>
+  <text x="850" y="440" font-family="Arial, sans-serif" font-size="36" fill="white" text-anchor="middle" opacity="0.8">BUILDER</text>
+
+  <!-- Tagline -->
+  <text x="850" y="520" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.7">Create &amp; Share Your Predictions</text>
+
+  <!-- URL -->
+  <text x="850" y="580" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle" font-weight="bold">psudepthchart.com</text>
+
+  <!-- WE ARE badge -->
+  <rect x="620" y="70" width="460" height="60" rx="30" fill="white" opacity="0.15"/>
+  <text x="850" y="112" font-family="Arial Black, sans-serif" font-size="32" fill="white" text-anchor="middle">#WeAre</text>
+</svg>

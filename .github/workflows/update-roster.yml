@@ -1,9 +1,9 @@
 name: Update Penn State Roster
 
 on:
-  # schedule:
-  #   # Run daily at 6 AM EST (11 AM UTC) - DISABLED until scraper is fixed
-  #   - cron: '0 11 * * *'
+  schedule:
+    # Run daily at 6 AM EST (11 AM UTC)
+    - cron: '0 11 * * *'
   workflow_dispatch: # Allow manual triggering
 
 permissions:

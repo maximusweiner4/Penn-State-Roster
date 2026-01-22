@@ -24,7 +24,7 @@ const positionMap = {
   'ILB': 'LB',
   'OLB': 'LB',
   'MLB': 'LB',
-  'DB': 'CB',
+  'DB': 'DB',
   'CB': 'CB',
   'S': 'S',
   'SS': 'S',

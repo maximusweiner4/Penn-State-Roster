@@ -462,19 +462,37 @@
         }, 500);
       }
 
-      // Encode depth chart to shareable string
+      // Encode depth chart to shareable string (compact format)
       encodeChart() {
-        const data = {
-          chart: this.depthChart,
-          version: 1
-        };
-        return btoa(JSON.stringify(data));
+        const compact = {};
+        for (const [pos, players] of Object.entries(this.depthChart)) {
+          const nums = players.map(p => p ? p.number : 0);
+          if (nums.some(n => n !== 0)) {
+            compact[pos] = nums.filter((n, i) => nums.slice(0, i + 1).some(x => x !== 0));
+          }
+        }
+        const parts = Object.entries(compact).map(([pos, nums]) => pos + ':' + nums.join(','));
+        return btoa(parts.join(';'));
       }
 
       // Decode shareable string to depth chart
       decodeChart(encoded) {
         try {
-          const data = JSON.parse(atob(encoded));
+          const decoded = atob(encoded);
+          if (decoded.includes(':') && decoded.includes(';')) {
+            const chart = {};
+            const parts = decoded.split(';');
+            for (const part of parts) {
+              const [pos, numsStr] = part.split(':');
+              const nums = numsStr.split(',').map(n => parseInt(n) || 0);
+              chart[pos] = nums.map(num => {
+                if (num === 0) return null;
+                return this.roster.find(p => p.number === num) || null;
+              });
+            }
+            return chart;
+          }
+          const data = JSON.parse(decoded);
           if (data.chart) {
             return data.chart;
           }
@@ -483,6 +501,7 @@
         }
         return null;
       }
+
 
       // Load chart from URL hash if present
       loadFromUrlHash() {

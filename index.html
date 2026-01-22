@@ -970,6 +970,16 @@
         window.print();
       }
 
+      getPlayerLastName(name) {
+        const suffixes = ["Jr.", "Sr.", "II", "III", "IV", "V"];
+        const parts = name.split(" ");
+        let lastPart = parts.pop();
+        if (suffixes.includes(lastPart) && parts.length > 0) {
+          lastPart = parts.pop();
+        }
+        return lastPart;
+      }
+
       getPlayerInitials(name) {
         return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
       }
@@ -1370,7 +1380,7 @@
                     ${this.getPlayerInitials(player.name)}
                   </div>
                   <div class="font-display font-bold text-sm">#${player.number}</div>
-                  <div class="text-xs truncate max-w-[70px]" title="${player.name}${player.height ? ' • ' + player.height : ''}${player.weight ? ' • ' + player.weight : ''}">${player.name.split(' ').pop()}</div>
+                  <div class="text-xs truncate max-w-[70px]" title="${player.name}${player.height ? ' • ' + player.height : ''}${player.weight ? ' • ' + player.weight : ''}">${this.getPlayerLastName(player.name)}</div>
                   <button onclick="event.stopPropagation(); app.viewPlayerDetails(${JSON.stringify(player).replace(/"/g, '&quot;')})" class="inline-block mt-1 text-white/70 hover:text-white" title="View player info">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="12" r="10"/>

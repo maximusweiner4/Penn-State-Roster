@@ -462,13 +462,26 @@
         }, 500);
       }
 
+      // Position code mappings for shorter URLs
+      posToShort = {
+        'QB': 'q', 'RB': 'r', 'WR-X': 'wx', 'WR-Y': 'wy', 'WR-SLOT': 'ws', 'WR-Z': 'wz', 'TE': 't',
+        'OT': 'ot', 'OG': 'og', 'C': 'c', 'OT-R': 'otr', 'OG-R': 'ogr',
+        'DE-1': 'd1', 'DE-2': 'd2', 'DT-1': 't1', 'DT-2': 't2',
+        'LB-OLB': 'lo', 'LB-OLB-R': 'lor', 'LB-ILB': 'li',
+        'CB-X': 'cx', 'CB-Y': 'cy', 'CB-SLOT': 'cs',
+        'S-FS': 'fs', 'S-SS': 'ss',
+        'K': 'k', 'P': 'p', 'LS': 'ls'
+      };
+      shortToPos = Object.fromEntries(Object.entries(this.posToShort).map(([k,v]) => [v,k]));
+
       // Encode depth chart to shareable string (compact format)
       encodeChart() {
         const compact = {};
         for (const [pos, players] of Object.entries(this.depthChart)) {
           const nums = players.map(p => p ? p.number : 0);
           if (nums.some(n => n !== 0)) {
-            compact[pos] = nums.filter((n, i) => nums.slice(0, i + 1).some(x => x !== 0));
+            const shortPos = this.posToShort[pos] || pos;
+            compact[shortPos] = nums.filter((n, i) => nums.slice(0, i + 1).some(x => x !== 0));
           }
         }
         const parts = Object.entries(compact).map(([pos, nums]) => pos + ':' + nums.join(','));
@@ -479,11 +492,12 @@
       decodeChart(encoded) {
         try {
           const decoded = atob(encoded);
-          if (decoded.includes(':') && decoded.includes(';')) {
+          if (decoded.includes(':')) {
             const chart = {};
             const parts = decoded.split(';');
             for (const part of parts) {
-              const [pos, numsStr] = part.split(':');
+              const [shortPos, numsStr] = part.split(':');
+              const pos = this.shortToPos[shortPos] || shortPos;
               const nums = numsStr.split(',').map(n => parseInt(n) || 0);
               chart[pos] = nums.map(num => {
                 if (num === 0) return null;
@@ -501,6 +515,7 @@
         }
         return null;
       }
+
 
 
       // Load chart from URL hash if present

@@ -3,62 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penn State Football Depth Chart Builder | PSU Depth Chart 2026</title>
-
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Build and customize your own Penn State Nittany Lions football depth chart. Interactive tool with the full 2026 roster - create, save, and share your predictions.">
-  <meta name="keywords" content="Penn State football, PSU depth chart, Nittany Lions roster, Penn State 2026, college football depth chart, PSU football roster">
-  <meta name="author" content="PSU Depth Chart">
-  <meta name="robots" content="index, follow">
-  <meta name="google-site-verification" content="6jE-kIiYjsJqoIuHtaaJp4A-JDpcdfwVAcDynWfG2rY" />
-  <link rel="canonical" href="https://psudepthchart.com/">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="apple-touch-icon" href="/icon-192.png">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#041E42">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PSU Depth Chart">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://psudepthchart.com/">
-  <meta property="og:title" content="Penn State Football Depth Chart Builder">
-  <meta property="og:description" content="Build and customize your own Penn State Nittany Lions football depth chart. Interactive tool with the full 2026 roster.">
-  <meta property="og:image" content="https://psudepthchart.com/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:site_name" content="PSU Depth Chart">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://psudepthchart.com/">
-  <meta name="twitter:title" content="Penn State Football Depth Chart Builder">
-  <meta name="twitter:description" content="Build and customize your own Penn State Nittany Lions football depth chart. Interactive tool with the full 2026 roster.">
-  <meta name="twitter:image" content="https://psudepthchart.com/og-image.png">
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Penn State Football Depth Chart Builder",
-    "description": "Build and customize your own Penn State Nittany Lions football depth chart with the full 2026 roster.",
-    "url": "https://psudepthchart.com",
-    "applicationCategory": "SportsApplication",
-    "operatingSystem": "Any",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "author": {
-      "@type": "Organization",
-      "name": "PSU Depth Chart"
-    }
-  }
-  </script>
-
+  <title>Penn State Football Depth Chart Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,13 +13,6 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            'psu-blue': '#041E42',
-            'psu-light': '#1E407C',
-            'psu-white': '#FFFFFF',
-            'field-green': '#2D5A27',
-            'field-light': '#3D7A37',
-          },
           fontFamily: {
             'display': ['Oswald', 'sans-serif'],
             'body': ['Source Sans 3', 'sans-serif'],
@@ -90,7 +28,7 @@
     .font-display {
       font-family: 'Oswald', sans-serif;
     }
-    
+
     /* Animations */
     @keyframes spin {
       from { transform: rotate(0deg); }
@@ -100,31 +38,14 @@
       from { opacity: 0.7; }
       to { opacity: 1; }
     }
-    @keyframes slideIn {
-      from { opacity: 0.8; }
-      to { opacity: 1; }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
     @keyframes savedPop {
       0% { opacity: 0.7; }
       100% { opacity: 1; }
     }
     .animate-spin { animation: spin 1s linear infinite; }
     .animate-fadeIn { animation: fadeIn 0.15s ease-out forwards; }
-    .animate-slideIn { animation: slideIn 0.15s ease-out forwards; }
-    .animate-pulse { animation: pulse 2s ease-in-out infinite; }
     .animate-savedPop { animation: savedPop 0.2s ease-out; }
-    
-    /* Staggered animations */
-    .stagger-1 { animation-delay: 0.05s; }
-    .stagger-2 { animation-delay: 0.1s; }
-    .stagger-3 { animation-delay: 0.15s; }
-    .stagger-4 { animation-delay: 0.2s; }
-    .stagger-5 { animation-delay: 0.25s; }
-    
+
     /* Loading skeleton */
     .skeleton {
       background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
@@ -135,21 +56,18 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    
-    /* Dark mode skeleton */
+
     .dark .skeleton {
       background: linear-gradient(90deg, #374151 25%, #4B5563 50%, #374151 75%);
       background-size: 200% 100%;
     }
-    
+
     /* Drag and drop styles */
     .dragging { opacity: 0.5; transform: scale(1.05); }
     .drag-over { box-shadow: 0 0 0 3px #FCD34D; }
-    
+
     /* Tooltip styles */
-    .tooltip {
-      position: relative;
-    }
+    .tooltip { position: relative; }
     .tooltip::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -164,26 +82,21 @@
       white-space: nowrap;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
+      transition: opacity 0.2s;
       z-index: 100;
       margin-bottom: 8px;
     }
-    .tooltip:hover::after {
-      opacity: 1;
-    }
-    
+    .tooltip:hover::after { opacity: 1; }
+
     /* Print styles */
     @media print {
       .no-print { display: none !important; }
       body { background: white !important; }
-      .print-only { display: block !important; }
-      .bg-gradient-to-br { background: white !important; }
     }
-    .print-only { display: none; }
-    
+
     /* Field lines */
     .field-lines {
-      background-image: 
+      background-image:
         repeating-linear-gradient(
           0deg,
           transparent,
@@ -192,8 +105,8 @@
           rgba(255,255,255,0.15) 10%
         );
     }
-    
-    /* Position card hover - subtle effect for better usability */
+
+    /* Position card hover */
     .position-card {
       transition: box-shadow 0.15s ease, z-index 0s;
     }
@@ -203,72 +116,230 @@
     .position-card:hover .position-card-inner {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-    
+
     /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #041E42;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #1E407C;
-    }
-    .dark ::-webkit-scrollbar-track {
-      background: #374151;
-    }
-    .dark ::-webkit-scrollbar-thumb {
-      background: #6B7280;
-    }
-    
-    /* Mobile responsive field */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--primary-color, #1a1a2e); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary-light, #2a2a4e); }
+
+    /* Mobile responsive */
     @media (max-width: 768px) {
-      .field-container {
-        min-height: auto;
-        padding: 1rem;
-      }
+      .field-container { min-height: auto; padding: 1rem; }
       .position-card-inner {
         min-width: 56px !important;
         font-size: 9px;
       }
-      .position-card-inner .text-xs {
-        font-size: 8px;
-      }
-      .position-card-inner .text-sm {
-        font-size: 10px;
-      }
-      .position-card-inner .w-8 {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
     }
-    
-    /* Portrait mode on mobile - switch to list view */
+
     @media (max-width: 640px) and (orientation: portrait) {
-      .field-view {
-        display: none;
-      }
-      .mobile-list-view {
-        display: block !important;
-      }
+      .field-view { display: none; }
+      .mobile-list-view { display: block !important; }
     }
-    
-    .mobile-list-view {
-      display: none;
-    }
+
+    .mobile-list-view { display: none; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-psu-blue via-psu-light to-psu-blue min-h-screen transition-colors duration-300">
+<body class="min-h-screen transition-colors duration-300">
   <div id="app"></div>
 
   <script>
-    // Position definitions with full names for tooltips
+    // Position definitions
+    // Formation definitions for offense and defense
+    const FORMATIONS = {
+      offense: {
+        'spread': {
+          name: 'Spread (10 Personnel)',
+          description: '1 RB, 0 TE, 4 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'WR-SLOT', name: 'Slot', fullName: 'Slot Receiver (Left)', depth: 3, x: 20, y: 45 },
+            { code: 'WR-SLOT-R', name: 'Slot', fullName: 'Slot Receiver (Right)', depth: 3, x: 80, y: 45, isRight: true },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 62 },
+            { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 82 }
+          ]
+        },
+        'pro': {
+          name: 'Pro Style (11 Personnel)',
+          description: '1 RB, 1 TE, 3 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'TE', name: 'TE', fullName: 'Tight End', depth: 2, x: 78, y: 42 },
+            { code: 'WR-SLOT', name: 'Slot', fullName: 'Slot Receiver', depth: 3, x: 85, y: 45 },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 62 },
+            { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 82 }
+          ]
+        },
+        'i-form': {
+          name: 'I-Formation (21 Personnel)',
+          description: '2 RB, 1 TE, 2 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'TE', name: 'TE', fullName: 'Tight End', depth: 2, x: 78, y: 42 },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 58 },
+            { code: 'FB', name: 'FB', fullName: 'Fullback', depth: 2, x: 50, y: 72 },
+            { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 86 }
+          ]
+        },
+        'pistol': {
+          name: 'Pistol (11 Personnel)',
+          description: '1 RB, 1 TE, 3 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'TE', name: 'TE', fullName: 'Tight End', depth: 2, x: 78, y: 42 },
+            { code: 'WR-SLOT', name: 'Slot', fullName: 'Slot Receiver', depth: 3, x: 85, y: 45 },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 58 },
+            { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 75 }
+          ]
+        },
+        '12-personnel': {
+          name: '12 Personnel',
+          description: '1 RB, 2 TE, 2 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'TE', name: 'TE', fullName: 'Tight End (Y)', depth: 2, x: 78, y: 42 },
+            { code: 'TE-2', name: 'TE2', fullName: 'Tight End (F)', depth: 2, x: 22, y: 42 },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 62 },
+            { code: 'RB', name: 'RB', fullName: 'Running Back', depth: 3, x: 50, y: 82 }
+          ]
+        },
+        'empty': {
+          name: 'Empty (10 Personnel)',
+          description: '0 RB, 1 TE, 4 WR',
+          positions: [
+            { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
+            { code: 'OT', name: 'LT', fullName: 'Left Tackle', depth: 4, x: 30, y: 42 },
+            { code: 'OG', name: 'LG', fullName: 'Left Guard', depth: 4, x: 40, y: 42 },
+            { code: 'C', name: 'C', fullName: 'Center', depth: 3, x: 50, y: 42 },
+            { code: 'OG', name: 'RG', fullName: 'Right Guard', depth: 4, x: 60, y: 42, isRight: true },
+            { code: 'OT', name: 'RT', fullName: 'Right Tackle', depth: 4, x: 70, y: 42, isRight: true },
+            { code: 'TE', name: 'TE', fullName: 'Tight End', depth: 2, x: 78, y: 42 },
+            { code: 'WR-SLOT', name: 'Slot', fullName: 'Slot Receiver (Left)', depth: 3, x: 18, y: 45 },
+            { code: 'WR-SLOT-R', name: 'Slot', fullName: 'Slot Receiver (Right)', depth: 3, x: 88, y: 45, isRight: true },
+            { code: 'WR-Z', name: 'Z', fullName: 'Flanker (Z Receiver)', depth: 3, x: 95, y: 45 },
+            { code: 'QB', name: 'QB', fullName: 'Quarterback', depth: 2, x: 50, y: 62 }
+          ]
+        }
+      },
+      defense: {
+        '4-3': {
+          name: '4-3 Defense',
+          description: '4 DL, 3 LB, 4 DB',
+          positions: [
+            { code: 'CB-X', name: 'CB', fullName: 'Cornerback (Left)', depth: 3, x: 5, y: 40 },
+            { code: 'DE-1', name: 'DE', fullName: 'Defensive End (Left)', depth: 3, x: 32, y: 40 },
+            { code: 'DT-1', name: 'DT', fullName: 'Defensive Tackle (Left)', depth: 3, x: 44, y: 40 },
+            { code: 'DT-2', name: 'DT', fullName: 'Defensive Tackle (Right)', depth: 3, x: 56, y: 40 },
+            { code: 'DE-2', name: 'DE', fullName: 'Defensive End (Right)', depth: 3, x: 68, y: 40 },
+            { code: 'CB-Y', name: 'CB', fullName: 'Cornerback (Right)', depth: 3, x: 95, y: 40 },
+            { code: 'LB-WLB', name: 'WLB', fullName: 'Weak Side Linebacker', depth: 3, x: 30, y: 60 },
+            { code: 'LB-MLB', name: 'MLB', fullName: 'Middle Linebacker', depth: 3, x: 50, y: 60 },
+            { code: 'LB-SLB', name: 'SLB', fullName: 'Strong Side Linebacker', depth: 3, x: 70, y: 60 },
+            { code: 'S-FS', name: 'FS', fullName: 'Free Safety', depth: 3, x: 40, y: 80 },
+            { code: 'S-SS', name: 'SS', fullName: 'Strong Safety', depth: 3, x: 60, y: 80 }
+          ]
+        },
+        '3-4': {
+          name: '3-4 Defense',
+          description: '3 DL, 4 LB, 4 DB',
+          positions: [
+            { code: 'CB-X', name: 'CB', fullName: 'Cornerback (Left)', depth: 3, x: 5, y: 40 },
+            { code: 'DE-1', name: 'DE', fullName: 'Defensive End (Left)', depth: 3, x: 35, y: 40 },
+            { code: 'NT', name: 'NT', fullName: 'Nose Tackle', depth: 3, x: 50, y: 40 },
+            { code: 'DE-2', name: 'DE', fullName: 'Defensive End (Right)', depth: 3, x: 65, y: 40 },
+            { code: 'CB-Y', name: 'CB', fullName: 'Cornerback (Right)', depth: 3, x: 95, y: 40 },
+            { code: 'LB-LOLB', name: 'LOLB', fullName: 'Left Outside Linebacker', depth: 3, x: 25, y: 55 },
+            { code: 'LB-LILB', name: 'LILB', fullName: 'Left Inside Linebacker', depth: 3, x: 42, y: 60 },
+            { code: 'LB-RILB', name: 'RILB', fullName: 'Right Inside Linebacker', depth: 3, x: 58, y: 60 },
+            { code: 'LB-ROLB', name: 'ROLB', fullName: 'Right Outside Linebacker', depth: 3, x: 75, y: 55 },
+            { code: 'S-FS', name: 'FS', fullName: 'Free Safety', depth: 3, x: 40, y: 80 },
+            { code: 'S-SS', name: 'SS', fullName: 'Strong Safety', depth: 3, x: 60, y: 80 }
+          ]
+        },
+        'nickel': {
+          name: 'Nickel (4-2-5)',
+          description: '4 DL, 2 LB, 5 DB',
+          positions: [
+            { code: 'CB-X', name: 'CB', fullName: 'Cornerback (Left)', depth: 3, x: 5, y: 40 },
+            { code: 'DE-1', name: 'DE', fullName: 'Defensive End (Left)', depth: 3, x: 35, y: 40 },
+            { code: 'DT-1', name: 'DT', fullName: 'Defensive Tackle (Left)', depth: 3, x: 45, y: 40 },
+            { code: 'DT-2', name: 'DT', fullName: 'Defensive Tackle (Right)', depth: 3, x: 55, y: 40 },
+            { code: 'DE-2', name: 'DE', fullName: 'Defensive End (Right)', depth: 3, x: 65, y: 40 },
+            { code: 'CB-SLOT', name: 'NCB', fullName: 'Nickel Cornerback', depth: 3, x: 75, y: 40 },
+            { code: 'CB-Y', name: 'CB', fullName: 'Cornerback (Right)', depth: 3, x: 95, y: 40 },
+            { code: 'LB-OLB', name: 'OLB', fullName: 'Outside Linebacker', depth: 4, x: 40, y: 60 },
+            { code: 'LB-ILB', name: 'ILB', fullName: 'Inside Linebacker', depth: 4, x: 60, y: 60 },
+            { code: 'S-FS', name: 'FS', fullName: 'Free Safety', depth: 3, x: 40, y: 80 },
+            { code: 'S-SS', name: 'SS', fullName: 'Strong Safety', depth: 3, x: 60, y: 80 }
+          ]
+        },
+        'dime': {
+          name: 'Dime (4-1-6)',
+          description: '4 DL, 1 LB, 6 DB',
+          positions: [
+            { code: 'CB-X', name: 'CB', fullName: 'Cornerback (Left)', depth: 3, x: 5, y: 40 },
+            { code: 'DE-1', name: 'DE', fullName: 'Defensive End (Left)', depth: 3, x: 35, y: 40 },
+            { code: 'DT-1', name: 'DT', fullName: 'Defensive Tackle (Left)', depth: 3, x: 45, y: 40 },
+            { code: 'DT-2', name: 'DT', fullName: 'Defensive Tackle (Right)', depth: 3, x: 55, y: 40 },
+            { code: 'DE-2', name: 'DE', fullName: 'Defensive End (Right)', depth: 3, x: 65, y: 40 },
+            { code: 'CB-SLOT', name: 'NCB', fullName: 'Nickel Cornerback', depth: 3, x: 75, y: 42 },
+            { code: 'CB-SLOT-2', name: 'DCB', fullName: 'Dime Cornerback', depth: 3, x: 25, y: 42 },
+            { code: 'CB-Y', name: 'CB', fullName: 'Cornerback (Right)', depth: 3, x: 95, y: 40 },
+            { code: 'LB-MLB', name: 'MLB', fullName: 'Middle Linebacker', depth: 3, x: 50, y: 60 },
+            { code: 'S-FS', name: 'FS', fullName: 'Free Safety', depth: 3, x: 40, y: 80 },
+            { code: 'S-SS', name: 'SS', fullName: 'Strong Safety', depth: 3, x: 60, y: 80 }
+          ]
+        },
+        '3-3-5': {
+          name: '3-3-5 Defense',
+          description: '3 DL, 3 LB, 5 DB',
+          positions: [
+            { code: 'CB-X', name: 'CB', fullName: 'Cornerback (Left)', depth: 3, x: 5, y: 40 },
+            { code: 'DE-1', name: 'DE', fullName: 'Defensive End (Left)', depth: 3, x: 35, y: 40 },
+            { code: 'NT', name: 'NT', fullName: 'Nose Tackle', depth: 3, x: 50, y: 40 },
+            { code: 'DE-2', name: 'DE', fullName: 'Defensive End (Right)', depth: 3, x: 65, y: 40 },
+            { code: 'CB-SLOT', name: 'NCB', fullName: 'Nickel Cornerback', depth: 3, x: 78, y: 42 },
+            { code: 'CB-Y', name: 'CB', fullName: 'Cornerback (Right)', depth: 3, x: 95, y: 40 },
+            { code: 'LB-WLB', name: 'WLB', fullName: 'Weak Side Linebacker', depth: 3, x: 30, y: 58 },
+            { code: 'LB-MLB', name: 'MLB', fullName: 'Middle Linebacker', depth: 3, x: 50, y: 60 },
+            { code: 'LB-SLB', name: 'SLB', fullName: 'Strong Side Linebacker', depth: 3, x: 70, y: 58 },
+            { code: 'S-FS', name: 'FS', fullName: 'Free Safety', depth: 3, x: 40, y: 80 },
+            { code: 'S-SS', name: 'SS', fullName: 'Strong Safety', depth: 3, x: 60, y: 80 }
+          ]
+        }
+      }
+    };
+
     const POSITIONS = {
       offense: [
         { code: 'WR-X', name: 'X', fullName: 'Split End (X Receiver)', depth: 3, x: 5, y: 45 },
@@ -303,121 +374,32 @@
       ]
     };
 
-    const DEFAULT_ROSTER = [
-      { name: 'Audavion Collins', number: 2, position: 'CB', year: 'R-Sr.', height: '5-11', weight: '180 lbs', hometown: 'Covington, Ga.', highSchool: 'Newton', previousSchool: 'Mississippi State', url: 'https://gopsusports.com/sports/football/roster/player/audavion-collins' },
-      { name: 'Daryus Dixson', number: 5, position: 'CB', year: 'So.', height: '6-0', weight: '195 lbs', hometown: 'Perris, Calif.', highSchool: 'Mater Dei', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/daryus-dixson' },
-      { name: 'Koby Howard', number: 6, position: 'WR', year: 'So.', height: '5-11', weight: '196 lbs', hometown: 'Pensacola, Fla.', highSchool: 'Chaminade-Madonna Prep', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/koby-howard' },
-      { name: 'Zion Tracy', number: 7, position: 'CB', year: 'Sr.', height: '5-11', weight: '185 lbs', hometown: 'Hempstead, N.Y.', highSchool: 'St. Thomas More (Conn.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/zion-tracy' },
-      { name: 'LaVar Arrington II', number: 11, position: 'LB', year: 'So.', height: '6-3', weight: '220 lbs', hometown: 'Annapolis, Md.', highSchool: 'Charter Oak (Calif.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/lavar-arrington-ii' },
-      { name: 'Lyrick Samuel', number: 11, position: 'WR', year: 'R-Fr.', height: '6-4', weight: '185 lbs', hometown: 'Brooklyn, N.Y.', highSchool: 'Erasmus Hall', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/lyrick-samuel' },
-      { name: 'Xxavier Thomas', number: 12, position: 'CB', year: 'R-Fr.', height: '5-11', weight: '185 lbs', hometown: 'Canonsburg, Pa.', highSchool: 'Pittsburgh Central Catholic', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/xxavier-thomas' },
-      { name: 'Tony Rojas', number: 13, position: 'LB', year: 'R-Jr.', height: '6-2', weight: '230 lbs', hometown: 'Fairfax, Va.', highSchool: 'Fairfax', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/tony-rojas' },
-      { name: 'Joshua Johnson', number: 15, position: 'CB', year: 'R-Fr.', height: '6-2', weight: '195 lbs', hometown: 'Ironton, Ohio', highSchool: 'Ironton', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/josh-johnson' },
-      { name: 'Donte Nastasi', number: 16, position: 'CB', year: 'R-Jr.', height: '5-10', weight: '165 lbs', hometown: 'State College, Pa.', highSchool: 'State College Area', previousSchool: 'Wagner', url: 'https://gopsusports.com/sports/football/roster/player/dontae-natasi' },
-      { name: 'Max Granville', number: 18, position: 'DE', year: 'R-So.', height: '6-3', weight: '248 lbs', hometown: 'Sugar Land, Texas', highSchool: 'Fort Bend Christian Academy', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/max-granville' },
-      { name: 'Jack Lambert', number: 19, position: 'QB', year: 'R-Jr.', height: '6-3', weight: '206 lbs', hometown: 'Hampstead, N.C.', highSchool: 'Topsail', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/jack-lambert' },
-      { name: 'Vaboue Toure', number: 21, position: 'S', year: 'R-So.', height: '6-1', weight: '208 lbs', hometown: 'Pleasantville, N.J.', highSchool: 'Irvington', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/vaboue-toure' },
-      { name: 'Jahmir Joseph', number: 23, position: 'CB', year: 'R-Fr.', height: '6-0', weight: '193 lbs', hometown: 'Nyack, N.Y.', highSchool: 'St. Joseph Regional (N.J.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/jahmir-joseph' },
-      { name: 'Quinton Martin Jr.', number: 25, position: 'RB', year: 'R-So.', height: '6-1', weight: '205 lbs', hometown: 'Belle Vernon, Pa.', highSchool: 'Belle Vernon', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/quinton-martin-jr' },
-      { name: 'Alex Tatsch', number: 25, position: 'LB', year: 'So.', height: '6-2', weight: '231 lbs', hometown: 'Latrobe, Pa.', highSchool: 'Greater Latrobe', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/alex-tatsch' },
-      { name: 'Cam Smith', number: 26, position: 'LB', year: 'R-Fr.', height: '6-0', weight: '219 lbs', hometown: 'Salem, N.J.', highSchool: 'St Joseph\'s Prep (Pa.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/cameron-smith' },
-      { name: 'Cam Wallace', number: 26, position: 'RB', year: 'R-So.', height: '5-9', weight: '198 lbs', hometown: 'Mount Vernon, Ga.', highSchool: 'Montgomery County', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/cam-wallace' },
-      { name: 'Logan Cunningham', number: 31, position: 'WR', year: 'R-Sr.', height: '5-8', weight: '189 lbs', hometown: 'Belle Vernon, Pa.', highSchool: 'Belle Vernon', previousSchool: 'Marietta College', url: 'https://gopsusports.com/sports/football/roster/player/logan-cunningham' },
-      { name: 'Blaise Sokach-Minnick', number: 35, position: 'LS', year: 'R-Sr.', height: '6-3', weight: '224 lbs', hometown: 'West Pittston, Pa.', highSchool: 'Wyoming Area', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/blaise-sokach-minnick' },
-      { name: 'Tyler Armstead', number: 35, position: 'CB', year: 'R-So.', height: '6-1', weight: '172 lbs', hometown: 'Canonsburg, Pa.', highSchool: 'Canon-McMillan', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/tyler-armstead' },
-      { name: 'Max Heffner', number: 37, position: 'CB', year: 'R-Fr.', height: '5-11', weight: '180 lbs', hometown: 'Birdsboro, Pa.', highSchool: 'Daniel Boone', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/max-heffner' },
-      { name: 'Ty Blanding', number: 39, position: 'DT', year: 'R-Jr.', height: '6-1', weight: '295 lbs', hometown: 'Bronx, N.Y.', highSchool: 'Christ The King', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/ty-blanding' },
-      { name: 'Jashaun Green', number: 39, position: 'S', year: 'R-Sr.', height: '6-1', weight: '180 lbs', hometown: 'State College, Pa.', highSchool: 'State College Area', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/jashaun-green' },
-      { name: 'Mason Robinson', number: 42, position: 'DE', year: 'R-Jr.', height: '6-3', weight: '254 lbs', hometown: 'Randallstown, Md.', highSchool: 'McDonogh School', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/mason-robinson' },
-      { name: 'Dayshaun Burnett', number: 43, position: 'DE', year: 'R-Fr.', height: '6-3', weight: '234 lbs', hometown: 'Pittsburgh, Pa.', highSchool: 'Imani Christian Academy', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/dayshaun-burrett' },
-      { name: 'Aidan Probst', number: 47, position: 'DE', year: 'R-So.', height: '6-2', weight: '250 lbs', hometown: 'Erie, Pa.', highSchool: 'McDowell', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/aidan-probst' },
-      { name: 'Cooper Cousins', number: 50, position: 'OL', year: 'Jr.', height: '6-6', weight: '316 lbs', hometown: 'Erie, Pa.', highSchool: 'McDowell', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/cooper-cousins' },
-      { name: 'Dominic Rulli', number: 52, position: 'OL', year: 'R-Sr.', height: '6-3', weight: '295 lbs', hometown: 'Burlington, Ky.', highSchool: 'The Taft School (Conn.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/dominic-rulli' },
-      { name: 'Chimdy Onoh', number: 55, position: 'OL', year: 'R-Jr.', height: '6-5', weight: '321 lbs', hometown: 'Baltimore, Md.', highSchool: 'Dundalk', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/chimdy-onoh' },
-      { name: 'Liam Horan', number: 61, position: 'OL', year: 'R-So.', height: '6-3', weight: '290 lbs', hometown: 'West Chester, Pa.', highSchool: 'Malvern Prep', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/liam-horan' },
-      { name: 'Jim Fitzgerald', number: 65, position: 'OL', year: 'R-Sr.', height: '6-7', weight: '311 lbs', hometown: 'Severna Park, Md.', highSchool: 'Archbishop Spalding', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/jim-fitzgerald' },
-      { name: 'Henry Boehme', number: 67, position: 'OL', year: 'R-Jr.', height: '6-5', weight: '286 lbs', hometown: 'Birmingham, Ala.', highSchool: 'Mountain Brook', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/henry-boehme' },
-      { name: 'Anthony Donkoh', number: 68, position: 'OL', year: 'R-Jr.', height: '6-5', weight: '320 lbs', hometown: 'Aldie, Va.', highSchool: 'Lightridge', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/anthony-donkoh' },
-      { name: 'Garrett Sexton', number: 71, position: 'OL', year: 'R-So.', height: '6-6', weight: '300 lbs', hometown: 'Hartland, Wis.', highSchool: 'Arrowhead Union', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/garrett-sexton' },
-      { name: 'Caleb Brewer', number: 73, position: 'OL', year: 'R-So.', height: '6-4', weight: '302 lbs', hometown: 'Reading, Pa.', highSchool: 'Wyomissing', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/caleb-brewer' },
-      { name: 'Owen Aliciene', number: 77, position: 'OL', year: 'R-Fr.', height: '6-7', weight: '298 lbs', hometown: 'Cheshire, Conn.', highSchool: 'Avon Old Farms', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/owen-aliciene' },
-      { name: 'Malachi Goodman', number: 78, position: 'OL', year: 'R-Fr.', height: '6-6', weight: '315 lbs', hometown: 'Bloomfield, N.J.', highSchool: 'Paramus Catholic', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/malachi-goodman' },
-      { name: 'Donnie Harbour', number: 79, position: 'OL', year: 'R-So.', height: '6-3', weight: '325 lbs', hometown: 'Milwaukee, Wis.', highSchool: 'Catholic Memorial', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/donnie-harbour' },
-      { name: 'Ethan Black', number: 82, position: 'WR', year: 'R-Jr.', height: '5-9', weight: '180 lbs', hometown: 'Davidsville, Pa.', highSchool: 'Conemaugh Township', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/ethan-black' },
-      { name: 'Brian Kortovich', number: 83, position: 'TE', year: 'R-Fr.', height: '6-4', weight: '250 lbs', hometown: 'Willoughby, Ohio', highSchool: 'Villa Angela-St. Joseph', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/brian-kortovich' },
-      { name: 'Peter Gonzalez', number: 84, position: 'WR', year: 'R-So.', height: '6-2', weight: '207 lbs', hometown: 'Mars, Pa.', highSchool: 'Pittsburgh Central Catholic', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/peter-gonzalez' },
-      { name: 'Andrew Rappleyea', number: 87, position: 'TE', year: 'R-Jr.', height: '6-4', weight: '252 lbs', hometown: 'Millbrook, N.Y.', highSchool: 'Milton Academy (Mass.)', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/andrew-rappleyea' },
-      { name: 'Finn Furmanek', number: 89, position: 'TE', year: 'R-Jr.', height: '6-3', weight: '255 lbs', hometown: 'State College, Pa.', highSchool: 'State College Area', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/finn-furmanek' },
-      { name: 'Liam Andrews', number: 90, position: 'DT', year: 'R-So.', height: '6-4', weight: '288 lbs', hometown: 'Brookline, Mass.', highSchool: 'Dexter School', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/liam-andrews' },
-      { name: 'Andrew Dufault', number: 92, position: 'LS', year: 'R-So.', height: '6-1', weight: '240 lbs', hometown: 'Westwood, Mass.', highSchool: 'Xaverian Brothers', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/andrew-dufault' },
-      { name: 'Bobby Mears', number: 93, position: 'DE', year: 'R-Jr.', height: '6-4', weight: '250 lbs', hometown: 'West Chester, Pa.', highSchool: 'Malvern Prep', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/bobby-mears' },
-      { name: 'Ryan Barker', number: 94, position: 'K', year: 'R-Jr.', height: '6-2', weight: '200 lbs', hometown: 'Landenberg, Pa.', highSchool: 'Kennett', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/ryan-barker' },
-      { name: 'De\'Andre Cook', number: 94, position: 'DT', year: 'R-So.', height: '6-4', weight: '300 lbs', hometown: 'Washington, D.C.', highSchool: 'Friendship Collegiate Academy', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/deandre-cook' },
-      { name: 'Jordan Mayer', number: 95, position: 'DE', year: 'R-Jr.', height: '6-4', weight: '250 lbs', hometown: 'Jefferson Hills, Pa.', highSchool: 'Thomas Jefferson', previousSchool: 'Wisconsin', url: 'https://gopsusports.com/sports/football/roster/player/jordan-mayer' },
-      { name: 'Matthew Parker', number: 98, position: 'K', year: 'R-Fr.', height: '6-0', weight: '220 lbs', hometown: 'York, Pa.', highSchool: 'Central York', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/matthew-parker' },
-      { name: 'Yvan Kemajou', number: 99, position: 'DE', year: 'So.', height: '6-3', weight: '252 lbs', hometown: 'Burtonsville, Md.', highSchool: 'Paint Branch', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/yvan-kemajou' },
-      { name: 'Peyton Falzone', number: 0, position: 'QB', year: 'Fr.', height: '6-5', weight: '210 lbs', hometown: 'Nazareth, Pa.', highSchool: 'Nazareth', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/peyton-falzone' },
-      { name: 'Jackson Ford', number: 0, position: 'DE', year: 'Fr.', height: '6-5', weight: '240 lbs', hometown: 'Phoenixville, Pa.', highSchool: 'Malvern Prep', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/jackson-ford' },
-      { name: 'Rocco Becht', number: 0, position: 'QB', year: 'R-Sr.', height: '6-1', weight: '210 lbs', hometown: 'Wesley Chapel, Fla.', highSchool: 'Wiregrass Ranch', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/rocco-becht' },
-      { name: 'Alex Manske', number: 0, position: 'QB', year: 'R-Fr.', height: '6-3', weight: '225 lbs', hometown: 'Algona, Iowa', highSchool: 'Algona', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/alex-manske' },
-      { name: 'Kase Evans', number: 0, position: 'QB', year: 'Fr.', height: '6-3', weight: '200 lbs', hometown: 'Lexington, Texas', highSchool: 'Lexington', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/kase-evans' },
-      { name: 'James Peoples', number: 0, position: 'RB', year: 'Jr.', height: '5-10', weight: '206 lbs', hometown: 'San Antonio, Texas', highSchool: 'Veterans Memorial', previousSchool: 'Ohio State', url: 'https://gopsusports.com/sports/football/roster/player/james-peoples' },
-      { name: 'Carson Hansen', number: 0, position: 'RB', year: 'Sr.', height: '6-2', weight: '220 lbs', hometown: 'Lakeville, Minn.', highSchool: 'Lakeville South', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/carson-hansen' },
-      { name: 'D\'Antae Sheffey', number: 0, position: 'RB', year: 'Fr.', height: '5-11', weight: '195 lbs', hometown: 'State College, Pa.', highSchool: 'State College Area', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/dantae-sheffey' },
-      { name: 'Karon Brookins', number: 0, position: 'WR', year: 'R-Fr.', height: '6-5', weight: '200 lbs', hometown: 'Pennsauken, N.J.', highSchool: 'Timber Creek', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/karon-brookins' },
-      { name: 'Brett Eskildsen', number: 0, position: 'WR', year: 'Jr.', height: '6-1', weight: '200 lbs', hometown: 'Frisco, Texas', highSchool: 'Centennial', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/brett-eskildsen' },
-      { name: 'Keith Jones Jr.', number: 0, position: 'WR', year: 'R-So.', height: '6-4', weight: '208 lbs', hometown: 'New Orleans, La.', highSchool: 'Edna Kerr', previousSchool: 'Grambling', url: 'https://gopsusports.com/sports/football/roster/player/keith-jones-jr' },
-      { name: 'Zay Robinson', number: 0, position: 'WR', year: 'R-Fr.', height: '5-11', weight: '185 lbs', hometown: 'Des Moines, Iowa', highSchool: 'West Des Moines', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/zay-robinson' },
-      { name: 'Chase Sowell', number: 0, position: 'WR', year: 'R-Sr.', height: '6-3', weight: '210 lbs', hometown: 'Humble, Texas', highSchool: 'Atascocita', previousSchool: 'Colorado/ECU/Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/chase-sowell' },
-      { name: 'Ben Whitver', number: 0, position: 'WR', year: 'Fr.', height: '6-2', weight: '190 lbs', hometown: 'Powhatan, Va.', highSchool: 'Powhatan', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/ben-whitver' },
-      { name: 'Cooper Alexander', number: 0, position: 'TE', year: 'R-So.', height: '6-4', weight: '245 lbs', hometown: 'Washington, Okla.', highSchool: 'Washington HS', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/cooper-alexander' },
-      { name: 'Benjamin Brahmer', number: 0, position: 'TE', year: 'Sr.', height: '6-7', weight: '255 lbs', hometown: 'Pierce, Neb.', highSchool: 'Pierce', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/benjamin-brahmer' },
-      { name: 'Gabe Burkle', number: 0, position: 'TE', year: 'R-Sr.', height: '6-6', weight: '255 lbs', hometown: 'Cedar Rapids, Iowa', highSchool: 'Prairie', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/gabe-burkle' },
-      { name: 'Hunter Albright', number: 0, position: 'OL', year: 'R-Fr.', height: '6-5', weight: '310 lbs', hometown: 'Hollidaysburg, Pa.', highSchool: 'Hollidaysburg', previousSchool: 'Saint Francis', url: 'https://gopsusports.com/sports/football/roster/player/hunter-albright' },
-      { name: 'Trevor Buhr', number: 0, position: 'OL', year: 'R-Jr.', height: '6-4', weight: '325 lbs', hometown: 'Washington, Mo.', highSchool: 'Washington HS', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/trevor-buhr' },
-      { name: 'Tyshon Huff', number: 0, position: 'OL', year: 'R-Jr.', height: '6-4', weight: '300 lbs', hometown: 'Cincinnati, Ohio', highSchool: 'Princeton HS', previousSchool: 'Tiffin', url: 'https://gopsusports.com/sports/football/roster/player/tyshon-huff' },
-      { name: 'Kuol Kuol II', number: 0, position: 'OL', year: 'R-Fr.', height: '6-6', weight: '290 lbs', hometown: 'Centerville, Ohio', highSchool: 'Centerville', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/kuol-kuol-ii' },
-      { name: 'Vaea Ikakoula', number: 0, position: 'OL', year: 'R-Fr.', height: '6-3', weight: '355 lbs', hometown: 'Laie, Hawaii', highSchool: 'West (Utah)', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/vaea-ikakoula' },
-      { name: 'Brock Riker', number: 0, position: 'OL', year: 'R-So.', height: '6-4', weight: '285 lbs', hometown: 'Brock, Texas', highSchool: 'Brock', previousSchool: 'Texas State', url: 'https://gopsusports.com/sports/football/roster/player/brock-riker' },
-      { name: 'Will Tompkins', number: 0, position: 'OL', year: 'R-Fr.', height: '6-5', weight: '300 lbs', hometown: 'Cedar Falls, Iowa', highSchool: 'Cedar Falls', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/will-tompkins' },
-      { name: 'Mason Bandhauer', number: 0, position: 'OL', year: 'Fr.', height: '6-6', weight: '260 lbs', hometown: 'Fort Collins, Colo.', highSchool: 'Fort Collins', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/mason-bandhauer' },
-      { name: 'Alijah Carnell', number: 0, position: 'DT', year: 'R-So.', height: '6-5', weight: '290 lbs', hometown: 'Henderson, Nev.', highSchool: 'Bishop Gorman', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/alijah-carnell' },
-      { name: 'Ike Ezeogu', number: 0, position: 'DT', year: 'R-Sr.', height: '6-5', weight: '285 lbs', hometown: 'Blue Springs, Mo.', highSchool: 'Blue Springs', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/ike-ezeogu' },
-      { name: 'Alexander McPherson', number: 0, position: 'DT', year: 'So.', height: '6-6', weight: '240 lbs', hometown: 'Stuart, Fla.', highSchool: 'IMG Academy', previousSchool: 'Colorado', url: 'https://gopsusports.com/sports/football/roster/player/alexander-mcpherson' },
-      { name: 'Armstrong Nnodim', number: 0, position: 'DT', year: 'R-So.', height: '6-2', weight: '290 lbs', hometown: 'Mesquite, Texas', highSchool: 'John Horn', previousSchool: 'Oklahoma State', url: 'https://gopsusports.com/sports/football/roster/player/armstrong-nnodim' },
-      { name: 'Siale Taupaki', number: 0, position: 'DT', year: 'Redshirt Senior+', height: '6-2', weight: '310 lbs', hometown: 'East Oakland, Calif.', highSchool: 'Oakland', previousSchool: 'UCLA', url: 'https://gopsusports.com/sports/football/roster/player/siale-taupaki' },
-      { name: 'Dallas Vakalahi', number: 0, position: 'DT', year: 'Jr.', height: '6-2', weight: '318 lbs', hometown: 'West Valley, Utah', highSchool: 'West', previousSchool: 'Utah', url: 'https://gopsusports.com/sports/football/roster/player/dallas-vakalahi' },
-      { name: 'Keanu Williams', number: 0, position: 'DT', year: 'R-Sr.', height: '6-5', weight: '320 lbs', hometown: 'Clovis, Calif.', highSchool: 'Clovis', previousSchool: 'Oregon/UCLA', url: 'https://gopsusports.com/sports/football/roster/player/keanu-williams' },
-      { name: 'Caleb Bacon', number: 0, position: 'LB', year: 'R-Sr.', height: '6-4', weight: '240 lbs', hometown: 'Lake Mills, Iowa.', highSchool: 'Lake Mills', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/caleb-bacon' },
-      { name: 'Cael Brezina', number: 0, position: 'LB', year: 'Jr.', height: '6-3', weight: '235 lbs', hometown: 'Downers Grove, Ill.', highSchool: 'Downers Grove North', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/cael-brezina' },
-      { name: 'Kooper Ebel', number: 0, position: 'LB', year: 'Sr.', height: '6-4', weight: '235 lbs', hometown: 'Hartley, Iowa', highSchool: 'Hartley-Melvin-Sanborn', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/kooper-ebel' },
-      { name: 'John Klosterman', number: 0, position: 'LB', year: 'R-Sr.', height: '5-11', weight: '230 lbs', hometown: 'Iowa City, Iowa', highSchool: 'City', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/john-klosterman' },
-      { name: 'Jeremiah Cooper', number: 0, position: 'CB', year: 'R-Sr.', height: '6-0', weight: '195 lbs', hometown: 'El Paso, Texas', highSchool: 'Andress', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/jeremiah-cooper' },
-      { name: 'Omarion Davis', number: 0, position: 'CB', year: 'So.', height: '5-11', weight: '185 lbs', hometown: 'Charlotte, N.C.', highSchool: 'Indian Land', previousSchool: 'Boston College', url: 'https://gopsusports.com/sports/football/roster/player/omarion-davis' },
-      { name: 'Chris Fileppo', number: 0, position: 'LB', year: 'So.', height: '6-4', weight: '208 lbs', hometown: 'Doylestown, Pa.', highSchool: 'LaSalle College HS', previousSchool: 'West Virginia', url: 'https://gopsusports.com/sports/football/roster/player/chris-fileppo' },
-      { name: 'Ibn McDaniels', number: 0, position: 'CB', year: 'R-So.', height: '6-3', weight: '205 lbs', hometown: 'Elizabeth, N.J.', highSchool: 'Elizabeth', previousSchool: 'Syracuse', url: 'https://gopsusports.com/sports/football/roster/player/ibn-mcdaniels' },
-      { name: 'Marcus Neal Jr.', number: 0, position: 'CB', year: 'Jr.', height: '6-1', weight: '215 lbs', hometown: 'Kansas City, Mo.', highSchool: 'Roytown South', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/marcus-neal-jr' },
-      { name: 'Jamison Patton', number: 0, position: 'CB', year: 'Sr.', height: '6-2', weight: '210 lbs', hometown: 'Des Moines, Iowa', highSchool: 'Ankeny', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/jamison-patton' },
-      { name: 'Hunter Sowell', number: 0, position: 'CB', year: 'R-Fr.', height: '5-10', weight: '170 lbs', hometown: 'Humble, Texas', highSchool: 'Atascocita', previousSchool: 'Iowa State', url: 'https://gopsusports.com/sports/football/roster/player/hunter-sowell' },
-      { name: 'Christian Askew', number: 0, position: 'CB', year: 'Fr.', height: '6-4', weight: '185 lbs', hometown: 'Kathleen, Ga.', highSchool: 'Veterans', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/christian-askew' },
-      { name: 'Tyrell Chatman', number: 0, position: 'CB', year: 'Fr.', height: '6-2', weight: '180 lbs', hometown: 'Lincoln, Neb.', highSchool: 'North Star', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/tyrell-chatman' },
-      { name: 'Bryson Williams', number: 0, position: 'CB', year: 'Fr.', height: '6-4', weight: '180 lbs', hometown: 'Omaha, Neb.', highSchool: 'Westside', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/bryson-williams' },
-      { name: 'Josiah Zayas', number: 0, position: 'CB', year: 'Fr.', height: '6-2', weight: '190 lbs', hometown: 'Piscataway, N.J.', highSchool: 'Piscataway Twp', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/josiah-zayas' },
-      { name: 'Amarion Jackson', number: 0, position: 'ATH', year: 'Fr.', height: '6-2', weight: '185 lbs', hometown: 'Omaha, Neb.', highSchool: 'Millard South', previousSchool: '', url: 'https://gopsusports.com/sports/football/roster/player/amarion-jackson' },
-      { name: 'Cristiano Rosa', number: 0, position: 'K', year: 'R-Sr.', height: '5-11', weight: '206 lbs', hometown: 'Shelton, Conn.', highSchool: 'Shelton', previousSchool: 'Central Connecticut State/James Madison', url: 'https://gopsusports.com/sports/football/roster/player/cristiano-rosa' },
-      { name: 'Nathan Tiyce', number: 0, position: 'P', year: 'So.', height: '6-5', weight: '230 lbs', hometown: 'Gerringong, Australia', highSchool: 'Tocal College', previousSchool: 'Mississippi State', url: 'https://gopsusports.com/sports/football/roster/player/nathan-tiyce' }
-    ];
+    // Default empty roster - will be populated by scraper
+    const DEFAULT_ROSTER = [];
+
+    // Default team config
+    const DEFAULT_TEAM = {
+      name: 'Your Team',
+      primaryColor: '#1a1a2e',
+      secondaryColor: '#ffffff',
+      rosterUrl: ''
+    };
 
     class DepthChartApp {
       constructor() {
         this.depthChart = {};
         this.roster = DEFAULT_ROSTER;
+        this.team = DEFAULT_TEAM;
         this.activeTab = 'offense';
         this.depthLevel = 0;
         this.selectedSlot = null;
         this.showPlayerModal = false;
         this.showImportModal = false;
         this.showResetModal = false;
+        this.showSetupModal = false;
+        this.showTeamSettingsModal = false;
+        this.showAppResetModal = false;
+        this.fetchingRoster = false;
         this.importText = '';
         this.importMessage = '';
         this.searchQuery = '';
@@ -427,122 +409,84 @@
         this.showOnboarding = false;
         this.draggedPlayer = null;
         this.dragOverPosition = null;
-        
-        // Undo/Redo stacks
+
+        // Quick depth reorder
+        this.showDepthReorderModal = false;
+        this.selectedPositionGroup = null;
+
+        // Formation state
+        this.offenseFormation = 'pro';
+        this.defenseFormation = 'nickel';
+
         this.undoStack = [];
         this.redoStack = [];
         this.maxUndoSteps = 20;
-        
-        // Auto-save indicator
         this.lastSaved = null;
-
-        // Share menu state
-        this.showShareMenu = false;
-        this.linkCopied = false;
-        this.sharedChart = false;
-        this.viewingPlayer = null; // Player details modal
 
         this.init();
       }
 
       init() {
-        // Show loading state
         this.render();
 
-        // Simulate loading for smooth transition
         setTimeout(() => {
           this.loadDarkMode();
+          this.loadFormations();
+          this.loadTeam();
           this.loadDepthChart();
           this.loadRoster();
-          this.loadFromUrlHash(); // Load shared chart if present
           this.checkOnboarding();
           this.loading = false;
+          this.applyTeamColors();
           this.render();
           this.setupKeyboardShortcuts();
         }, 500);
       }
 
-      // Position code mappings for shorter URLs
-      posToShort = {
-        'QB': 'q', 'RB': 'r', 'WR-X': 'wx', 'WR-Y': 'wy', 'WR-SLOT': 'ws', 'WR-Z': 'wz', 'TE': 't',
-        'OT': 'ot', 'OG': 'og', 'C': 'c', 'OT-R': 'otr', 'OG-R': 'ogr',
-        'DE-1': 'd1', 'DE-2': 'd2', 'DT-1': 't1', 'DT-2': 't2',
-        'LB-OLB': 'lo', 'LB-OLB-R': 'lor', 'LB-ILB': 'li',
-        'CB-X': 'cx', 'CB-Y': 'cy', 'CB-SLOT': 'cs',
-        'S-FS': 'fs', 'S-SS': 'ss',
-        'K': 'k', 'P': 'p', 'LS': 'ls'
-      };
-      shortToPos = Object.fromEntries(Object.entries(this.posToShort).map(([k,v]) => [v,k]));
-
-      // Encode depth chart to shareable string (compact format)
-      encodeChart() {
-        const compact = {};
-        for (const [pos, players] of Object.entries(this.depthChart)) {
-          const nums = players.map(p => p ? p.number : 0);
-          if (nums.some(n => n !== 0)) {
-            const shortPos = this.posToShort[pos] || pos;
-            compact[shortPos] = nums.filter((n, i) => nums.slice(0, i + 1).some(x => x !== 0));
+      loadTeam() {
+        const saved = localStorage.getItem('generic-team-config');
+        if (saved) {
+          const savedTeam = JSON.parse(saved);
+          // Check if the team has changed (new scrape)
+          if (savedTeam.name !== DEFAULT_TEAM.name || savedTeam.rosterUrl !== DEFAULT_TEAM.rosterUrl) {
+            // Team changed - clear old data and use new defaults
+            console.log(`Team changed from ${savedTeam.name} to ${DEFAULT_TEAM.name}, resetting data...`);
+            localStorage.removeItem('generic-team-config');
+            localStorage.removeItem('generic-roster');
+            localStorage.removeItem('generic-depth-chart');
+            this.team = { ...DEFAULT_TEAM };
+            this.roster = [...DEFAULT_ROSTER];
+            this.initializeEmptyChart();
+            return;
           }
-        }
-        const parts = Object.entries(compact).map(([pos, nums]) => pos + ':' + nums.join(','));
-        return btoa(parts.join(';'));
-      }
-
-      // Decode shareable string to depth chart
-      decodeChart(encoded) {
-        try {
-          const decoded = atob(encoded);
-          if (decoded.includes(':')) {
-            const chart = {};
-            const parts = decoded.split(';');
-            for (const part of parts) {
-              const [shortPos, numsStr] = part.split(':');
-              const pos = this.shortToPos[shortPos] || shortPos;
-              const nums = numsStr.split(',').map(n => parseInt(n) || 0);
-              chart[pos] = nums.map(num => {
-                if (num === 0) return null;
-                return this.roster.find(p => p.number === num) || null;
-              });
-            }
-            return chart;
-          }
-          const data = JSON.parse(decoded);
-          if (data.chart) {
-            return data.chart;
-          }
-        } catch (e) {
-          console.error('Failed to decode chart:', e);
-        }
-        return null;
-      }
-
-
-
-      // Load chart from URL hash if present
-      loadFromUrlHash() {
-        const hash = window.location.hash.slice(1);
-        if (hash && hash.startsWith('chart=')) {
-          const encoded = hash.replace('chart=', '');
-          const chart = this.decodeChart(encoded);
-          if (chart) {
-            this.depthChart = chart;
-            this.sharedChart = true; // Flag to show "viewing shared chart" message
-          }
+          this.team = { ...DEFAULT_TEAM, ...savedTeam };
         }
       }
 
-      // Generate shareable URL
-      getShareableUrl() {
-        const encoded = this.encodeChart();
-        return `https://psudepthchart.com/#chart=${encoded}`;
+      saveTeam() {
+        localStorage.setItem('generic-team-config', JSON.stringify(this.team));
+        this.applyTeamColors();
+      }
+
+      applyTeamColors() {
+        document.documentElement.style.setProperty('--primary-color', this.team.primaryColor);
+        document.body.style.background = `linear-gradient(135deg, ${this.team.primaryColor} 0%, ${this.adjustColor(this.team.primaryColor, 30)} 50%, ${this.team.primaryColor} 100%)`;
+      }
+
+      adjustColor(color, amount) {
+        // Simple color lightening
+        const hex = color.replace('#', '');
+        const r = Math.min(255, parseInt(hex.substr(0, 2), 16) + amount);
+        const g = Math.min(255, parseInt(hex.substr(2, 2), 16) + amount);
+        const b = Math.min(255, parseInt(hex.substr(4, 2), 16) + amount);
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
       }
 
       loadDarkMode() {
-        const saved = localStorage.getItem('psu-dark-mode');
+        const saved = localStorage.getItem('generic-dark-mode');
         if (saved !== null) {
           this.darkMode = JSON.parse(saved);
         } else {
-          // Check system preference
           this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         this.applyDarkMode();
@@ -558,13 +502,13 @@
 
       toggleDarkMode() {
         this.darkMode = !this.darkMode;
-        localStorage.setItem('psu-dark-mode', JSON.stringify(this.darkMode));
+        localStorage.setItem('generic-dark-mode', JSON.stringify(this.darkMode));
         this.applyDarkMode();
         this.render();
       }
 
       loadDepthChart() {
-        const saved = localStorage.getItem('psu-depth-chart');
+        const saved = localStorage.getItem('generic-depth-chart');
         if (saved) {
           this.depthChart = JSON.parse(saved);
         } else {
@@ -573,21 +517,25 @@
       }
 
       loadRoster() {
-        const saved = localStorage.getItem('psu-roster');
+        const saved = localStorage.getItem('generic-roster');
         if (saved) {
           this.roster = JSON.parse(saved);
         }
       }
 
       checkOnboarding() {
-        const hasSeenOnboarding = localStorage.getItem('psu-onboarding-seen');
-        const hasAnyPlayers = Object.values(this.depthChart).some(arr => arr.some(p => p !== null));
-        this.showOnboarding = !hasSeenOnboarding && !hasAnyPlayers;
+        const hasSeenOnboarding = localStorage.getItem('generic-onboarding-seen');
+        const hasRoster = this.roster.length > 0;
+        this.showOnboarding = !hasSeenOnboarding && !hasRoster;
+        this.showSetupModal = !hasRoster && !this.showOnboarding;
       }
 
       dismissOnboarding() {
         this.showOnboarding = false;
-        localStorage.setItem('psu-onboarding-seen', 'true');
+        localStorage.setItem('generic-onboarding-seen', 'true');
+        if (this.roster.length === 0) {
+          this.showSetupModal = true;
+        }
         this.render();
       }
 
@@ -598,13 +546,12 @@
         });
       }
 
-      // Save state for undo
       saveStateForUndo() {
         this.undoStack.push(JSON.stringify(this.depthChart));
         if (this.undoStack.length > this.maxUndoSteps) {
           this.undoStack.shift();
         }
-        this.redoStack = []; // Clear redo stack on new action
+        this.redoStack = [];
       }
 
       undo() {
@@ -626,7 +573,7 @@
       }
 
       autoSave() {
-        localStorage.setItem('psu-depth-chart', JSON.stringify(this.depthChart));
+        localStorage.setItem('generic-depth-chart', JSON.stringify(this.depthChart));
         this.lastSaved = new Date();
         this.saving = true;
         this.render();
@@ -637,22 +584,22 @@
       }
 
       exportDepthChart() {
-        let text = 'PENN STATE FOOTBALL DEPTH CHART\n================================\n';
+        let text = `${this.team.name.toUpperCase()} FOOTBALL DEPTH CHART\n${'='.repeat(this.team.name.length + 21)}\n`;
         text += `Generated: ${new Date().toLocaleDateString()}\n\n`;
-        
+
         const sections = {
           'OFFENSE': ['QB', 'RB', 'WR-X', 'WR-Z', 'WR-SLOT', 'TE', 'OT', 'OT-R', 'OG', 'OG-R', 'C'],
           'DEFENSE': ['DE-1', 'DE-2', 'DT-1', 'DT-2', 'LB-ILB', 'LB-OLB', 'CB-X', 'CB-Y', 'CB-SLOT', 'S-FS', 'S-SS'],
           'SPECIAL TEAMS': ['K', 'P', 'LS']
         };
-        
+
         for (const [section, positions] of Object.entries(sections)) {
           text += `${section}\n${'-'.repeat(section.length)}\n\n`;
-          
+
           for (const pos of positions) {
             const players = this.depthChart[pos] || [];
             const filled = players.filter(p => p !== null);
-            
+
             if (filled.length > 0) {
               const posLabel = pos.replace('-R', ' (Right)').replace('-', ' ');
               text += `${posLabel}:\n`;
@@ -669,78 +616,11 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `penn-state-depth-chart-${new Date().toISOString().split('T')[0]}.txt`;
+        a.download = `${this.team.name.toLowerCase().replace(/\s+/g, '-')}-depth-chart-${new Date().toISOString().split('T')[0]}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-      }
-
-      // Social sharing methods
-      toggleShareMenu() {
-        this.showShareMenu = !this.showShareMenu;
-        this.linkCopied = false;
-        this.render();
-
-        // Close menu when clicking outside
-        if (this.showShareMenu) {
-          setTimeout(() => {
-            const closeHandler = (e) => {
-              if (!e.target.closest('.relative')) {
-                this.showShareMenu = false;
-                this.render();
-                document.removeEventListener('click', closeHandler);
-              }
-            };
-            document.addEventListener('click', closeHandler);
-          }, 100);
-        }
-      }
-
-      shareToTwitter() {
-        const text = "Check out my Penn State Football depth chart prediction! 🦁🏈 #WeAre #PennState";
-        const url = this.getShareableUrl();
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'width=550,height=420');
-        this.showShareMenu = false;
-        this.render();
-      }
-
-      shareToFacebook() {
-        const url = this.getShareableUrl();
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'width=550,height=420');
-        this.showShareMenu = false;
-        this.render();
-      }
-
-      shareToReddit() {
-        const title = "Check out my Penn State Football depth chart prediction!";
-        const url = this.getShareableUrl();
-        window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`, '_blank');
-        this.showShareMenu = false;
-        this.render();
-      }
-
-      copyLink() {
-        const url = this.getShareableUrl();
-        navigator.clipboard.writeText(url).then(() => {
-          this.linkCopied = true;
-          this.render();
-          setTimeout(() => {
-            this.linkCopied = false;
-            this.showShareMenu = false;
-            this.render();
-          }, 1500);
-        });
-      }
-
-      viewPlayerDetails(player) {
-        this.viewingPlayer = player;
-        this.render();
-      }
-
-      closePlayerDetails() {
-        this.viewingPlayer = null;
-        this.render();
       }
 
       showResetConfirmation() {
@@ -756,46 +636,73 @@
         this.render();
       }
 
+      resetApp() {
+        this.showTeamSettingsModal = false;
+        this.showAppResetModal = true;
+        this.render();
+      }
+
+      confirmAppReset() {
+        // Clear all localStorage data for this app
+        localStorage.removeItem('generic-team-config');
+        localStorage.removeItem('generic-roster');
+        localStorage.removeItem('generic-depth-chart');
+        localStorage.removeItem('generic-onboarding-seen');
+        localStorage.removeItem('generic-dark-mode');
+
+        // Reset app state directly
+        this.roster = [];
+        this.team = { name: 'Your Team', primaryColor: '#1a1a2e', secondaryColor: '#ffffff', rosterUrl: '' };
+        this.depthChart = {};
+        this.initializeEmptyChart();
+        this.showAppResetModal = false;
+        this.showSetupModal = true;
+        this.showOnboarding = false;
+        this.applyTeamColors();
+        this.render();
+      }
+
       importRoster() {
         try {
           const lines = this.importText.split('\n').filter(line => line.trim());
           const newRoster = [];
-          
+
           for (const line of lines) {
             const commaFormat = line.match(/(\d+),?\s*([^,]+),?\s*([A-Z]{1,3}),?\s*(.+)/);
             const hashFormat = line.match(/#(\d+)\s+([A-Za-z\s'.]+?)\s+([A-Z]{1,3})\s+(.+)/);
-            
+
             let match = commaFormat || hashFormat;
-            
+
             if (match) {
               const number = parseInt(match[1]);
               const name = match[2].trim();
               const position = match[3].trim();
               const year = match[4].trim();
-              
+
               const validPositions = ['QB', 'RB', 'WR', 'TE', 'OL', 'DE', 'DT', 'LB', 'CB', 'S', 'K', 'P', 'LS'];
               if (validPositions.includes(position) && !isNaN(number)) {
-                newRoster.push({ name, number, position, year });
+                newRoster.push({ name, number, position, year, height: '', weight: '', hometown: '', highSchool: '', previousSchool: '', url: '' });
               }
             }
           }
-          
+
           if (newRoster.length > 0) {
             this.roster = newRoster;
-            localStorage.setItem('psu-roster', JSON.stringify(newRoster));
-            this.importMessage = `✓ Successfully imported ${newRoster.length} players!`;
+            localStorage.setItem('generic-roster', JSON.stringify(newRoster));
+            this.importMessage = `Successfully imported ${newRoster.length} players!`;
             setTimeout(() => {
               this.showImportModal = false;
+              this.showSetupModal = false;
               this.importText = '';
               this.importMessage = '';
               this.render();
             }, 2000);
           } else {
-            this.importMessage = '✗ No valid players found. Please check the format.';
+            this.importMessage = 'No valid players found. Please check the format.';
           }
           this.render();
         } catch (error) {
-          this.importMessage = '✗ Error parsing roster data. Please check the format.';
+          this.importMessage = 'Error parsing roster data. Please check the format.';
           this.render();
         }
       }
@@ -803,22 +710,25 @@
       getAvailablePlayers(posCode) {
         let positionToSearch = posCode.replace('-R', '');
         if (positionToSearch.startsWith('WR-')) positionToSearch = 'WR';
+        else if (positionToSearch.startsWith('TE-')) positionToSearch = 'TE';
+        else if (positionToSearch.startsWith('RB-')) positionToSearch = 'RB';
         else if (['OT', 'OG', 'C'].includes(positionToSearch)) positionToSearch = 'OL';
         else if (positionToSearch.startsWith('CB-')) positionToSearch = 'CB';
         else if (positionToSearch.startsWith('S-')) positionToSearch = 'S';
         else if (positionToSearch.startsWith('LB-')) positionToSearch = 'LB';
         else if (positionToSearch.startsWith('DE-')) positionToSearch = 'DE';
         else if (positionToSearch.startsWith('DT-')) positionToSearch = 'DT';
+        else if (positionToSearch.startsWith('NT-') || positionToSearch === 'NT') positionToSearch = 'NT';
 
-        // Allow CB, S, and DB players to be placed at any defensive back position (CB or Safety)
-        let positionsToInclude = [positionToSearch];
-        if (positionToSearch === 'CB' || positionToSearch === 'S') {
-          positionsToInclude = ['CB', 'S', 'DB'];
+        // Allow DL, DE, DT, NT players to appear in any defensive line position
+        const positionsToMatch = [positionToSearch];
+        if (positionToSearch === 'DE' || positionToSearch === 'DT' || positionToSearch === 'NT') {
+          positionsToMatch.push('DL', 'DE', 'DT', 'NT', 'EDGE');
         }
 
-        const allPlayers = this.roster.filter(p => positionsToInclude.includes(p.position));
+        const allPlayers = this.roster.filter(p => positionsToMatch.includes(p.position));
 
-        // Get all players assigned to ANY position in the entire depth chart
+        // Get all players assigned to ANY position
         const allAssigned = [];
         Object.values(this.depthChart).forEach(depthArray => {
           depthArray.forEach(player => {
@@ -826,12 +736,10 @@
           });
         });
 
-        // Filter out players already assigned anywhere
         let available = allPlayers.filter(p =>
           !allAssigned.some(a => a.number === p.number && a.name === p.name)
         );
 
-        // Apply search filter
         if (this.searchQuery.trim()) {
           const query = this.searchQuery.toLowerCase();
           available = available.filter(p =>
@@ -865,7 +773,6 @@
         this.render();
       }
 
-      // Drag and drop handlers
       handleDragStart(player, position, depth) {
         this.draggedPlayer = { player, fromPosition: position, fromDepth: depth };
       }
@@ -878,19 +785,20 @@
 
       handleDragLeave() {
         this.dragOverPosition = null;
+
+        // Formation state
+        this.offenseFormation = 'pro';
+        this.defenseFormation = 'nickel';
         this.render();
       }
 
       handleDrop(toPosition, toDepth) {
         if (!this.draggedPlayer) return;
-        
+
         const { player, fromPosition, fromDepth } = this.draggedPlayer;
-        
-        // Check if the player can play this position
         const fromPosBase = fromPosition.replace('-R', '').split('-')[0];
         const toPosBase = toPosition.replace('-R', '').split('-')[0];
-        
-        // Simple position compatibility check
+
         const positionGroups = {
           'WR': ['WR'],
           'OL': ['OT', 'OG', 'C'],
@@ -906,7 +814,7 @@
           'P': ['P'],
           'LS': ['LS']
         };
-        
+
         let canDrop = false;
         for (const [group, positions] of Object.entries(positionGroups)) {
           if (positions.some(p => fromPosBase.includes(p) || fromPosition.includes(p)) &&
@@ -915,30 +823,28 @@
             break;
           }
         }
-        
+
         if (canDrop) {
           this.saveStateForUndo();
-          
-          // Swap players
           const targetPlayer = this.depthChart[toPosition]?.[toDepth];
-          
           this.depthChart[fromPosition] = [...(this.depthChart[fromPosition] || [])];
           this.depthChart[toPosition] = [...(this.depthChart[toPosition] || [])];
-          
           this.depthChart[toPosition][toDepth] = player;
           this.depthChart[fromPosition][fromDepth] = targetPlayer || null;
-          
           this.autoSave();
         }
-        
+
         this.draggedPlayer = null;
         this.dragOverPosition = null;
+
+        // Formation state
+        this.offenseFormation = 'pro';
+        this.defenseFormation = 'nickel';
         this.render();
       }
 
       setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-          // Escape to close modals
           if (e.key === 'Escape') {
             if (this.showPlayerModal) {
               this.showPlayerModal = false;
@@ -953,28 +859,30 @@
             } else if (this.showResetModal) {
               this.showResetModal = false;
               this.render();
+            } else if (this.showTeamSettingsModal) {
+              this.showTeamSettingsModal = false;
+              this.render();
+            } else if (this.showAppResetModal) {
+              this.showAppResetModal = false;
+              this.render();
             }
           }
-          
-          // Ctrl/Cmd + Z for undo
+
           if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
             e.preventDefault();
             this.undo();
           }
-          
-          // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y for redo
+
           if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
             e.preventDefault();
             this.redo();
           }
-          
-          // D for dark mode toggle (when no modal is open)
-          if (e.key === 'd' && !this.showPlayerModal && !this.showImportModal && !this.showResetModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+
+          if (e.key === 'd' && !this.showPlayerModal && !this.showImportModal && !this.showResetModal && !this.showTeamSettingsModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             this.toggleDarkMode();
           }
-          
-          // Arrow keys for depth level (when no modal is open)
-          if (!this.showPlayerModal && !this.showImportModal && !this.showResetModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+
+          if (!this.showPlayerModal && !this.showImportModal && !this.showResetModal && !this.showTeamSettingsModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             if (e.key === 'ArrowUp' && this.depthLevel > 0) {
               this.depthLevel--;
               this.render();
@@ -1004,6 +912,36 @@
         window.print();
       }
 
+      // Get positions for current tab based on selected formation
+      getPositions(tab) {
+        if (tab === "offense") {
+          return FORMATIONS.offense[this.offenseFormation]?.positions || POSITIONS.offense;
+        } else if (tab === "defense") {
+          return FORMATIONS.defense[this.defenseFormation]?.positions || POSITIONS.defense;
+        }
+        return POSITIONS[tab] || [];
+      }
+
+      // Change formation and reinitialize positions
+      changeFormation(type, formation) {
+        if (type === "offense") {
+          this.offenseFormation = formation;
+          localStorage.setItem("depth-chart-offense-formation", formation);
+        } else if (type === "defense") {
+          this.defenseFormation = formation;
+          localStorage.setItem("depth-chart-defense-formation", formation);
+        }
+        this.render();
+      }
+
+      // Load saved formations
+      loadFormations() {
+        const savedOffense = localStorage.getItem("depth-chart-offense-formation");
+        const savedDefense = localStorage.getItem("depth-chart-defense-formation");
+        if (savedOffense && FORMATIONS.offense[savedOffense]) this.offenseFormation = savedOffense;
+        if (savedDefense && FORMATIONS.defense[savedDefense]) this.defenseFormation = savedDefense;
+      }
+
       getPlayerLastName(name) {
         const suffixes = ["Jr.", "Sr.", "II", "III", "IV", "V"];
         const parts = name.split(" ");
@@ -1018,29 +956,239 @@
         return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
       }
 
+      // Get roster statistics by position group
+      getRosterStats() {
+        const stats = {};
+        const groups = {
+          'QB': ['QB'],
+          'RB': ['RB', 'FB'],
+          'WR': ['WR'],
+          'TE': ['TE'],
+          'OL': ['OL', 'OT', 'OG', 'C'],
+          'DL': ['DL', 'DT', 'DE', 'NT', 'EDGE'],
+          'LB': ['LB', 'ILB', 'OLB', 'MLB'],
+          'CB': ['CB', 'DB'],
+          'S': ['S', 'SS', 'FS'],
+          'K': ['K', 'PK'],
+          'P': ['P'],
+          'LS': ['LS', 'SNP']
+        };
+
+        for (const [group, positions] of Object.entries(groups)) {
+          stats[group] = this.roster.filter(p => positions.includes(p.position)).length;
+        }
+        return stats;
+      }
+
+      // Get progress statistics - positions filled vs total
+      getProgressStats() {
+        let filled = 0;
+        let total = 0;
+
+        // Count positions for current formation
+        const offensePositions = FORMATIONS.offense[this.offenseFormation]?.positions || [];
+        const defensePositions = FORMATIONS.defense[this.defenseFormation]?.positions || [];
+        const specialPositions = POSITIONS.special || [];
+
+        const allPositions = [...offensePositions, ...defensePositions, ...specialPositions];
+
+        for (const pos of allPositions) {
+          const posKey = pos.isRight ? `${pos.code}-R` : pos.code;
+          const depth = pos.depth || 3;
+
+          for (let d = 0; d < Math.min(depth, 3); d++) {
+            total++;
+            if (this.depthChart[posKey]?.[d]) {
+              filled++;
+            }
+          }
+        }
+
+        return { filled, total, percentage: total > 0 ? Math.round((filled / total) * 100) : 0 };
+      }
+
+      // Detect position mismatches between roster and depth chart needs
+      getPositionMismatches() {
+        const mismatches = [];
+        const stats = this.getRosterStats();
+
+        // Check for common mismatches
+        if (stats['DL'] > 0 && stats['DL'] === this.roster.filter(p => p.position === 'DL').length) {
+          // All defensive linemen are labeled as generic "DL"
+          const dlCount = stats['DL'];
+          mismatches.push({
+            type: 'dl_generic',
+            message: `${dlCount} player${dlCount > 1 ? 's' : ''} listed as "DL" - they'll appear in both DE and DT positions`,
+            count: dlCount
+          });
+        }
+
+        // Check for missing position groups
+        const neededGroups = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S'];
+        for (const group of neededGroups) {
+          if (stats[group] === 0) {
+            mismatches.push({
+              type: 'missing',
+              message: `No ${group} players in roster`,
+              group
+            });
+          }
+        }
+
+        return mismatches;
+      }
+
+      // Get available positions for a player position type
+      getMatchingDepthChartPositions(playerPosition) {
+        const mapping = {
+          'QB': ['QB'],
+          'RB': ['RB', 'FB'],
+          'FB': ['FB', 'RB'],
+          'WR': ['WR-X', 'WR-Z', 'WR-SLOT', 'WR-SLOT-R'],
+          'TE': ['TE', 'TE-2'],
+          'OL': ['OT', 'OG', 'C'],
+          'OT': ['OT'],
+          'OG': ['OG'],
+          'C': ['C'],
+          'DL': ['DE-1', 'DE-2', 'DT-1', 'DT-2'],
+          'DE': ['DE-1', 'DE-2'],
+          'DT': ['DT-1', 'DT-2'],
+          'EDGE': ['DE-1', 'DE-2'],
+          'LB': ['LB-ILB', 'LB-OLB'],
+          'ILB': ['LB-ILB'],
+          'OLB': ['LB-OLB'],
+          'CB': ['CB-X', 'CB-Y', 'CB-SLOT'],
+          'DB': ['CB-X', 'CB-Y', 'CB-SLOT', 'S-FS', 'S-SS'],
+          'S': ['S-FS', 'S-SS'],
+          'FS': ['S-FS'],
+          'SS': ['S-SS'],
+          'K': ['K'],
+          'P': ['P'],
+          'LS': ['LS']
+        };
+        return mapping[playerPosition] || [];
+      }
+
+      // Open depth reorder modal for a position group
+      openDepthReorder(positionGroup) {
+        this.selectedPositionGroup = positionGroup;
+        this.showDepthReorderModal = true;
+        this.render();
+      }
+
+      // Get all players for a position group
+      getPlayersForGroup(group) {
+        const groupMapping = {
+          'QB': ['QB'],
+          'RB': ['RB', 'FB'],
+          'WR': ['WR'],
+          'TE': ['TE'],
+          'OL': ['OL', 'OT', 'OG', 'C'],
+          'DL': ['DL', 'DT', 'DE', 'NT', 'EDGE'],
+          'LB': ['LB', 'ILB', 'OLB', 'MLB'],
+          'CB': ['CB', 'DB'],
+          'S': ['S', 'SS', 'FS'],
+          'K': ['K', 'PK'],
+          'P': ['P'],
+          'LS': ['LS', 'SNP']
+        };
+        const positions = groupMapping[group] || [group];
+        return this.roster.filter(p => positions.includes(p.position));
+      }
+
+      // Get depth chart slots for a position group
+      getDepthSlotsForGroup(group) {
+        const slotMapping = {
+          'QB': [{ key: 'QB', name: 'QB', depth: 2 }],
+          'RB': [{ key: 'RB', name: 'RB', depth: 3 }, { key: 'FB', name: 'FB', depth: 2 }],
+          'WR': [
+            { key: 'WR-X', name: 'X (Split End)', depth: 3 },
+            { key: 'WR-Z', name: 'Z (Flanker)', depth: 3 },
+            { key: 'WR-SLOT', name: 'Slot L', depth: 3 },
+            { key: 'WR-SLOT-R', name: 'Slot R', depth: 3 }
+          ],
+          'TE': [{ key: 'TE', name: 'TE', depth: 2 }, { key: 'TE-2', name: 'TE2', depth: 2 }],
+          'OL': [
+            { key: 'OT', name: 'LT', depth: 4 },
+            { key: 'OG', name: 'LG', depth: 4 },
+            { key: 'C', name: 'C', depth: 3 },
+            { key: 'OG-R', name: 'RG', depth: 4 },
+            { key: 'OT-R', name: 'RT', depth: 4 }
+          ],
+          'DL': [
+            { key: 'DE-1', name: 'DE (L)', depth: 3 },
+            { key: 'DT-1', name: 'DT (L)', depth: 3 },
+            { key: 'NT', name: 'NT (Nose)', depth: 3 },
+            { key: 'DT-2', name: 'DT (R)', depth: 3 },
+            { key: 'DE-2', name: 'DE (R)', depth: 3 }
+          ],
+          'LB': [
+            { key: 'LB-OLB', name: 'OLB/WILL', depth: 3 },
+            { key: 'LB-ILB', name: 'ILB/MIKE', depth: 3 }
+          ],
+          'CB': [
+            { key: 'CB-X', name: 'CB1', depth: 3 },
+            { key: 'CB-Y', name: 'CB2', depth: 3 },
+            { key: 'CB-SLOT', name: 'Nickel', depth: 2 }
+          ],
+          'S': [
+            { key: 'S-FS', name: 'FS', depth: 3 },
+            { key: 'S-SS', name: 'SS', depth: 3 }
+          ],
+          'K': [{ key: 'K', name: 'K', depth: 2 }],
+          'P': [{ key: 'P', name: 'P', depth: 2 }],
+          'LS': [{ key: 'LS', name: 'LS', depth: 2 }]
+        };
+        return slotMapping[group] || [];
+      }
+
+      // Assign player to a slot from reorder modal
+      assignFromReorder(slotKey, depthIndex, player) {
+        this.saveStateForUndo();
+        if (!this.depthChart[slotKey]) {
+          this.depthChart[slotKey] = [];
+        }
+        this.depthChart[slotKey][depthIndex] = player;
+        this.autoSave();
+        this.render();
+      }
+
+      // Remove player from slot in reorder modal
+      removeFromReorder(slotKey, depthIndex) {
+        this.saveStateForUndo();
+        if (this.depthChart[slotKey]) {
+          this.depthChart[slotKey][depthIndex] = null;
+        }
+        this.autoSave();
+        this.render();
+      }
+
       render() {
         const app = document.getElementById('app');
-        
+
         if (this.loading) {
           app.innerHTML = this.renderLoadingState();
           return;
         }
-        
+
         app.innerHTML = `
           <div class="max-w-7xl mx-auto p-4">
             ${this.renderHeader()}
-            ${this.sharedChart ? this.renderSharedBanner() : ''}
             ${this.renderButtons()}
             ${this.renderTabs()}
             ${this.activeTab !== 'special' ? this.renderDepthSelector() : ''}
+            ${this.activeTab !== 'special' ? this.renderFormationSelector() : ''}
             ${this.renderField()}
             ${this.renderKeyboardHints()}
           </div>
           ${this.showOnboarding ? this.renderOnboarding() : ''}
+          ${this.showSetupModal ? this.renderSetupModal() : ''}
+          ${this.showTeamSettingsModal ? this.renderTeamSettingsModal() : ''}
           ${this.showPlayerModal ? this.renderPlayerModal() : ''}
           ${this.showImportModal ? this.renderImportModal() : ''}
           ${this.showResetModal ? this.renderResetModal() : ''}
-          ${this.viewingPlayer ? this.renderPlayerDetails() : ''}
+          ${this.showAppResetModal ? this.renderAppResetModal() : ''}
+          ${this.showDepthReorderModal ? this.renderDepthReorderModal() : ''}
         `;
         this.attachEventListeners();
       }
@@ -1048,7 +1196,7 @@
       renderLoadingState() {
         return `
           <div class="max-w-7xl mx-auto p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border-4 border-psu-blue dark:border-psu-light">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border-4 border-gray-300">
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 skeleton rounded-full"></div>
                 <div class="flex-1">
@@ -1070,47 +1218,39 @@
         return `
           <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
-              <div class="bg-psu-blue p-6 text-white text-center">
+              <div class="p-6 text-center" style="background: ${this.team.primaryColor}; color: white;">
                 <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span class="text-psu-blue font-display font-bold text-2xl">PSU</span>
+                  <span style="color: ${this.team.primaryColor};" class="font-display font-bold text-2xl">CFB</span>
                 </div>
-                <h2 class="font-display text-3xl font-bold">Welcome to the Depth Chart!</h2>
+                <h2 class="font-display text-3xl font-bold">College Football Depth Chart</h2>
               </div>
               <div class="p-6">
                 <div class="space-y-4">
                   <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-psu-blue text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                    <div class="w-8 h-8 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0" style="background: ${this.team.primaryColor};">1</div>
                     <div>
-                      <h3 class="font-semibold text-gray-900 dark:text-white">Click any position</h3>
-                      <p class="text-gray-600 dark:text-gray-400 text-sm">Click on a position on the field to assign players</p>
+                      <h3 class="font-semibold text-gray-900 dark:text-white">Import your roster</h3>
+                      <p class="text-gray-600 dark:text-gray-400 text-sm">Paste a roster URL or manually enter players</p>
                     </div>
                   </div>
                   <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-psu-blue text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                    <div class="w-8 h-8 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0" style="background: ${this.team.primaryColor};">2</div>
                     <div>
-                      <h3 class="font-semibold text-gray-900 dark:text-white">Select a player</h3>
-                      <p class="text-gray-600 dark:text-gray-400 text-sm">Choose from available players for that position</p>
+                      <h3 class="font-semibold text-gray-900 dark:text-white">Click positions to assign</h3>
+                      <p class="text-gray-600 dark:text-gray-400 text-sm">Select players for each position on the field</p>
                     </div>
                   </div>
                   <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-psu-blue text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                    <div class="w-8 h-8 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0" style="background: ${this.team.primaryColor};">3</div>
                     <div>
                       <h3 class="font-semibold text-gray-900 dark:text-white">Drag to rearrange</h3>
                       <p class="text-gray-600 dark:text-gray-400 text-sm">Drag players between positions to swap them</p>
                     </div>
                   </div>
                 </div>
-                <div class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    <strong>Pro tip:</strong> Use keyboard shortcuts! Press <kbd class="px-2 py-1 bg-white dark:bg-gray-600 rounded text-xs">Ctrl+Z</kbd> to undo, arrow keys to navigate, and <kbd class="px-2 py-1 bg-white dark:bg-gray-600 rounded text-xs">D</kbd> for dark mode.
-                  </p>
-                </div>
               </div>
               <div class="p-4 border-t dark:border-gray-700">
-                <button
-                  onclick="app.dismissOnboarding()"
-                  class="w-full bg-psu-blue hover:bg-psu-light text-white py-3 rounded-lg font-display font-semibold text-lg transition-colors"
-                >
+                <button onclick="app.dismissOnboarding()" class="w-full text-white py-3 rounded-lg font-display font-semibold text-lg transition-colors" style="background: ${this.team.primaryColor};">
                   Get Started
                 </button>
               </div>
@@ -1119,70 +1259,310 @@
         `;
       }
 
-      renderSharedBanner() {
+      renderSetupModal() {
+        const importTab = this.setupImportTab || 'url';
         return `
-          <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-lg p-4 mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="18" cy="5" r="3"/>
-                <circle cx="6" cy="12" r="3"/>
-                <circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              <div>
-                <span class="font-semibold">Viewing a Shared Depth Chart</span>
-                <span class="opacity-90 ml-2">- Make changes to create your own version!</span>
+          <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden my-4">
+              <div class="p-6 text-center text-white" style="background: ${this.team.primaryColor};">
+                <h2 class="font-display text-2xl font-bold">Setup Your Team</h2>
+                <p class="opacity-80">Import a roster to get started</p>
+              </div>
+              <div class="p-6">
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team Name</label>
+                  <input
+                    type="text"
+                    id="teamNameInput"
+                    placeholder="e.g., Ohio State Buckeyes"
+                    value="${this.team.name !== 'Your Team' ? this.team.name : ''}"
+                    class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
+                  <div class="flex gap-3">
+                    <input
+                      type="color"
+                      id="teamColorInput"
+                      value="${this.team.primaryColor}"
+                      class="w-12 h-10 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      id="teamColorText"
+                      value="${this.team.primaryColor}"
+                      placeholder="#1a1a2e"
+                      class="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div class="border-t dark:border-gray-700 pt-6">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Import Roster</label>
+
+                  <!-- Import Method Tabs -->
+                  <div class="flex mb-4 border-b dark:border-gray-600">
+                    <button onclick="app.setupImportTab = 'url'; app.render()" class="px-4 py-2 font-semibold text-sm ${importTab === 'url' ? 'border-b-2 text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}" style="${importTab === 'url' ? `border-color: ${this.team.primaryColor};` : ''}">
+                      <span class="mr-1">🔗</span> From URL
+                    </button>
+                    <button onclick="app.setupImportTab = 'manual'; app.render()" class="px-4 py-2 font-semibold text-sm ${importTab === 'manual' ? 'border-b-2 text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}" style="${importTab === 'manual' ? `border-color: ${this.team.primaryColor};` : ''}">
+                      <span class="mr-1">📝</span> Manual Entry
+                    </button>
+                  </div>
+
+                  ${importTab === 'url' ? `
+                    <!-- URL Import -->
+                    <div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        Enter your team's roster page URL (works with most college athletics sites)
+                      </p>
+                      <input
+                        type="url"
+                        id="rosterUrlInput"
+                        placeholder="https://ohiostatebuckeyes.com/sports/football/roster"
+                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white mb-4"
+                      />
+
+                      <button
+                        onclick="app.fetchRosterFromUrl()"
+                        class="w-full py-3 rounded-lg font-display font-semibold text-white transition-colors flex items-center justify-center gap-2 ${this.fetchingRoster ? 'opacity-70 cursor-not-allowed' : ''}"
+                        style="background: ${this.team.primaryColor};"
+                        ${this.fetchingRoster ? 'disabled' : ''}
+                      >
+                        ${this.fetchingRoster ? `
+                          <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                          </svg>
+                          Fetching Roster...
+                        ` : `
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                          </svg>
+                          Fetch Roster
+                        `}
+                      </button>
+
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                        Works with Sidearm Sports sites (most college athletics). If import fails, use Manual Entry.
+                      </p>
+                    </div>
+                  ` : `
+                    <!-- Manual Import -->
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Format: #Number Name Position Year (one player per line)</p>
+                      <textarea
+                        id="setupRosterTextarea"
+                        placeholder="#1 John Smith QB Sr.&#10;#24 Mike Johnson RB Jr.&#10;#7 David Wilson WR So.&#10;..."
+                        class="w-full h-48 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-mono text-sm focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      ></textarea>
+                    </div>
+                  `}
+
+                  ${this.importMessage ? `
+                    <div class="mt-3 p-2 rounded ${this.importMessage.includes('Success') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} text-sm">
+                      ${this.importMessage}
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex gap-3">
+                <button
+                  onclick="app.saveSetup()"
+                  class="flex-1 text-white px-4 py-3 rounded-lg font-display font-semibold transition-colors"
+                  style="background: ${this.team.primaryColor};"
+                >
+                  ${importTab === 'url' ? 'Continue' : 'Save & Import'}
+                </button>
+                <button
+                  onclick="app.showSetupModal = false; app.render()"
+                  class="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Skip
+                </button>
               </div>
             </div>
-            <button onclick="app.sharedChart = false; window.history.replaceState(null, '', '/'); app.render()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-semibold transition-colors">
-              Dismiss
-            </button>
           </div>
         `;
       }
 
-      renderHeader() {
+      async fetchRosterFromUrl() {
+        const urlInput = document.getElementById('rosterUrlInput');
+        const url = urlInput?.value?.trim();
+
+        if (!url) {
+          this.importMessage = 'Please enter a roster URL';
+          this.render();
+          return;
+        }
+
+        // Validate URL format
+        try {
+          new URL(url);
+        } catch (e) {
+          this.importMessage = 'Please enter a valid URL';
+          this.render();
+          return;
+        }
+
+        this.fetchingRoster = true;
+        this.importMessage = '';
+        this.render();
+
+        try {
+          const response = await fetch('/api/scrape', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch roster');
+          }
+
+          // Update team info
+          if (data.team) {
+            this.team.name = data.team.name || this.team.name;
+            this.team.primaryColor = data.team.primaryColor || this.team.primaryColor;
+            this.team.rosterUrl = data.team.rosterUrl || url;
+            this.saveTeam();
+          }
+
+          // Update roster
+          if (data.roster && data.roster.length > 0) {
+            this.roster = data.roster;
+            localStorage.setItem('generic-roster', JSON.stringify(this.roster));
+            this.importMessage = `Success! Imported ${data.roster.length} players from ${data.team?.name || 'roster'}`;
+            this.showSetupModal = false;
+          } else {
+            this.importMessage = 'No players found on that page. Try using Manual Entry.';
+          }
+
+        } catch (error) {
+          console.error('Fetch error:', error);
+          this.importMessage = error.message || 'Failed to fetch roster. Try using Manual Entry.';
+        } finally {
+          this.fetchingRoster = false;
+          this.render();
+        }
+      }
+
+      saveSetup() {
+        const nameInput = document.getElementById('teamNameInput');
+        const colorInput = document.getElementById('teamColorText');
+        const rosterTextarea = document.getElementById('setupRosterTextarea');
+
+        if (nameInput.value.trim()) {
+          this.team.name = nameInput.value.trim();
+        }
+        if (colorInput.value.trim()) {
+          this.team.primaryColor = colorInput.value.trim();
+        }
+        this.saveTeam();
+
+        if (rosterTextarea.value.trim()) {
+          this.importText = rosterTextarea.value;
+          this.importRoster();
+        } else {
+          this.showSetupModal = false;
+          this.render();
+        }
+      }
+
+      renderTeamSettingsModal() {
         return `
-          <div class="bg-white dark:bg-gray-800 text-psu-blue dark:text-white rounded-lg shadow-lg p-6 mb-6 border-4 border-psu-blue dark:border-psu-light">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-psu-blue dark:bg-psu-light rounded-full flex items-center justify-center text-white font-display font-bold text-xl flex-shrink-0 shadow-lg">
-                  <svg viewBox="0 0 100 100" class="w-12 h-12">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="4"/>
-                    <text x="50" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="currentColor">PSU</text>
+          <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showTeamSettingsModal = false; app.render(); }">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+              <div class="p-4 text-white flex items-center justify-between" style="background: ${this.team.primaryColor};">
+                <h2 class="font-display text-xl font-bold">Team Settings</h2>
+                <button onclick="app.showTeamSettingsModal = false; app.render()" class="text-white/80 hover:text-white">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
+                </button>
+              </div>
+              <div class="p-4">
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team Name</label>
+                  <input
+                    type="text"
+                    id="settingsTeamName"
+                    value="${this.team.name}"
+                    class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
+                  <div class="flex gap-3">
+                    <input type="color" id="settingsTeamColor" value="${this.team.primaryColor}" class="w-12 h-10 rounded cursor-pointer"/>
+                    <input type="text" id="settingsTeamColorText" value="${this.team.primaryColor}" class="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-mono bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <button onclick="app.saveTeamSettings()" class="w-full text-white py-3 rounded-lg font-display font-semibold" style="background: ${this.team.primaryColor};">
+                  Save Changes
+                </button>
+              </div>
+              <div class="p-4 border-t dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Clear all data and start fresh with a new team</p>
+                <button onclick="app.resetApp()" class="w-full py-3 rounded-lg font-display font-semibold border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                  Reset App
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      saveTeamSettings() {
+        const nameInput = document.getElementById('settingsTeamName');
+        const colorInput = document.getElementById('settingsTeamColorText');
+        if (nameInput.value.trim()) this.team.name = nameInput.value.trim();
+        if (colorInput.value.trim()) this.team.primaryColor = colorInput.value.trim();
+        this.saveTeam();
+        this.showTeamSettingsModal = false;
+        this.render();
+      }
+
+      renderHeader() {
+        const stats = this.getRosterStats();
+        const progress = this.getProgressStats();
+        const mismatches = this.getPositionMismatches();
+        const totalPlayers = this.roster.length;
+
+        return `
+          <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6 mb-6 border-4" style="border-color: ${this.team.primaryColor};">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center text-white font-display font-bold text-xl flex-shrink-0 shadow-lg" style="background: ${this.team.primaryColor};">
+                  <span>${this.team.name.split(' ').map(w => w[0]).join('').substring(0, 3)}</span>
                 </div>
                 <div>
-                  <h1 class="font-display text-3xl font-bold mb-1 tracking-wide">PENN STATE FOOTBALL</h1>
-                  <p class="text-psu-light dark:text-gray-400 font-body">Interactive Depth Chart Builder</p>
+                  <h1 class="font-display text-3xl font-bold mb-1 tracking-wide">${this.team.name.toUpperCase()}</h1>
+                  <p class="text-gray-500 dark:text-gray-400 font-body">Interactive Depth Chart Builder</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
                 ${this.saving ? `
                   <span class="text-green-600 dark:text-green-400 text-sm font-semibold flex items-center gap-2 animate-savedPop">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                     Auto-saved
                   </span>
                 ` : ''}
-                <button
-                  onclick="app.toggleDarkMode()"
-                  class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors no-print"
-                  title="Toggle dark mode (D)"
-                >
+                <button onclick="app.showTeamSettingsModal = true; app.render()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors no-print" title="Team settings">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-600 dark:text-gray-300">
+                    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                  </svg>
+                </button>
+                <button onclick="app.toggleDarkMode()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors no-print" title="Toggle dark mode (D)">
                   ${this.darkMode ? `
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-yellow-500">
-                      <circle cx="12" cy="12" r="5"/>
-                      <line x1="12" y1="1" x2="12" y2="3"/>
-                      <line x1="12" y1="21" x2="12" y2="23"/>
-                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                      <line x1="1" y1="12" x2="3" y2="12"/>
-                      <line x1="21" y1="12" x2="23" y2="12"/>
-                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                     </svg>
                   ` : `
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-600">
@@ -1192,6 +1572,64 @@
                 </button>
               </div>
             </div>
+
+            ${totalPlayers > 0 ? `
+              <!-- Roster Stats & Progress -->
+              <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <!-- Progress Bar -->
+                <div class="mb-3">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Depth Chart Progress</span>
+                    <span class="text-sm font-bold" style="color: ${this.team.primaryColor};">${progress.filled}/${progress.total} positions (${progress.percentage}%)</span>
+                  </div>
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div class="h-2.5 rounded-full transition-all duration-300" style="width: ${progress.percentage}%; background: ${this.team.primaryColor};"></div>
+                  </div>
+                </div>
+
+                <!-- Roster Stats Pills (clickable for quick reorder) -->
+                <div class="flex flex-wrap gap-2 items-center">
+                  <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 py-1">ROSTER (${totalPlayers}):</span>
+                  ${Object.entries(stats).filter(([_, count]) => count > 0).map(([pos, count]) => `
+                    <button
+                      onclick="app.openDepthReorder('${pos}')"
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold transition-colors hover:ring-2 hover:ring-offset-1 ${
+                        count > 0 ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                      }"
+                      style="--tw-ring-color: ${this.team.primaryColor};"
+                      title="Click to reorder ${pos} depth"
+                    >
+                      ${pos}: ${count}
+                    </button>
+                  `).join('')}
+                  <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">(click to reorder)</span>
+                </div>
+
+                <!-- Position Mismatch Warnings -->
+                ${mismatches.length > 0 ? `
+                  <div class="mt-3 space-y-2">
+                    ${mismatches.slice(0, 3).map(m => `
+                      <div class="flex items-start gap-2 text-sm ${m.type === 'missing' ? 'text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0 mt-0.5">
+                          ${m.type === 'missing'
+                            ? '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+                            : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
+                          }
+                        </svg>
+                        <span>${m.message}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            ` : `
+              <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  No roster imported yet. Click <strong>Import</strong> to add players.
+                </p>
+              </div>
+            `}
           </div>
         `;
       }
@@ -1199,90 +1637,31 @@
       renderButtons() {
         return `
           <div class="flex flex-wrap gap-3 mb-6 no-print">
-            <button onclick="app.undo()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-psu-blue dark:text-white border-2 border-psu-blue dark:border-psu-light px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed" ${this.undoStack.length === 0 ? 'disabled' : ''} title="Undo (Ctrl+Z)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="1 4 1 10 7 10"/>
-                <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-              </svg>
+            <button onclick="app.undo()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50" style="border-color: ${this.team.primaryColor};" ${this.undoStack.length === 0 ? 'disabled' : ''}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
               Undo
             </button>
-            <button onclick="app.redo()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-psu-blue dark:text-white border-2 border-psu-blue dark:border-psu-light px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed" ${this.redoStack.length === 0 ? 'disabled' : ''} title="Redo (Ctrl+Shift+Z)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="23 4 23 10 17 10"/>
-                <path d="M20.49 15a9 9 0 11-2.13-9.36L23 10"/>
-              </svg>
+            <button onclick="app.redo()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50" style="border-color: ${this.team.primaryColor};" ${this.redoStack.length === 0 ? 'disabled' : ''}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.13-9.36L23 10"/></svg>
               Redo
             </button>
             <div class="w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
-            <button onclick="app.showImportModal = true; app.render()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-psu-blue dark:text-white border-2 border-psu-blue dark:border-psu-light px-4 py-2 rounded-lg font-semibold transition-colors">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-              </svg>
+            <button onclick="app.showImportModal = true; app.render()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-2 px-4 py-2 rounded-lg font-semibold transition-colors" style="border-color: ${this.team.primaryColor};">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
               Import
             </button>
-            <button onclick="app.exportDepthChart()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-psu-blue dark:text-white border-2 border-psu-blue dark:border-psu-light px-4 py-2 rounded-lg font-semibold transition-colors">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-              </svg>
+            <button onclick="app.exportDepthChart()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-2 px-4 py-2 rounded-lg font-semibold transition-colors" style="border-color: ${this.team.primaryColor};">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               Export
             </button>
-            <button onclick="app.printChart()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-psu-blue dark:text-white border-2 border-psu-blue dark:border-psu-light px-4 py-2 rounded-lg font-semibold transition-colors">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 6 2 18 2 18 9"/>
-                <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-                <rect x="6" y="14" width="12" height="8"/>
-              </svg>
+            <button onclick="app.printChart()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-2 px-4 py-2 rounded-lg font-semibold transition-colors" style="border-color: ${this.team.primaryColor};">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               Print
             </button>
             <button onclick="app.showResetConfirmation()" class="flex items-center gap-2 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 border-2 border-red-300 dark:border-red-800 px-4 py-2 rounded-lg font-semibold transition-colors">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-              </svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
               Reset
             </button>
-            <div class="w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
-            <div class="relative">
-              <button onclick="app.toggleShareMenu()" class="flex items-center gap-2 bg-psu-blue dark:bg-psu-light hover:bg-psu-light dark:hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="18" cy="5" r="3"/>
-                  <circle cx="6" cy="12" r="3"/>
-                  <circle cx="18" cy="19" r="3"/>
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-                Share
-              </button>
-              ${this.showShareMenu ? `
-              <div class="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border-2 border-psu-blue dark:border-psu-light rounded-lg shadow-xl z-50 min-w-[200px] animate-fadeIn">
-                <button onclick="app.shareToTwitter()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors rounded-t-lg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-gray-800 dark:text-white">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                  <span class="text-gray-800 dark:text-white font-medium">Share on X</span>
-                </button>
-                <button onclick="app.shareToFacebook()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                  <span class="text-gray-800 dark:text-white font-medium">Share on Facebook</span>
-                </button>
-                <button onclick="app.shareToReddit()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF4500">
-                    <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
-                  </svg>
-                  <span class="text-gray-800 dark:text-white font-medium">Share on Reddit</span>
-                </button>
-                <button onclick="app.copyLink()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors rounded-b-lg border-t border-gray-200 dark:border-gray-600">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-600 dark:text-gray-300">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                  </svg>
-                  <span class="text-gray-800 dark:text-white font-medium">${this.linkCopied ? 'Copied!' : 'Copy Link'}</span>
-                </button>
-              </div>
-              ` : ''}
-            </div>
           </div>
         `;
       }
@@ -1293,17 +1672,18 @@
           { key: 'defense', label: 'DEFENSE', icon: '🛡️' },
           { key: 'special', label: 'SPECIAL TEAMS', icon: '⭐' }
         ];
-        
+
         return `
           <div class="flex gap-2 mb-4">
             ${tabs.map(tab => `
-              <button 
+              <button
                 onclick="app.activeTab = '${tab.key}'; app.render()"
                 class="px-6 py-3 rounded-t-lg font-display font-semibold text-lg tracking-wide transition-all border-2 ${
                   this.activeTab === tab.key
-                    ? 'bg-white dark:bg-gray-800 text-psu-blue dark:text-white border-psu-blue dark:border-psu-light shadow-lg -mb-[2px] relative z-10'
-                    : 'bg-psu-light/50 dark:bg-gray-700 text-white border-transparent hover:bg-psu-light dark:hover:bg-gray-600'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-lg -mb-[2px] relative z-10'
+                    : 'bg-gray-200/50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                 }"
+                style="${this.activeTab === tab.key ? `border-color: ${this.team.primaryColor};` : ''}"
               >
                 <span class="mr-2">${tab.icon}</span>
                 ${tab.label}
@@ -1315,59 +1695,75 @@
 
       renderDepthSelector() {
         return `
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4 border-2 border-psu-blue dark:border-psu-light">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4 border-2" style="border-color: ${this.team.primaryColor};">
             <div class="flex items-center gap-4 flex-wrap">
-              <span class="font-display font-semibold text-psu-blue dark:text-white">DEPTH LEVEL:</span>
+              <span class="font-display font-semibold text-gray-900 dark:text-white">DEPTH LEVEL:</span>
               <div class="flex gap-2">
                 ${[0, 1, 2].map(level => `
                   <button
                     onclick="app.depthLevel = ${level}; app.render()"
                     class="px-4 py-2 rounded-lg font-semibold transition-all border-2 ${
                       this.depthLevel === level
-                        ? 'bg-psu-blue dark:bg-psu-light text-white border-psu-blue dark:border-psu-light shadow-md scale-105'
-                        : 'bg-white dark:bg-gray-700 text-psu-blue dark:text-white border-psu-blue dark:border-psu-light hover:bg-gray-50 dark:hover:bg-gray-600'
+                        ? 'text-white shadow-md scale-105'
+                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600'
                     }"
+                    style="${this.depthLevel === level ? `background: ${this.team.primaryColor}; border-color: ${this.team.primaryColor};` : `border-color: ${this.team.primaryColor};`}"
                   >
                     ${level === 0 ? '🥇 Starters' : level === 1 ? '🥈 2nd String' : '🥉 3rd String'}
                   </button>
                 `).join('')}
-              </div>
-              <div class="ml-auto text-sm text-gray-500 dark:text-gray-400">
-                Use ↑↓ arrow keys
               </div>
             </div>
           </div>
         `;
       }
 
-      renderField() {
-        const positions = POSITIONS[this.activeTab];
-        
+
+      renderFormationSelector() {
+        if (this.activeTab === 'special') return '';
+
+        const formations = this.activeTab === 'offense' ? FORMATIONS.offense : FORMATIONS.defense;
+        const currentFormation = this.activeTab === 'offense' ? this.offenseFormation : this.defenseFormation;
+
         return `
-          <!-- Desktop/Landscape Field View -->
-          <div class="field-view field-container bg-gradient-to-b from-field-green to-field-light rounded-lg shadow-lg p-4 md:p-8 relative overflow-hidden" style="min-height: 600px;">
-            <!-- Field markings -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4 border-2" style="border-color: ${this.team.primaryColor};">
+            <div class="flex items-center gap-4 flex-wrap">
+              <span class="font-display font-semibold text-gray-900 dark:text-white">FORMATION:</span>
+              <select
+                onchange="app.changeFormation('${this.activeTab}', this.value)"
+                class="px-4 py-2 rounded-lg font-semibold border-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white cursor-pointer"
+                style="border-color: ${this.team.primaryColor};"
+              >
+                ${Object.entries(formations).map(([key, formation]) => `
+                  <option value="${key}" ${key === currentFormation ? 'selected' : ''}>
+                    ${formation.name}
+                  </option>
+                `).join('')}
+              </select>
+              <span class="text-sm text-gray-500 dark:text-gray-400">
+                ${formations[currentFormation]?.description || ''}
+              </span>
+            </div>
+          </div>
+        `;
+      }
+
+      renderField() {
+        const positions = this.getPositions(this.activeTab);
+
+        return `
+          <div class="field-view field-container bg-gradient-to-b from-green-700 to-green-600 rounded-lg shadow-lg p-4 md:p-8 relative overflow-hidden" style="min-height: 600px;">
             <div class="field-lines absolute inset-0 pointer-events-none"></div>
-            
-            <!-- Yard line numbers -->
             <div class="absolute left-2 top-1/2 -translate-y-1/2 text-white/20 font-display text-4xl font-bold">50</div>
             <div class="absolute right-2 top-1/2 -translate-y-1/2 text-white/20 font-display text-4xl font-bold">50</div>
-            
             ${positions.map((pos, index) => this.renderPosition(pos, index)).join('')}
-            
             <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/20 font-display text-4xl font-bold tracking-widest">
               ${this.activeTab === 'offense' ? 'OFFENSE' : this.activeTab === 'defense' ? 'DEFENSE' : 'SPECIAL TEAMS'}
             </div>
-            
-            <!-- Print header -->
-            <div class="print-only absolute top-2 left-2 text-sm text-gray-600">
-              Penn State Football Depth Chart - ${new Date().toLocaleDateString()}
-            </div>
           </div>
-          
-          <!-- Mobile Portrait List View -->
+
           <div class="mobile-list-view bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-            <div class="bg-field-green p-3 text-center">
+            <div class="bg-green-700 p-3 text-center">
               <span class="text-white font-display text-xl font-bold tracking-widest">
                 ${this.activeTab === 'offense' ? 'OFFENSE' : this.activeTab === 'defense' ? 'DEFENSE' : 'SPECIAL TEAMS'}
               </span>
@@ -1383,20 +1779,12 @@
         const posKey = pos.isRight ? `${pos.code}-R` : pos.code;
         const player = this.depthChart[posKey]?.[this.depthLevel];
         const isDragOver = this.dragOverPosition?.position === posKey && this.dragOverPosition?.depth === this.depthLevel;
-        
+
         return `
-          <div 
-            class="absolute transform -translate-x-1/2 -translate-y-1/2 position-card"
-            style="left: ${pos.x}%; top: ${pos.y}%;"
-            data-position="${posKey}"
-            data-depth="${this.depthLevel}"
-          >
-            <div 
-              class="tooltip ${player ? 'bg-psu-blue dark:bg-psu-light hover:bg-psu-light dark:hover:bg-blue-700' : 'bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 border-2 border-psu-blue dark:border-psu-light'} 
-                     ${player ? 'text-white' : 'text-psu-blue dark:text-white'} 
-                     ${isDragOver ? 'drag-over' : ''}
-                     rounded-lg shadow-lg transition-colors cursor-pointer position-card-inner"
-              style="min-width: 80px;"
+          <div class="absolute transform -translate-x-1/2 -translate-y-1/2 position-card" style="left: ${pos.x}%; top: ${pos.y}%;" data-position="${posKey}" data-depth="${this.depthLevel}">
+            <div
+              class="tooltip ${player ? 'text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-2'} ${isDragOver ? 'drag-over' : ''} rounded-lg shadow-lg transition-colors cursor-pointer position-card-inner"
+              style="min-width: 80px; ${player ? `background: ${this.team.primaryColor};` : `border-color: ${this.team.primaryColor};`}"
               data-tooltip="${pos.fullName}"
               onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.depthLevel} }; app.showPlayerModal = true; app.render()"
               draggable="${player ? 'true' : 'false'}"
@@ -1405,7 +1793,7 @@
               ondragleave="app.handleDragLeave()"
               ondrop="app.handleDrop('${posKey}', ${this.depthLevel})"
             >
-              <div class="px-2 py-1 ${player ? 'border-b border-white/30' : 'border-b-2 border-psu-blue dark:border-psu-light'} text-center">
+              <div class="px-2 py-1 ${player ? 'border-b border-white/30' : 'border-b-2'} text-center" style="${!player ? `border-color: ${this.team.primaryColor};` : ''}">
                 <div class="text-xs font-display font-bold tracking-wide">${pos.name}</div>
               </div>
               ${player ? `
@@ -1415,19 +1803,14 @@
                   </div>
                   <div class="font-display font-bold text-sm">#${player.number}</div>
                   <div class="text-xs truncate max-w-[70px]" title="${player.name}${player.height ? ' • ' + player.height : ''}${player.weight ? ' • ' + player.weight : ''}">${this.getPlayerLastName(player.name)}</div>
-                  <button onclick="event.stopPropagation(); app.viewPlayerDetails(${JSON.stringify(player).replace(/"/g, '&quot;')})" class="inline-block mt-1 text-white/70 hover:text-white" title="View player info">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="16" x2="12" y2="12"/>
-                      <line x1="12" y1="8" x2="12.01" y2="8"/>
-                    </svg>
-                  </button>
+                  ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="inline-block mt-1 text-white/70 hover:text-white" title="View player page">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>` : ''}
                 </div>
               ` : `
                 <div class="px-2 py-3 text-center">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto opacity-50">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                   </svg>
                 </div>
               `}
@@ -1439,14 +1822,14 @@
       renderMobilePosition(pos, index) {
         const posKey = pos.isRight ? `${pos.code}-R` : pos.code;
         const player = this.depthChart[posKey]?.[this.depthLevel];
-        
+
         return `
-          <div 
-            class="flex items-center p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors"
+          <div
+            class="flex items-center p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.depthLevel} }; app.showPlayerModal = true; app.render()"
           >
             <div class="w-16 flex-shrink-0">
-              <div class="bg-psu-blue dark:bg-psu-light text-white text-center py-1 px-2 rounded font-display font-bold text-sm">
+              <div class="text-white text-center py-1 px-2 rounded font-display font-bold text-sm" style="background: ${this.team.primaryColor};">
                 ${pos.name}
               </div>
             </div>
@@ -1454,35 +1837,23 @@
               <div class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">${pos.fullName}</div>
               ${player ? `
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 bg-psu-blue dark:bg-psu-light text-white rounded-full flex items-center justify-center text-xs font-bold">
+                  <div class="w-8 h-8 text-white rounded-full flex items-center justify-center text-xs font-bold" style="background: ${this.team.primaryColor};">
                     ${this.getPlayerInitials(player.name)}
                   </div>
                   <div class="flex-1">
                     <div class="font-semibold text-gray-900 dark:text-white text-sm">#${player.number} ${player.name}</div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">${player.year}${player.height ? ` • ${player.height}` : ''}${player.weight ? ` • ${player.weight}` : ''}</div>
                   </div>
-                  ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-psu-blue dark:hover:text-psu-light">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                      <polyline points="15 3 21 3 21 9"/>
-                      <line x1="10" y1="14" x2="21" y2="3"/>
-                    </svg>
+                  ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>` : ''}
                 </div>
               ` : `
-                <div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                  <span class="text-sm">Tap to assign player</span>
+                <div class="flex items-center gap-2 text-gray-400">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span class="text-sm">Tap to assign</span>
                 </div>
               `}
-            </div>
-            <div class="flex-shrink-0 text-gray-400 dark:text-gray-500">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
             </div>
           </div>
         `;
@@ -1491,12 +1862,11 @@
       renderKeyboardHints() {
         return `
           <div class="mt-4 text-center text-white/60 text-sm no-print">
-            <span class="inline-flex items-center gap-4">
-              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">←→</kbd> Switch tabs</span>
-              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">↑↓</kbd> Depth level</span>
+            <span class="inline-flex items-center gap-4 flex-wrap justify-center">
+              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">←→</kbd> Tabs</span>
+              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">↑↓</kbd> Depth</span>
               <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">Ctrl+Z</kbd> Undo</span>
-              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">D</kbd> Dark mode</span>
-              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">Esc</kbd> Close modal</span>
+              <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">D</kbd> Dark</span>
             </span>
           </div>
         `;
@@ -1504,98 +1874,67 @@
 
       renderPlayerModal() {
         if (!this.selectedSlot) return '';
-        
+
         const { position, depth } = this.selectedSlot;
         const availablePlayers = this.getAvailablePlayers(position);
         const currentPlayer = this.depthChart[position]?.[depth];
-        
-        // Find position info for full name
+
         const allPositions = [...POSITIONS.offense, ...POSITIONS.defense, ...POSITIONS.special];
         const posInfo = allPositions.find(p => {
           const key = p.isRight ? `${p.code}-R` : p.code;
           return key === position;
         });
-        
+
         return `
           <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showPlayerModal = false; app.selectedSlot = null; app.searchQuery = ''; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
-              <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between bg-psu-blue dark:bg-psu-light text-white">
+              <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between text-white" style="background: ${this.team.primaryColor};">
                 <div>
-                  <h2 class="font-display text-xl font-bold">
-                    ${posInfo?.fullName || position}
-                  </h2>
-                  <p class="text-sm text-white/70">
-                    ${depth === 0 ? 'Starter' : `${depth + 1}${depth === 1 ? 'nd' : depth === 2 ? 'rd' : 'th'} String`}
-                  </p>
+                  <h2 class="font-display text-xl font-bold">${posInfo?.fullName || position}</h2>
+                  <p class="text-sm text-white/70">${depth === 0 ? 'Starter' : `${depth + 1}${depth === 1 ? 'nd' : 'rd'} String`}</p>
                 </div>
                 <button onclick="app.showPlayerModal = false; app.selectedSlot = null; app.searchQuery = ''; app.render()" class="text-white/80 hover:text-white p-1">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
-              
+
               <div class="p-4 border-b dark:border-gray-700">
                 <div class="relative">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
-                  <input
-                    type="text"
-                    id="playerSearch"
-                    placeholder="Search by name or number..."
-                    class="w-full pl-10 pr-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:border-psu-blue dark:focus:border-psu-light focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value="${this.searchQuery}"
-                  />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="playerSearch" placeholder="Search by name or number..." class="w-full pl-10 pr-4 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" value="${this.searchQuery}"/>
                 </div>
               </div>
-              
+
               <div class="p-4 overflow-y-auto flex-1">
                 ${currentPlayer ? `
-                  <div class="mb-4 p-4 bg-psu-blue/10 dark:bg-psu-light/20 rounded-lg border border-psu-blue/30 dark:border-psu-light/30">
-                    <div class="text-xs font-semibold text-psu-blue dark:text-psu-light mb-2 uppercase tracking-wide">Current Player</div>
+                  <div class="mb-4 p-4 rounded-lg border" style="background: ${this.team.primaryColor}10; border-color: ${this.team.primaryColor}30;">
+                    <div class="text-xs font-semibold mb-2 uppercase tracking-wide" style="color: ${this.team.primaryColor};">Current Player</div>
                     <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 bg-psu-blue dark:bg-psu-light text-white rounded-full flex items-center justify-center font-bold text-lg">
+                      <div class="w-12 h-12 text-white rounded-full flex items-center justify-center font-bold text-lg" style="background: ${this.team.primaryColor};">
                         ${this.getPlayerInitials(currentPlayer.name)}
                       </div>
                       <div class="flex-1">
                         <div class="font-bold text-gray-900 dark:text-white">
                           #${currentPlayer.number}
-                          ${currentPlayer.url ? `<a href="${currentPlayer.url}" target="_blank" class="hover:underline hover:text-psu-light">${currentPlayer.name}</a>` : currentPlayer.name}
+                          ${currentPlayer.url ? `<a href="${currentPlayer.url}" target="_blank" class="hover:underline">${currentPlayer.name}</a>` : currentPlayer.name}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">${currentPlayer.year}${currentPlayer.height ? ` • ${currentPlayer.height}` : ''}${currentPlayer.weight ? ` • ${currentPlayer.weight}` : ''}</div>
-                        ${currentPlayer.hometown ? `<div class="text-xs text-gray-500 dark:text-gray-500">${currentPlayer.hometown}</div>` : ''}
+                        ${currentPlayer.hometown ? `<div class="text-xs text-gray-500">${currentPlayer.hometown}</div>` : ''}
                       </div>
-                      <button onclick="app.removePlayer('${position}', ${depth})" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Remove player">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg>
+                      <button onclick="app.removePlayer('${position}', ${depth})" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" title="Remove">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                       </button>
                     </div>
                   </div>
                 ` : ''}
 
-                ${availablePlayers.length === 0 ? `
-                  <div class="text-center py-8">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-gray-300 dark:text-gray-600 mb-3">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="15" y1="9" x2="9" y2="15"/>
-                      <line x1="9" y1="9" x2="15" y2="15"/>
-                    </svg>
-                    <p class="text-gray-500 dark:text-gray-400">
-                      ${this.searchQuery ? 'No players match your search' : 'No available players for this position'}
-                    </p>
-                  </div>
-                ` : `
+                ${availablePlayers.length === 0 ? this.renderEmptyPlayerState(position) : `
                   <div class="space-y-2">
                     ${availablePlayers.map((player, i) => `
                       <button
                         onclick="app.addPlayer('${position}', ${depth}, ${JSON.stringify(player).replace(/"/g, '&quot;')})"
-                        class="w-full text-left bg-gray-50 dark:bg-gray-700 hover:bg-psu-blue/10 dark:hover:bg-psu-light/20 border border-gray-200 dark:border-gray-600 hover:border-psu-blue dark:hover:border-psu-light rounded-lg p-3 transition-colors"
-                        >
+                        class="w-full text-left bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg p-3 transition-colors"
+                      >
                         <div class="flex items-center gap-3">
                           <div class="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm font-semibold">
                             ${this.getPlayerInitials(player.name)}
@@ -1605,12 +1944,8 @@
                             <div class="text-sm text-gray-500 dark:text-gray-400">${player.position} • ${player.year}${player.height ? ` • ${player.height}` : ''}${player.weight ? ` • ${player.weight}` : ''}</div>
                             ${player.hometown ? `<div class="text-xs text-gray-400 dark:text-gray-500">${player.hometown}${player.previousSchool ? ` (${player.previousSchool})` : ''}</div>` : ''}
                           </div>
-                          ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-psu-blue dark:hover:text-psu-light" title="View player page">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                              <polyline points="15 3 21 3 21 9"/>
-                              <line x1="10" y1="14" x2="21" y2="3"/>
-                            </svg>
+                          ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600" title="View profile">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                           </a>` : ''}
                         </div>
                       </button>
@@ -1623,53 +1958,162 @@
         `;
       }
 
+      renderEmptyPlayerState(position) {
+        if (this.searchQuery) {
+          return `
+            <div class="text-center py-8">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-gray-300 dark:text-gray-600 mb-3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <p class="text-gray-500 dark:text-gray-400 font-semibold">No players match "${this.searchQuery}"</p>
+              <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Try a different search term</p>
+            </div>
+          `;
+        }
+
+        // Determine what positions would match this slot
+        const posBase = position.replace('-R', '').replace(/-\d+$/, '');
+        const positionNames = {
+          'QB': 'Quarterback (QB)',
+          'RB': 'Running Back (RB)',
+          'FB': 'Fullback (FB, RB)',
+          'WR': 'Wide Receiver (WR)',
+          'TE': 'Tight End (TE)',
+          'OT': 'Offensive Tackle (OL, OT)',
+          'OG': 'Offensive Guard (OL, OG)',
+          'C': 'Center (OL, C)',
+          'DE': 'Defensive End (DE, DL, EDGE)',
+          'DT': 'Defensive Tackle (DT, DL, NT)',
+          'LB': 'Linebacker (LB, ILB, OLB, MLB)',
+          'CB': 'Cornerback (CB, DB)',
+          'S': 'Safety (S, FS, SS)',
+          'K': 'Kicker (K, PK)',
+          'P': 'Punter (P)',
+          'LS': 'Long Snapper (LS, SNP)'
+        };
+
+        const expectedPositions = positionNames[posBase] || posBase;
+        const stats = this.getRosterStats();
+        const rosterTotal = this.roster.length;
+
+        // Check if all players are already assigned
+        const allAssigned = [];
+        Object.values(this.depthChart).forEach(depthArray => {
+          depthArray.forEach(player => {
+            if (player) allAssigned.push(player);
+          });
+        });
+
+        // Get players that match this position (before filtering out assigned)
+        let matchingPos = posBase;
+        if (posBase.startsWith('WR')) matchingPos = 'WR';
+        else if (posBase.startsWith('TE')) matchingPos = 'TE';
+        else if (posBase.startsWith('RB') || posBase === 'FB') matchingPos = 'RB';
+        else if (['OT', 'OG', 'C'].includes(posBase)) matchingPos = 'OL';
+        else if (posBase.startsWith('CB')) matchingPos = 'CB';
+        else if (posBase.startsWith('S-')) matchingPos = 'S';
+        else if (posBase.startsWith('LB')) matchingPos = 'LB';
+        else if (posBase.startsWith('DE')) matchingPos = 'DE';
+        else if (posBase.startsWith('DT')) matchingPos = 'DT';
+
+        const matchingPlayers = this.roster.filter(p => {
+          if (matchingPos === 'DE' || matchingPos === 'DT') {
+            return ['DE', 'DT', 'DL', 'EDGE', 'NT'].includes(p.position);
+          }
+          if (matchingPos === 'OL') {
+            return ['OL', 'OT', 'OG', 'C'].includes(p.position);
+          }
+          if (matchingPos === 'CB') {
+            return ['CB', 'DB'].includes(p.position);
+          }
+          if (matchingPos === 'S') {
+            return ['S', 'SS', 'FS', 'DB'].includes(p.position);
+          }
+          if (matchingPos === 'RB') {
+            return ['RB', 'FB'].includes(p.position);
+          }
+          return p.position === matchingPos;
+        });
+
+        const assignedCount = matchingPlayers.filter(p =>
+          allAssigned.some(a => a.number === p.number && a.name === p.name)
+        ).length;
+
+        if (rosterTotal === 0) {
+          return `
+            <div class="text-center py-8">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-amber-400 mb-3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <p class="text-gray-700 dark:text-gray-300 font-semibold">No roster imported</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Import a roster to start adding players</p>
+              <button onclick="app.showPlayerModal = false; app.showImportModal = true; app.render()" class="mt-3 px-4 py-2 text-white rounded-lg text-sm font-semibold" style="background: ${this.team.primaryColor};">
+                Import Roster
+              </button>
+            </div>
+          `;
+        }
+
+        if (matchingPlayers.length === 0) {
+          return `
+            <div class="text-center py-8">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-amber-400 mb-3"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <p class="text-gray-700 dark:text-gray-300 font-semibold">No ${expectedPositions} in roster</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Your roster doesn't have players with matching positions</p>
+              <div class="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-left text-sm">
+                <p class="text-gray-600 dark:text-gray-400 mb-2">Players need one of these positions:</p>
+                <p class="font-mono text-xs text-gray-500">${expectedPositions}</p>
+              </div>
+            </div>
+          `;
+        }
+
+        if (assignedCount === matchingPlayers.length) {
+          return `
+            <div class="text-center py-8">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-green-500 mb-3"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <p class="text-gray-700 dark:text-gray-300 font-semibold">All ${matchingPos} players assigned!</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">${assignedCount} of ${matchingPlayers.length} players are on the depth chart</p>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="text-center py-8">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto text-gray-300 dark:text-gray-600 mb-3"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <p class="text-gray-500 dark:text-gray-400">No available players for this position</p>
+          </div>
+        `;
+      }
+
       renderImportModal() {
         return `
           <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-              <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between bg-psu-blue dark:bg-psu-light text-white">
+              <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between text-white" style="background: ${this.team.primaryColor};">
                 <h2 class="font-display text-xl font-bold">Import Roster</h2>
                 <button onclick="app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render()" class="text-white/80 hover:text-white">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
-              
+
               <div class="p-4 overflow-y-auto flex-1">
                 <div class="mb-4">
                   <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Paste roster data below. Each line should contain:</p>
                   <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200 mb-2">#19 Jack Lambert QB RJr</div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Format: #Number Name Position Year (or use commas: 19, Jack Lambert, QB, RJr)</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Format: #Number Name Position Year (or commas)</p>
                 </div>
 
-                <textarea
-                  id="importTextarea"
-                  placeholder="Paste roster data here..."
-                  class="w-full h-64 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-mono text-sm focus:border-psu-blue dark:focus:border-psu-light focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >${this.importText}</textarea>
+                <textarea id="importTextarea" placeholder="Paste roster data here..." class="w-full h-64 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-mono text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">${this.importText}</textarea>
 
                 ${this.importMessage ? `
-                  <div class="mt-3 p-3 rounded-lg ${
-                    this.importMessage.startsWith('✓') ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                  }">
+                  <div class="mt-3 p-3 rounded-lg ${this.importMessage.includes('Success') ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'}">
                     ${this.importMessage}
                   </div>
                 ` : ''}
               </div>
 
               <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex gap-3">
-                <button
-                  onclick="app.importRoster()"
-                  class="flex-1 bg-psu-blue dark:bg-psu-light hover:bg-psu-light dark:hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-display font-semibold transition-colors"
-                >
+                <button onclick="app.importRoster()" class="flex-1 text-white px-4 py-3 rounded-lg font-display font-semibold" style="background: ${this.team.primaryColor};">
                   Import Roster
                 </button>
-                <button
-                  onclick="app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render()"
-                  class="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-psu-blue dark:border-psu-light text-psu-blue dark:text-white rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
+                <button onclick="app.showImportModal = false; app.importText = ''; app.importMessage = ''; app.render()" class="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white rounded-lg font-semibold">
                   Cancel
                 </button>
               </div>
@@ -1685,28 +2129,14 @@
               <div class="p-6 text-center">
                 <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                   </svg>
                 </div>
                 <h2 class="font-display text-2xl font-bold text-gray-900 dark:text-white mb-2">Reset Depth Chart?</h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  This will remove all player assignments. You can undo this action with <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">Ctrl+Z</kbd>.
-                </p>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">This will remove all player assignments. You can undo with Ctrl+Z.</p>
                 <div class="flex gap-3">
-                  <button
-                    onclick="app.showResetModal = false; app.render()"
-                    class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onclick="app.confirmReset()"
-                    class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors"
-                  >
-                    Reset Chart
-                  </button>
+                  <button onclick="app.showResetModal = false; app.render()" class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</button>
+                  <button onclick="app.confirmReset()" class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold">Reset</button>
                 </div>
               </div>
             </div>
@@ -1714,108 +2144,153 @@
         `;
       }
 
-      renderPlayerDetails() {
-        const p = this.viewingPlayer;
-        if (!p) return '';
+      renderAppResetModal() {
+        return `
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showAppResetModal = false; app.render(); }">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+              <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <h2 class="font-display text-2xl font-bold text-gray-900 dark:text-white mb-2">Reset Entire App?</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">This will clear all data including your roster and depth chart. The app will return to its initial setup state.</p>
+                <div class="flex gap-3">
+                  <button onclick="app.showAppResetModal = false; app.render()" class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</button>
+                  <button onclick="app.confirmAppReset()" class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold">Reset App</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      renderDepthReorderModal() {
+        if (!this.selectedPositionGroup) return '';
+
+        const group = this.selectedPositionGroup;
+        const players = this.getPlayersForGroup(group);
+        const slots = this.getDepthSlotsForGroup(group);
+
+        // Get currently assigned players
+        const assignedPlayerKeys = new Set();
+        Object.values(this.depthChart).forEach(depthArray => {
+          depthArray?.forEach(player => {
+            if (player) assignedPlayerKeys.add(`${player.number}-${player.name}`);
+          });
+        });
+
+        // Filter to unassigned players for this group
+        const unassignedPlayers = players.filter(p => !assignedPlayerKeys.has(`${p.number}-${p.name}`));
 
         return `
-          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.closePlayerDetails(); }">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden animate-fadeIn">
-              <!-- Header -->
-              <div class="bg-gradient-to-r from-psu-blue to-psu-light p-6 text-white">
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center gap-4">
-                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-3xl font-display font-bold">
-                      ${p.number || '--'}
-                    </div>
-                    <div>
-                      <h2 class="font-display text-2xl font-bold">${p.name}</h2>
-                      <p class="text-white/80">${p.position} • ${p.year}</p>
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showDepthReorderModal = false; app.selectedPositionGroup = null; app.render(); }">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between text-white" style="background: ${this.team.primaryColor};">
+                <div>
+                  <h2 class="font-display text-xl font-bold">${group} Depth Chart</h2>
+                  <p class="text-sm text-white/70">${players.length} players in roster</p>
+                </div>
+                <button onclick="app.showDepthReorderModal = false; app.selectedPositionGroup = null; app.render()" class="text-white/80 hover:text-white p-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+
+              <div class="p-4 overflow-y-auto flex-1">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <!-- Position Slots -->
+                  <div>
+                    <h3 class="font-display font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                      Depth Chart Slots
+                    </h3>
+                    <div class="space-y-4">
+                      ${slots.map(slot => `
+                        <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
+                          <div class="px-3 py-2 text-sm font-semibold text-white" style="background: ${this.team.primaryColor};">
+                            ${slot.name}
+                          </div>
+                          <div class="divide-y dark:divide-gray-700">
+                            ${[0, 1, 2].slice(0, slot.depth).map(d => {
+                              const player = this.depthChart[slot.key]?.[d];
+                              return `
+                                <div class="p-2 flex items-center gap-2 ${player ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}">
+                                  <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${d === 0 ? 'bg-yellow-400 text-yellow-900' : d === 1 ? 'bg-gray-300 text-gray-700' : 'bg-amber-600 text-white'}">
+                                    ${d + 1}
+                                  </span>
+                                  ${player ? `
+                                    <div class="flex-1">
+                                      <span class="font-semibold text-gray-900 dark:text-white text-sm">#${player.number} ${player.name}</span>
+                                      <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">${player.year || ''}</span>
+                                    </div>
+                                    <button onclick="app.removeFromReorder('${slot.key}', ${d})" class="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="Remove">
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                  ` : `
+                                    <span class="flex-1 text-gray-400 dark:text-gray-500 text-sm italic">Empty - select from available players</span>
+                                  `}
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                        </div>
+                      `).join('')}
                     </div>
                   </div>
-                  <button onclick="app.closePlayerDetails()" class="text-white/70 hover:text-white p-1">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
+
+                  <!-- Available Players -->
+                  <div>
+                    <h3 class="font-display font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                      Available Players (${unassignedPlayers.length})
+                    </h3>
+                    ${unassignedPlayers.length === 0 ? `
+                      <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-3 text-green-500"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <p class="font-semibold">All ${group} players assigned!</p>
+                      </div>
+                    ` : `
+                      <div class="space-y-2 max-h-96 overflow-y-auto">
+                        ${unassignedPlayers.map(player => `
+                          <div class="border dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-700/50">
+                            <div class="flex items-center gap-3 mb-2">
+                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background: ${this.team.primaryColor};">
+                                ${this.getPlayerInitials(player.name)}
+                              </div>
+                              <div class="flex-1">
+                                <div class="font-semibold text-gray-900 dark:text-white">#${player.number} ${player.name}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">${player.position} • ${player.year}${player.height ? ` • ${player.height}` : ''}${player.weight ? ` • ${player.weight}` : ''}</div>
+                              </div>
+                            </div>
+                            <div class="flex flex-wrap gap-1">
+                              ${slots.map(slot => `
+                                ${[0, 1, 2].slice(0, slot.depth).map(d => {
+                                  const occupied = this.depthChart[slot.key]?.[d];
+                                  return !occupied ? `
+                                    <button
+                                      onclick="app.assignFromReorder('${slot.key}', ${d}, ${JSON.stringify(player).replace(/"/g, '&quot;')})"
+                                      class="px-2 py-1 text-xs rounded border hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                                      style="border-color: ${this.team.primaryColor}; color: ${this.team.primaryColor};"
+                                    >
+                                      ${slot.name} #${d + 1}
+                                    </button>
+                                  ` : '';
+                                }).join('')}
+                              `).join('')}
+                            </div>
+                          </div>
+                        `).join('')}
+                      </div>
+                    `}
+                  </div>
                 </div>
               </div>
 
-              <!-- Stats -->
-              <div class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                  ${p.height ? `
-                  <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Height</div>
-                    <div class="text-lg font-semibold text-gray-900 dark:text-white">${p.height}</div>
-                  </div>
-                  ` : ''}
-                  ${p.weight ? `
-                  <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Weight</div>
-                    <div class="text-lg font-semibold text-gray-900 dark:text-white">${p.weight}</div>
-                  </div>
-                  ` : ''}
-                </div>
-
-                ${p.hometown || p.highSchool || p.previousSchool ? `
-                <div class="space-y-3 mb-6">
-                  ${p.hometown ? `
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-psu-blue/10 dark:bg-psu-light/20 rounded-full flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-psu-blue dark:text-psu-light">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">Hometown</div>
-                      <div class="text-gray-900 dark:text-white font-medium">${p.hometown}</div>
-                    </div>
-                  </div>
-                  ` : ''}
-                  ${p.highSchool ? `
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-psu-blue/10 dark:bg-psu-light/20 rounded-full flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-psu-blue dark:text-psu-light">
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">High School</div>
-                      <div class="text-gray-900 dark:text-white font-medium">${p.highSchool}</div>
-                    </div>
-                  </div>
-                  ` : ''}
-                  ${p.previousSchool ? `
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-psu-blue/10 dark:bg-psu-light/20 rounded-full flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-psu-blue dark:text-psu-light">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">Previous School</div>
-                      <div class="text-gray-900 dark:text-white font-medium">${p.previousSchool}</div>
-                    </div>
-                  </div>
-                  ` : ''}
-                </div>
-                ` : ''}
-
-                ${p.url ? `
-                <a href="${p.url}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-psu-blue hover:bg-psu-light text-white py-3 rounded-lg font-semibold transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                    <polyline points="15 3 21 3 21 9"/>
-                    <line x1="10" y1="14" x2="21" y2="3"/>
-                  </svg>
-                  View on GoPSUsports.com
-                </a>
-                ` : ''}
+              <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <button onclick="app.showDepthReorderModal = false; app.selectedPositionGroup = null; app.render()" class="w-full py-2 text-white rounded-lg font-semibold" style="background: ${this.team.primaryColor};">
+                  Done
+                </button>
               </div>
             </div>
           </div>
@@ -1825,17 +2300,47 @@
       attachEventListeners() {
         const textarea = document.getElementById('importTextarea');
         if (textarea) {
-          textarea.addEventListener('input', (e) => {
-            this.importText = e.target.value;
+          textarea.addEventListener('input', (e) => { this.importText = e.target.value; });
+        }
+
+        const setupTextarea = document.getElementById('setupRosterTextarea');
+        if (setupTextarea) {
+          setupTextarea.addEventListener('input', (e) => { this.importText = e.target.value; });
+        }
+
+        const colorInput = document.getElementById('teamColorInput');
+        const colorText = document.getElementById('teamColorText');
+        if (colorInput && colorText) {
+          colorInput.addEventListener('input', (e) => { colorText.value = e.target.value; });
+          colorText.addEventListener('input', (e) => { colorInput.value = e.target.value; });
+        }
+
+        const settingsColor = document.getElementById('settingsTeamColor');
+        const settingsColorText = document.getElementById('settingsTeamColorText');
+        if (settingsColor && settingsColorText) {
+          settingsColor.addEventListener('input', (e) => { settingsColorText.value = e.target.value; });
+          settingsColorText.addEventListener('input', (e) => { settingsColor.value = e.target.value; });
+        }
+
+        // URL input for roster import
+        const urlInput = document.getElementById('rosterUrlInput');
+        const commandOutput = document.getElementById('commandOutput');
+        if (urlInput && commandOutput) {
+          urlInput.addEventListener('input', (e) => {
+            const url = e.target.value.trim();
+            if (url) {
+              commandOutput.value = `node scrape-roster.js "${url}" && node update-html.js`;
+            } else {
+              commandOutput.value = '';
+            }
           });
         }
-        
+
         const searchInput = document.getElementById('playerSearch');
         if (searchInput) {
           searchInput.addEventListener('input', (e) => {
             this.searchQuery = e.target.value;
             this.render();
-            // Re-focus the search input after render
             setTimeout(() => {
               const newInput = document.getElementById('playerSearch');
               if (newInput) {
@@ -1850,21 +2355,6 @@
     }
 
     const app = new DepthChartApp();
-  </script>
-
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('ServiceWorker registered:', registration.scope);
-          })
-          .catch(error => {
-            console.log('ServiceWorker registration failed:', error);
-          });
-      });
-    }
   </script>
 </body>
 </html>

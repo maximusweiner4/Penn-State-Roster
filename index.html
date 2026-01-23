@@ -1116,8 +1116,7 @@
           'OL': ['OL', 'OT', 'OG', 'C'],
           'DL': ['DL', 'DT', 'DE', 'NT', 'EDGE'],
           'LB': ['LB', 'ILB', 'OLB', 'MLB'],
-          'CB': ['CB', 'DB'],
-          'S': ['S', 'SS', 'FS', 'DB'],
+          'DB': ['DB', 'CB', 'S', 'SS', 'FS'],
           'K': ['K', 'PK'],
           'P': ['P'],
           'LS': ['LS', 'SNP']
@@ -1173,7 +1172,7 @@
         }
 
         // Check for missing position groups
-        const neededGroups = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S'];
+        const neededGroups = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'DB'];
         for (const group of neededGroups) {
           if (stats[group] === 0) {
             mismatches.push({
@@ -1235,8 +1234,7 @@
           'OL': ['OL', 'OT', 'OG', 'C'],
           'DL': ['DL', 'DT', 'DE', 'NT', 'EDGE'],
           'LB': ['LB', 'ILB', 'OLB', 'MLB'],
-          'CB': ['CB', 'DB'],
-          'S': ['S', 'SS', 'FS', 'DB'],
+          'DB': ['DB', 'CB', 'S', 'SS', 'FS'],
           'K': ['K', 'PK'],
           'P': ['P'],
           'LS': ['LS', 'SNP']
@@ -1275,12 +1273,10 @@
             { key: 'LB-OLB', name: 'OLB/WILL', depth: 3 },
             { key: 'LB-ILB', name: 'ILB/MIKE', depth: 3 }
           ],
-          'CB': [
+          'DB': [
             { key: 'CB-X', name: 'CB1', depth: 3 },
             { key: 'CB-Y', name: 'CB2', depth: 3 },
-            { key: 'CB-SLOT', name: 'Nickel', depth: 3 }
-          ],
-          'S': [
+            { key: 'CB-SLOT', name: 'Nickel', depth: 3 },
             { key: 'S-FS', name: 'FS', depth: 3 },
             { key: 'S-SS', name: 'SS', depth: 3 }
           ],

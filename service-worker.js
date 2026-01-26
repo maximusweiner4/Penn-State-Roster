@@ -1,4 +1,4 @@
-const CACHE_NAME = 'psu-depth-chart-v1';
+const CACHE_NAME = 'psu-depth-chart-v2';
 const urlsToCache = [
   '/',
   '/index.html',

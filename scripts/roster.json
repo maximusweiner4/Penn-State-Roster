@@ -1222,5 +1222,53 @@
     "highSchool": "James Madison HS",
     "previousSchool": "",
     "url": "https://gopsusports.com/sports/football/roster/player/connor-barry"
+  },
+  {
+    "name": "Pete Eglitis",
+    "number": 0,
+    "position": "OL",
+    "year": "Fr.",
+    "height": "6-7",
+    "weight": "295 lbs",
+    "hometown": "Columbus, Ohio",
+    "highSchool": "",
+    "previousSchool": "",
+    "url": "https://gopsusports.com/sports/football/roster/player/pete-eglitis"
+  },
+  {
+    "name": "Elijah Reeder",
+    "number": 0,
+    "position": "DL",
+    "year": "Fr.",
+    "height": "6-6",
+    "weight": "210 lbs",
+    "hometown": "",
+    "highSchool": "Central Regional",
+    "previousSchool": "",
+    "url": "https://gopsusports.com/sports/football/roster/player/elijah-reeder"
+  },
+  {
+    "name": "Lucas Tenbrock",
+    "number": 0,
+    "position": "P",
+    "year": "Fr.",
+    "height": "6-6",
+    "weight": "210 lbs",
+    "hometown": "",
+    "highSchool": "St. Charles North",
+    "previousSchool": "",
+    "url": "https://gopsusports.com/sports/football/roster/player/lucas-tenbrock"
+  },
+  {
+    "name": "Keian Kaiser",
+    "number": 0,
+    "position": "LB",
+    "year": "Fr.",
+    "height": "6-4",
+    "weight": "215 lbs",
+    "hometown": "",
+    "highSchool": "",
+    "previousSchool": "",
+    "url": "https://gopsusports.com/sports/football/roster/player/keian-kaiser"
   }
 ]

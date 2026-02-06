@@ -1,4 +1,4 @@
-const CACHE_NAME = 'psu-depth-chart-v3';
+const CACHE_NAME = 'psu-depth-chart-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -35,24 +35,44 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for HTML, cache-first for static assets
 self.addEventListener('fetch', event => {
+  const request = event.request;
+
+  // Network-first for navigation requests (HTML pages)
+  if (request.mode === 'navigate' || (request.headers.get('accept') && request.headers.get('accept').includes('text/html'))) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // Cache-first for static assets
   event.respondWith(
-    caches.match(event.request)
+    caches.match(request)
       .then(response => {
-        // Return cached version or fetch from network
         if (response) {
           return response;
         }
-        return fetch(event.request).then(response => {
-          // Don't cache non-successful responses or non-GET requests
-          if (!response || response.status !== 200 || response.type !== 'basic' || event.request.method !== 'GET') {
+        return fetch(request).then(response => {
+          if (!response || response.status !== 200 || response.type !== 'basic' || request.method !== 'GET') {
             return response;
           }
-          // Clone and cache the response
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
+            cache.put(request, responseToCache);
           });
           return response;
         });

@@ -13,6 +13,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#041E42" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1f2937" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Build and customize your own Penn State Nittany Lions football depth chart. Assign players, track injuries, and share your lineup.">
+  <meta property="og:title" content="Penn State Football Depth Chart Builder">
+  <meta property="og:description" content="Build and customize your own Penn State Nittany Lions football depth chart with real roster data.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Penn State Football Depth Chart Builder">
+  <meta name="twitter:description" content="Build and customize your own Penn State Nittany Lions football depth chart with real roster data.">
+  <meta name="twitter:image" content="/og-image.png">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
   <title>Penn State Football Depth Chart Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,8 +35,8 @@
       theme: {
         extend: {
           fontFamily: {
-            'display': ['Bebas Neue', 'sans-serif'],
-            'body': ['Plus Jakarta Sans', 'sans-serif'],
+            'display': ['Bebas Neue', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', 'sans-serif'],
+            'body': ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
           }
         }
       }
@@ -37,11 +48,11 @@
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       letter-spacing: -0.01em;
     }
     .font-display {
-      font-family: 'Bebas Neue', sans-serif;
+      font-family: 'Bebas Neue', Impact, 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
       letter-spacing: 0.04em;
     }
 
@@ -623,6 +634,10 @@
         this.maxUndoSteps = 20;
         this.lastSaved = null;
 
+        // Toast notifications
+        this.toastMessage = '';
+        this.toastTimeout = null;
+
         this.init();
       }
 
@@ -749,9 +764,13 @@
           if (response.ok) {
             this.roster = await response.json();
             localStorage.setItem('psu-roster', JSON.stringify(this.roster));
+          } else {
+            console.error('Failed to load roster: HTTP', response.status);
+            this.showToast('Failed to load roster. Try refreshing the page.');
           }
         } catch (e) {
           console.error('Failed to load roster:', e);
+          this.showToast('Failed to load roster. Check your connection and refresh.');
         }
       }
 
@@ -996,6 +1015,7 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
+          this.showToast('Depth chart image downloaded');
         }, 'image/png');
       }
 
@@ -1037,6 +1057,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        this.showToast('Depth chart exported successfully');
       }
 
       showResetConfirmation() {
@@ -1220,6 +1241,17 @@
         this.depthChart[pos][depth] = null;
         this.autoSave();
         this.render();
+        this.showToast('Player removed (Ctrl+Z to undo)');
+      }
+
+      showToast(message) {
+        this.toastMessage = message;
+        if (this.toastTimeout) clearTimeout(this.toastTimeout);
+        this.render();
+        this.toastTimeout = setTimeout(() => {
+          this.toastMessage = '';
+          this.render();
+        }, 3000);
       }
 
       handleDragStart(player, position, depth) {
@@ -1656,6 +1688,12 @@
           ${this.showResetModal ? this.renderResetModal() : ''}
           ${this.showAppResetModal ? this.renderAppResetModal() : ''}
           ${this.showDepthReorderModal ? this.renderDepthReorderModal() : ''}
+          ${this.toastMessage ? `
+            <div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-xl shadow-2xl text-sm font-semibold z-50 animate-fadeIn flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              ${this.toastMessage}
+            </div>
+          ` : ''}
         `;
         this.attachEventListeners();
       }
@@ -2375,7 +2413,7 @@
                       #${backup.number} ${this.getPlayerLastName(backup.name)}
                     </div>
                   ` : ''}
-                  ${!this.twoDeepView && player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="inline-block mt-1 text-white/70 hover:text-white" title="View player page">
+                  ${!this.twoDeepView && player.url ? `<a href="${player.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-block mt-1 text-white/70 hover:text-white" title="View player page">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>` : ''}
                 </div>
@@ -2420,7 +2458,7 @@
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 text-white rounded-full flex items-center justify-center text-xs font-bold relative" style="background: ${this.team.primaryColor};">
                       ${this.getPlayerInitials(player.name)}
-                      ${status ? `<span class="absolute -top-1 -right-1 px-1 py-0.5 text-[7px] font-bold text-white rounded ${this.getStatusColor(status)}">${this.getStatusBadge(status)}</span>` : ''}
+                      ${status ? `<span class="absolute -top-1 -right-1 px-1 py-0.5 text-[7px] font-bold text-white rounded ${this.getStatusColor(status)}" title="${status}">${this.getStatusBadge(status)}</span>` : ''}
                     </div>
                     <div class="flex-1 min-w-0">
                       <div class="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-1 flex-wrap">
@@ -2432,7 +2470,7 @@
                       </div>
                       <div class="text-xs text-gray-500 dark:text-gray-400">${player.year}${player.height ? ` • ${player.height}` : ''}${player.weight ? ` • ${player.weight}` : ''}</div>
                     </div>
-                    ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0">
+                    ${player.url ? `<a href="${player.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>` : ''}
                   </div>
@@ -2471,7 +2509,7 @@
                           ${backupStatus ? `<span class="text-[9px] px-1 py-0.5 rounded ${this.getStatusColor(backupStatus)} text-white">${backupStatus}</span>` : ''}
                         </div>
                       </div>
-                      ${backup.url ? `<a href="${backup.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0">
+                      ${backup.url ? `<a href="${backup.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                       </a>` : ''}
                     </div>
@@ -2555,12 +2593,12 @@
                     <div class="flex items-center gap-3 mb-3">
                       <div class="w-12 h-12 text-white rounded-full flex items-center justify-center font-bold text-lg relative" style="background: ${this.team.primaryColor};">
                         ${this.getPlayerInitials(currentPlayer.name)}
-                        ${this.getPlayerStatus(currentPlayer) ? `<span class="absolute -top-1 -right-1 px-1 text-[8px] font-bold text-white rounded ${this.getStatusColor(this.getPlayerStatus(currentPlayer))}">${this.getStatusBadge(this.getPlayerStatus(currentPlayer))}</span>` : ''}
+                        ${this.getPlayerStatus(currentPlayer) ? `<span class="absolute -top-1 -right-1 px-1 text-[8px] font-bold text-white rounded ${this.getStatusColor(this.getPlayerStatus(currentPlayer))}" title="${this.getPlayerStatus(currentPlayer)}">${this.getStatusBadge(this.getPlayerStatus(currentPlayer))}</span>` : ''}
                       </div>
                       <div class="flex-1">
                         <div class="font-bold text-gray-900 dark:text-white">
                           #${currentPlayer.number}
-                          ${currentPlayer.url ? `<a href="${currentPlayer.url}" target="_blank" class="hover:underline">${currentPlayer.name}</a>` : currentPlayer.name}
+                          ${currentPlayer.url ? `<a href="${currentPlayer.url}" target="_blank" rel="noopener noreferrer" class="hover:underline">${currentPlayer.name}</a>` : currentPlayer.name}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">${currentPlayer.year}${currentPlayer.height ? ` • ${currentPlayer.height}` : ''}${currentPlayer.weight ? ` • ${currentPlayer.weight}` : ''}</div>
                         ${currentPlayer.hometown ? `<div class="text-xs text-gray-500">${currentPlayer.hometown}</div>` : ''}
@@ -2619,7 +2657,7 @@
                             ${player.isAssigned ? `<div class="text-xs text-amber-600 dark:text-amber-400 mt-1">Currently: ${player.assignments.map(a => this.getSlotDisplayName(a.position) + ' #' + (a.depth + 1)).join(', ')}</div>` : ''}
                             ${!player.isAssigned && player.hometown ? `<div class="text-xs text-gray-400 dark:text-gray-500">${player.hometown}${player.previousSchool ? ` (${player.previousSchool})` : ''}</div>` : ''}
                           </div>
-                          ${player.url ? `<a href="${player.url}" target="_blank" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600" title="View profile">
+                          ${player.url ? `<a href="${player.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="p-1 text-gray-400 hover:text-gray-600" title="View profile">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                           </a>` : ''}
                         </div>
@@ -3079,17 +3117,20 @@
         const searchInput = document.getElementById('playerSearch');
         if (searchInput) {
           searchInput.addEventListener('input', (e) => {
+            const cursorPos = e.target.selectionStart;
             this.searchQuery = e.target.value;
             this.render();
             setTimeout(() => {
               const newInput = document.getElementById('playerSearch');
               if (newInput) {
                 newInput.focus();
-                newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+                newInput.setSelectionRange(cursorPos, cursorPos);
               }
             }, 0);
           });
-          searchInput.focus();
+          if (this.showPlayerModal) {
+            searchInput.focus();
+          }
         }
       }
     }

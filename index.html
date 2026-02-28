@@ -714,6 +714,17 @@
         return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
       }
 
+      // Returns '#ffffff' or '#111111' depending on which contrasts better against the given hex color
+      getContrastColor(hex) {
+        const h = hex.replace('#', '');
+        const toLinear = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+        const r = toLinear(parseInt(h.substr(0, 2), 16));
+        const g = toLinear(parseInt(h.substr(2, 2), 16));
+        const b = toLinear(parseInt(h.substr(4, 2), 16));
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        return luminance > 0.179 ? '#111111' : '#ffffff';
+      }
+
       loadDarkMode() {
         const saved = localStorage.getItem('psu-dark-mode');
         if (saved !== null) {
@@ -872,7 +883,8 @@
         } catch (e) {
           console.error('Auto-save failed:', e);
           if (e.name === 'QuotaExceededError' || e.code === 22) {
-            this.showToast('Storage full — export your depth chart to avoid losing changes.');
+            this.exportDepthChart();
+            this.showToast('Storage full — your depth chart has been auto-exported as a backup.');
           }
           return;
         }
@@ -1747,8 +1759,14 @@
             ${this.renderTabs()}
             ${this.renderMobileControls()}
             <div class="desktop-only">
-              ${this.activeTab !== 'special' ? this.renderDepthSelector() : ''}
-              ${this.activeTab !== 'special' ? this.renderFormationSelector() : ''}
+              ${this.activeTab === 'special' ? `
+                <div class="bg-white/10 rounded-lg px-4 py-2 mb-2 text-white/70 text-sm text-center italic">
+                  Special teams — no formation or depth selection needed
+                </div>
+              ` : `
+                ${this.renderDepthSelector()}
+                ${this.renderFormationSelector()}
+              `}
             </div>
             ${this.renderField()}
             ${this.renderKeyboardHints()}
@@ -2445,8 +2463,8 @@
         return `
           <div class="absolute transform -translate-x-1/2 -translate-y-1/2 position-card" style="left: ${pos.x}%; top: ${pos.y}%;" data-position="${posKey}" data-depth="${this.depthLevel}">
             <div
-              class="tooltip ${player ? 'text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-2'} ${isDragOver ? 'drag-over' : ''} rounded-lg shadow-lg transition-colors cursor-pointer position-card-inner relative"
-              style="min-width: 80px; ${player ? `background: ${this.team.primaryColor};` : `border-color: ${this.team.primaryColor};`}"
+              class="tooltip ${player ? '' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-2'} ${isDragOver ? 'drag-over' : ''} rounded-lg shadow-lg transition-colors cursor-pointer position-card-inner relative"
+              style="min-width: 80px; ${player ? `background: ${this.team.primaryColor}; color: ${this.getContrastColor(this.team.primaryColor)};` : `border-color: ${this.team.primaryColor};`}"
               data-tooltip="${pos.fullName}${status ? ' [' + status + ']' : ''}${note ? ' - ' + note : ''}"
               role="button"
               tabindex="0"
@@ -2520,7 +2538,7 @@
               onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.twoDeepView ? 0 : this.depthLevel} }; app.showPlayerModal = true; app.render()"
             >
               <div class="w-16 flex-shrink-0">
-                <div class="text-white text-center py-1 px-2 rounded font-display font-bold text-sm relative" style="background: ${this.team.primaryColor};">
+                <div class="text-center py-1 px-2 rounded font-display font-bold text-sm relative" style="background: ${this.team.primaryColor}; color: ${this.getContrastColor(this.team.primaryColor)};">
                   ${pos.name}
                   ${isBattle ? `<span class="absolute -top-1 -right-1 text-[8px] bg-yellow-400 text-yellow-900 px-1 rounded font-bold" title="Position battle (undecided)">OR</span>` : ''}
                 </div>
@@ -2529,7 +2547,7 @@
                 <div class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">${pos.fullName}</div>
                 ${player ? `
                   <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 text-white rounded-full flex items-center justify-center text-xs font-bold relative" style="background: ${this.team.primaryColor};">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold relative" style="background: ${this.team.primaryColor}; color: ${this.getContrastColor(this.team.primaryColor)};">
                       ${this.getPlayerInitials(player.name)}
                       ${status ? `<span class="absolute -top-1 -right-1 px-1 py-0.5 text-[7px] font-bold text-white rounded ${this.getStatusColor(status)}" title="${status}">${this.getStatusBadge(status)}</span>` : ''}
                     </div>

@@ -145,7 +145,10 @@
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
-      white-space: nowrap;
+      white-space: normal;
+      max-width: 180px;
+      text-align: center;
+      word-break: break-word;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s;
@@ -159,8 +162,17 @@
     /* Print styles */
     @media print {
       .no-print { display: none !important; }
-      body { background: white !important; }
+      body { background: white !important; color: black !important; }
       .grain-overlay::before { display: none; }
+      /* Hide field/visual view; show mobile list which is linear and printable */
+      .field-view { display: none !important; }
+      .mobile-list-view { display: block !important; }
+      /* Ensure cards print with border instead of color background */
+      [class*="bg-gray-800"], [class*="bg-gray-700"], [class*="dark\:bg-gray"] { background: white !important; }
+      /* Remove shadows and transitions */
+      * { box-shadow: none !important; transition: none !important; }
+      /* Page break control */
+      .position-group { break-inside: avoid; page-break-inside: avoid; }
     }
 
     /* Field lines with enhanced contrast */
@@ -802,7 +814,12 @@
       }
 
       saveStateForUndo() {
-        this.undoStack.push(JSON.stringify(this.depthChart));
+        this.undoStack.push(JSON.stringify({
+          depthChart: this.depthChart,
+          playerStatuses: this.playerStatuses,
+          playerNotes: this.playerNotes,
+          positionBattles: this.positionBattles,
+        }));
         if (this.undoStack.length > this.maxUndoSteps) {
           this.undoStack.shift();
         }
@@ -811,8 +828,17 @@
 
       undo() {
         if (this.undoStack.length > 0) {
-          this.redoStack.push(JSON.stringify(this.depthChart));
-          this.depthChart = JSON.parse(this.undoStack.pop());
+          this.redoStack.push(JSON.stringify({
+            depthChart: this.depthChart,
+            playerStatuses: this.playerStatuses,
+            playerNotes: this.playerNotes,
+            positionBattles: this.positionBattles,
+          }));
+          const state = JSON.parse(this.undoStack.pop());
+          this.depthChart = state.depthChart;
+          this.playerStatuses = state.playerStatuses || {};
+          this.playerNotes = state.playerNotes || {};
+          this.positionBattles = state.positionBattles || {};
           this.autoSave();
           this.render();
         }
@@ -820,8 +846,17 @@
 
       redo() {
         if (this.redoStack.length > 0) {
-          this.undoStack.push(JSON.stringify(this.depthChart));
-          this.depthChart = JSON.parse(this.redoStack.pop());
+          this.undoStack.push(JSON.stringify({
+            depthChart: this.depthChart,
+            playerStatuses: this.playerStatuses,
+            playerNotes: this.playerNotes,
+            positionBattles: this.positionBattles,
+          }));
+          const state = JSON.parse(this.redoStack.pop());
+          this.depthChart = state.depthChart;
+          this.playerStatuses = state.playerStatuses || {};
+          this.playerNotes = state.playerNotes || {};
+          this.positionBattles = state.positionBattles || {};
           this.autoSave();
           this.render();
         }
@@ -837,17 +872,19 @@
         } catch (e) {
           console.error('Auto-save failed:', e);
           if (e.name === 'QuotaExceededError' || e.code === 22) {
-            this.showToast('Storage full. Export a backup to avoid losing changes.');
+            this.showToast('Storage full — export your depth chart to avoid losing changes.');
           }
           return;
         }
         this.lastSaved = new Date();
-        this.saving = true;
-        this.render();
-        setTimeout(() => {
-          this.saving = false;
+        if (!this.saving) {
+          this.saving = true;
           this.render();
-        }, 1500);
+          setTimeout(() => {
+            this.saving = false;
+            this.render();
+          }, 1500);
+        }
       }
 
       // Player status helper methods
@@ -1135,6 +1172,13 @@
           }
 
           if (newRoster.length > 0) {
+            // Clean up orphaned depth chart assignments from old roster
+            const newRosterKeys = new Set(newRoster.map(p => `${p.number}-${p.name}`));
+            for (const pos of Object.keys(this.depthChart)) {
+              this.depthChart[pos] = this.depthChart[pos].map(player =>
+                player && !newRosterKeys.has(`${player.number}-${player.name}`) ? null : player
+              );
+            }
             this.roster = newRoster;
             localStorage.setItem('generic-roster', JSON.stringify(newRoster));
             this.importMessage = `Successfully imported ${newRoster.length} players!`;
@@ -1403,6 +1447,15 @@
 
       // Change formation and reinitialize positions
       changeFormation(type, formation) {
+        // Warn if there are existing assignments that won't carry over
+        const currentPositions = this.getPositions(type === 'offense' ? 'offense' : 'defense');
+        const hasAssignments = currentPositions.some(pos => {
+          const key = pos.isRight ? `${pos.code}-R` : pos.code;
+          return this.depthChart[key]?.some(p => p !== null);
+        });
+        if (hasAssignments && !confirm('Changing formations may clear some player assignments. Continue?')) {
+          return;
+        }
         if (type === "offense") {
           this.offenseFormation = formation;
           localStorage.setItem("depth-chart-offense-formation", formation);
@@ -2395,9 +2448,13 @@
               class="tooltip ${player ? 'text-white' : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-2'} ${isDragOver ? 'drag-over' : ''} rounded-lg shadow-lg transition-colors cursor-pointer position-card-inner relative"
               style="min-width: 80px; ${player ? `background: ${this.team.primaryColor};` : `border-color: ${this.team.primaryColor};`}"
               data-tooltip="${pos.fullName}${status ? ' [' + status + ']' : ''}${note ? ' - ' + note : ''}"
+              role="button"
+              tabindex="0"
+              aria-label="${pos.fullName}${player ? ': #' + player.number + ' ' + player.name : ': empty'}"
+              onkeydown="if(event.key==='Enter'||event.key===' '){app.selectedSlot={position:'${posKey}',depth:${this.twoDeepView ? 0 : this.depthLevel}};app.showPlayerModal=true;app.render();}"
               onclick="app.selectedSlot = { position: '${posKey}', depth: ${this.twoDeepView ? 0 : this.depthLevel} }; app.showPlayerModal = true; app.render()"
               draggable="${player ? 'true' : 'false'}"
-              ondragstart="app.handleDragStart(${player ? JSON.stringify(player).replace(/"/g, '&quot;') : 'null'}, '${posKey}', ${this.twoDeepView ? 0 : this.depthLevel})"
+              ondragstart="app.handleDragStart(${player ? JSON.stringify(player).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : 'null'}, '${posKey}', ${this.twoDeepView ? 0 : this.depthLevel})"
               ondragover="app.handleDragOver('${posKey}', ${this.twoDeepView ? 0 : this.depthLevel}, event)"
               ondragleave="app.handleDragLeave()"
               ondrop="app.handleDrop('${posKey}', ${this.twoDeepView ? 0 : this.depthLevel})"
@@ -2544,7 +2601,7 @@
 
       renderKeyboardHints() {
         return `
-          <div class="mt-4 text-center text-white/60 text-sm no-print">
+          <div class="mt-4 text-center text-white/60 text-sm no-print hidden sm:block">
             <span class="inline-flex items-center gap-4 flex-wrap justify-center">
               <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">←→</kbd> Tabs</span>
               <span><kbd class="px-2 py-1 bg-white/10 rounded text-xs">↑↓</kbd> Depth</span>
@@ -2569,7 +2626,7 @@
         });
 
         return `
-          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showPlayerModal = false; app.selectedSlot = null; app.searchQuery = ''; app.render(); }">
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-backdrop="true" onclick="if(event.target.dataset.backdrop) { app.showPlayerModal = false; app.selectedSlot = null; app.searchQuery = ''; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
               <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between text-white" style="background: ${this.team.primaryColor};">
                 <div>
@@ -2671,7 +2728,7 @@
           <div class="space-y-2">
             ${availablePlayers.map((player, i) => `
               <button
-                onclick="app.addPlayer('${position}', ${depth}, ${JSON.stringify({name: player.name, number: player.number, position: player.position, year: player.year, height: player.height, weight: player.weight, hometown: player.hometown, highSchool: player.highSchool, previousSchool: player.previousSchool, url: player.url}).replace(/"/g, '&quot;')})"
+                onclick="app.addPlayer('${position}', ${depth}, ${JSON.stringify({name: player.name, number: player.number, position: player.position, year: player.year, height: player.height, weight: player.weight, hometown: player.hometown, highSchool: player.highSchool, previousSchool: player.previousSchool, url: player.url}).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')})"
                 class="w-full text-left ${player.isAssigned ? 'bg-gray-100 dark:bg-gray-800 opacity-60' : 'bg-gray-50 dark:bg-gray-700'} hover:bg-gray-100 dark:hover:bg-gray-600 hover:opacity-100 border border-gray-200 dark:border-gray-600 rounded-lg p-3 transition-all"
               >
                 <div class="flex items-center gap-3">
@@ -2860,7 +2917,7 @@
 
       renderResetModal() {
         return `
-          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showResetModal = false; app.render(); }">
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-backdrop="true" onclick="if(event.target.dataset.backdrop) { app.showResetModal = false; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div class="p-6 text-center">
                 <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -2882,7 +2939,7 @@
 
       renderAppResetModal() {
         return `
-          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showAppResetModal = false; app.render(); }">
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-backdrop="true" onclick="if(event.target.dataset.backdrop) { app.showAppResetModal = false; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div class="p-6 text-center">
                 <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -2941,7 +2998,7 @@
         const unassignedCount = allPlayers.filter(p => !p.isAssigned).length;
 
         return `
-          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target === this) { app.showDepthReorderModal = false; app.selectedPositionGroup = null; app.render(); }">
+          <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-backdrop="true" onclick="if(event.target.dataset.backdrop) { app.showDepthReorderModal = false; app.selectedPositionGroup = null; app.render(); }">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
               <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between text-white" style="background: ${this.team.primaryColor};">
                 <div>
@@ -3027,7 +3084,7 @@
                                   const isThisPlayerInSlot = occupied && occupied.number === player.number && occupied.name === player.name;
                                   return !isThisPlayerInSlot ? `
                                     <button
-                                      onclick="app.assignFromReorder('${slot.key}', ${d}, ${JSON.stringify({name: player.name, number: player.number, position: player.position, year: player.year, height: player.height, weight: player.weight, hometown: player.hometown, highSchool: player.highSchool, previousSchool: player.previousSchool, url: player.url}).replace(/"/g, '&quot;')})"
+                                      onclick="app.assignFromReorder('${slot.key}', ${d}, ${JSON.stringify({name: player.name, number: player.number, position: player.position, year: player.year, height: player.height, weight: player.weight, hometown: player.hometown, highSchool: player.highSchool, previousSchool: player.previousSchool, url: player.url}).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')})"
                                       class="px-2 py-1 text-xs rounded border hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${occupied ? 'border-dashed opacity-70' : ''}"
                                       style="border-color: ${this.team.primaryColor}; color: ${this.team.primaryColor};"
                                       title="${occupied ? 'Replace ' + occupied.name : ''}"
@@ -3139,15 +3196,19 @@
 
         const searchInput = document.getElementById('playerSearch');
         if (searchInput) {
+          let searchDebounce = null;
           searchInput.addEventListener('input', (e) => {
             this.searchQuery = e.target.value;
-            // Targeted update: only re-render the player list, not the entire app
-            const resultsContainer = document.getElementById('playerSearchResults');
-            if (resultsContainer && this.selectedSlot) {
-              const { position, depth } = this.selectedSlot;
-              const availablePlayers = this.getAvailablePlayers(position);
-              resultsContainer.innerHTML = this.renderPlayerListContent(position, depth, availablePlayers);
-            }
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+              // Targeted update: only re-render the player list, not the entire app
+              const resultsContainer = document.getElementById('playerSearchResults');
+              if (resultsContainer && this.selectedSlot) {
+                const { position, depth } = this.selectedSlot;
+                const availablePlayers = this.getAvailablePlayers(position);
+                resultsContainer.innerHTML = this.renderPlayerListContent(position, depth, availablePlayers);
+              }
+            }, 150);
           });
           if (this.showPlayerModal) {
             searchInput.focus();

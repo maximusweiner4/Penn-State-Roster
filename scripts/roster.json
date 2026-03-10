@@ -50,7 +50,7 @@
   {
     "name": "LaVar Arrington II",
     "number": 11,
-    "position": "LB",
+    "position": "DE",
     "year": "So.",
     "height": "6-3",
     "weight": "220 lbs",
@@ -254,7 +254,7 @@
   {
     "name": "Max Heffner",
     "number": 37,
-    "position": "DB",
+    "position": "CB",
     "year": "R-Fr.",
     "height": "5-11",
     "weight": "180 lbs",
@@ -926,7 +926,7 @@
   {
     "name": "Alijah Carnell",
     "number": 0,
-    "position": "DL",
+    "position": "DT",
     "year": "R-So.",
     "height": "6-5",
     "weight": "290 lbs",
@@ -936,9 +936,9 @@
     "url": "https://gopsusports.com/sports/football/roster/player/alijah-carnell"
   },
   {
-    "name": "Ike Ezeogu",
+    "name": "Ikenna Ezeogu",
     "number": 0,
-    "position": "DL",
+    "position": "DE",
     "year": "R-Sr.",
     "height": "6-5",
     "weight": "285 lbs",
@@ -950,7 +950,7 @@
   {
     "name": "Alexander McPherson",
     "number": 0,
-    "position": "DL",
+    "position": "DE",
     "year": "So.",
     "height": "6-6",
     "weight": "240 lbs",
@@ -962,7 +962,7 @@
   {
     "name": "Armstrong Nnodim",
     "number": 0,
-    "position": "DL",
+    "position": "DT",
     "year": "R-So.",
     "height": "6-2",
     "weight": "290 lbs",
@@ -974,7 +974,7 @@
   {
     "name": "Siale Taupaki",
     "number": 0,
-    "position": "DL",
+    "position": "DT",
     "year": "R-Sr.",
     "height": "6-2",
     "weight": "310 lbs",
@@ -986,7 +986,7 @@
   {
     "name": "Dallas Vakalahi",
     "number": 0,
-    "position": "DL",
+    "position": "DT",
     "year": "Jr.",
     "height": "6-2",
     "weight": "318 lbs",
@@ -998,7 +998,7 @@
   {
     "name": "Keanu Williams",
     "number": 0,
-    "position": "DL",
+    "position": "DT",
     "year": "R-Sr.",
     "height": "6-5",
     "weight": "320 lbs",
@@ -1058,7 +1058,7 @@
   {
     "name": "Jeremiah Cooper",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "R-Sr.",
     "height": "6-0",
     "weight": "195 lbs",
@@ -1070,7 +1070,7 @@
   {
     "name": "Omarion Davis",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "So.",
     "height": "5-11",
     "weight": "185 lbs",
@@ -1094,7 +1094,7 @@
   {
     "name": "Ibn McDaniels",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "R-So.",
     "height": "6-3",
     "weight": "205 lbs",
@@ -1106,7 +1106,7 @@
   {
     "name": "Marcus Neal Jr.",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "Jr.",
     "height": "6-1",
     "weight": "215 lbs",
@@ -1118,7 +1118,7 @@
   {
     "name": "Jamison Patton",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "Sr.",
     "height": "6-2",
     "weight": "210 lbs",
@@ -1130,7 +1130,7 @@
   {
     "name": "Hunter Sowell",
     "number": 0,
-    "position": "DB",
+    "position": "CB",
     "year": "R-Fr.",
     "height": "5-10",
     "weight": "170 lbs",
@@ -1142,7 +1142,7 @@
   {
     "name": "Tyrell Chatman",
     "number": 0,
-    "position": "DB",
+    "position": "CB",
     "year": "Fr.",
     "height": "6-2",
     "weight": "180 lbs",
@@ -1154,7 +1154,7 @@
   {
     "name": "Bryson Williams",
     "number": 0,
-    "position": "DB",
+    "position": "S",
     "year": "Fr.",
     "height": "6-4",
     "weight": "180 lbs",
@@ -1166,7 +1166,7 @@
   {
     "name": "Josiah Zayas",
     "number": 0,
-    "position": "DB",
+    "position": "CB",
     "year": "Fr.",
     "height": "6-2",
     "weight": "190 lbs",
@@ -1222,53 +1222,5 @@
     "highSchool": "James Madison HS",
     "previousSchool": "",
     "url": "https://gopsusports.com/sports/football/roster/player/connor-barry"
-  },
-  {
-    "name": "Pete Eglitis",
-    "number": 0,
-    "position": "OL",
-    "year": "Fr.",
-    "height": "6-7",
-    "weight": "295 lbs",
-    "hometown": "Columbus, Ohio",
-    "highSchool": "",
-    "previousSchool": "",
-    "url": "https://gopsusports.com/sports/football/roster/player/pete-eglitis"
-  },
-  {
-    "name": "Elijah Reeder",
-    "number": 0,
-    "position": "DL",
-    "year": "Fr.",
-    "height": "6-6",
-    "weight": "210 lbs",
-    "hometown": "",
-    "highSchool": "Central Regional",
-    "previousSchool": "",
-    "url": "https://gopsusports.com/sports/football/roster/player/elijah-reeder"
-  },
-  {
-    "name": "Lucas Tenbrock",
-    "number": 0,
-    "position": "P",
-    "year": "Fr.",
-    "height": "6-6",
-    "weight": "210 lbs",
-    "hometown": "",
-    "highSchool": "St. Charles North",
-    "previousSchool": "",
-    "url": "https://gopsusports.com/sports/football/roster/player/lucas-tenbrock"
-  },
-  {
-    "name": "Keian Kaiser",
-    "number": 0,
-    "position": "LB",
-    "year": "Fr.",
-    "height": "6-4",
-    "weight": "215 lbs",
-    "hometown": "",
-    "highSchool": "",
-    "previousSchool": "",
-    "url": "https://gopsusports.com/sports/football/roster/player/keian-kaiser"
   }
 ]

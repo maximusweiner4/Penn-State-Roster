@@ -780,25 +780,25 @@
       }
 
       async loadRoster() {
-        // First check localStorage for any saved roster
-        const saved = localStorage.getItem('psu-roster');
-        if (saved) {
-          this.roster = JSON.parse(saved);
-          return;
-        }
-
-        // Load Penn State roster from roster.json
+        // Always fetch the latest roster.json so daily scraper updates are reflected.
+        // Fall back to localStorage only if the network request fails.
         try {
-          const response = await fetch('scripts/roster.json');
+          const response = await fetch('scripts/roster.json?t=' + Date.now());
           if (response.ok) {
             this.roster = await response.json();
             localStorage.setItem('psu-roster', JSON.stringify(this.roster));
-          } else {
-            console.error('Failed to load roster: HTTP', response.status);
-            this.showToast('Failed to load roster. Try refreshing the page.');
+            return;
           }
         } catch (e) {
-          console.error('Failed to load roster:', e);
+          // Network failure — fall through to localStorage fallback
+        }
+
+        // Fallback: use cached roster if available
+        const saved = localStorage.getItem('psu-roster');
+        if (saved) {
+          this.roster = JSON.parse(saved);
+        } else {
+          console.error('Failed to load roster and no cached data available.');
           this.showToast('Failed to load roster. Check your connection and refresh.');
         }
       }

@@ -331,33 +331,26 @@ async function scrapeRoster() {
             }
           }
 
-          // Get hometown - look for City, State pattern
+          // Get hometown, high school, previous school by column position.
+          // gopsusports.com Sidearm table column order:
+          // 0=#, 1=Name, 2=Position, 3=Year, 4=Height, 5=Weight, 6=Hometown, 7=HS, 8=PreviousSchool
+          // Using column index is more reliable than regex since state abbrevs
+          // use mixed case + period (e.g. "Covington, Ga." not "Covington, GA").
+          const cellTexts = Array.from(cells).map(c => c.textContent.trim());
           let hometown = '';
-          const hometownCell = Array.from(cells).find(cell => {
-            const text = cell.textContent.trim();
-            // Match "City, ST" or "City, State" pattern but not school names
-            return /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*[A-Z]{2}(?:\s|$)/.test(text) ||
-                   /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*[A-Z][a-z]+$/.test(text);
-          });
-          if (hometownCell && !looksLikeSchoolName(hometownCell.textContent)) {
-            hometown = hometownCell.textContent.trim();
-          }
-
-          // Get high school and previous school
           let highSchool = '';
           let previousSchool = '';
 
-          // Look for cells that contain school-like names
-          for (const cell of cells) {
-            const text = cell.textContent.trim();
-            if (looksLikeSchoolName(text) && text !== name) {
-              if (!highSchool) {
-                highSchool = text;
-              } else if (!previousSchool) {
-                previousSchool = text;
-              }
-            }
-          }
+          if (cellTexts.length >= 7) hometown = cellTexts[6] || '';
+          if (cellTexts.length >= 8) highSchool = cellTexts[7] || '';
+          if (cellTexts.length >= 9) previousSchool = cellTexts[8] || '';
+
+          // Sanity check: hometown should contain a comma (City, State)
+          if (hometown && !hometown.includes(',')) hometown = '';
+          // Sanity check: skip if it looks like a social link or nav text
+          const skipPattern = /^(twitter|instagram|facebook|bio|stats|schedule|https?)$/i;
+          if (skipPattern.test(hometown)) hometown = '';
+          if (skipPattern.test(highSchool)) highSchool = '';
 
           if (name && looksLikePlayerName(name)) {
             playerList.push({

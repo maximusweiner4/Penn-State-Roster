@@ -810,11 +810,21 @@
           const response = await fetch('scripts/roster.json?t=' + Date.now());
           if (response.ok) {
             this.roster = await response.json();
-            localStorage.setItem('psu-roster', JSON.stringify(this.roster));
+            try { localStorage.setItem('psu-roster', JSON.stringify(this.roster)); } catch (_) {}
+            this.showToast('Roster refreshed — ' + this.roster.length + ' players loaded');
             this.render();
+          } else {
+            throw new Error('HTTP ' + response.status);
           }
         } catch (e) {
           console.error('Failed to refresh roster:', e);
+          // Fall back to cached roster if available
+          const cached = localStorage.getItem('psu-roster');
+          if (cached) {
+            try { this.roster = JSON.parse(cached); } catch (_) {}
+          }
+          this.showToast('Failed to refresh roster. Using cached data.');
+          this.render();
         }
       }
 
@@ -1071,6 +1081,10 @@
         ctx.fillText('Penn State Depth Chart Builder', canvas.width - 20, canvas.height - 15);
 
         canvas.toBlob((blob) => {
+          if (!blob) {
+            this.showToast('Image export failed — try again or use the text Export button.');
+            return;
+          }
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -1084,6 +1098,11 @@
       }
 
       exportDepthChart() {
+        const hasPlayers = Object.values(this.depthChart).some(slots => slots?.some(p => p !== null));
+        if (!hasPlayers) {
+          this.showToast('Depth chart is empty — assign players first.');
+          return;
+        }
         let text = `${this.team.name.toUpperCase()} FOOTBALL DEPTH CHART\n${'='.repeat(this.team.name.length + 21)}\n`;
         text += `Generated: ${new Date().toLocaleDateString()}\n\n`;
 
@@ -1469,6 +1488,7 @@
         if (hasAssignments && !confirm('Changing formations may clear some player assignments. Continue?')) {
           return;
         }
+        this.saveStateForUndo();
         if (type === "offense") {
           this.offenseFormation = formation;
           localStorage.setItem("depth-chart-offense-formation", formation);

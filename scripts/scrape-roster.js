@@ -136,77 +136,131 @@ async function scrapeRoster() {
 
     console.log('Extracting roster data...');
 
-    // Extract player data using confirmed gopsusports.com (Sidearm Vue) selectors.
+    // gopsusports.com (Nuxt/Sidearm) embeds the full roster as a flat reference
+    // array in a <script id="__NUXT_DATA__"> tag.  This is present in BOTH the
+    // SSR response and the client-side hydrated page, making it the most reliable
+    // extraction target regardless of rendering environment.
     //
-    // Page structure (confirmed from debug HTML 2026-03-25):
-    //   table > tbody > tr
-    //     td.roster-table-cell        → col 0: jersey number (or "-")
-    //     th.roster-table-cell        → col 1: name  (a.table__roster-name[href*="/roster/player/"])
-    //     td.roster-table-cell        → col 2: position abbreviation (e.g. "WR")
-    //     td.roster-table-cell        → col 3: year   (e.g. "Redshirt Senior")
-    //     td.roster-table-cell        → col 4: height (e.g. "6-3")
-    //     td.roster-table-cell        → col 5: weight (e.g. "210 lbs")
-    //     td.roster-table-cell        → col 6: hometown
-    //     td.roster-table-cell        → col 7: high school
-    //     td.roster-table-cell        → col 8: previous school (transfer)
-    //     td.roster-table-cell--no-print → col 9: action (ignored)
+    // Structure (confirmed 2026-03-25 from CI debug HTML):
+    //   data[3]  → {... "roster-1459-players-list-page-1": 1226 ...}
+    //   data[1226] → { players: 1227, meta: ... }
+    //   data[1227] → [ref1, ref2, ...]   (one entry per player)
+    //   each ref   → { player: {..., jersey_number, hometown, high_school,
+    //                             previous_school, height_feet, height_inches,
+    //                             weight, slug, first_name, last_name },
+    //                  player_position: { abbreviation: "WR" },
+    //                  class_level: { name: "Redshirt Senior" } }
     //
-    // Staff rows use a.table__roster-name too but link to /roster/season/.../staff/
-    // so we filter by /roster/player/ in the href.
+    // Fallback: if the JSON key changes, parse the HTML table rows instead.
     const players = await page.evaluate(() => {
-      const playerList = [];
-
-      // Primary selector: confirmed gopsusports.com Vue structure (2026-03-25).
-      // Staff use the same class but /staff/ in href, so filter by /roster/player/.
-      let playerLinks = document.querySelectorAll('a.table__roster-name[href*="/roster/player/"]');
-      console.log(`table__roster-name links: ${playerLinks.length}`);
-
-      // Fallback: in case the class name changes, try any link to a player page.
-      if (playerLinks.length === 0) {
-        playerLinks = document.querySelectorAll(
-          'a[href*="/sports/football/roster/player/"], a[href*="/roster/player/"]'
-        );
-        console.log(`Fallback player links: ${playerLinks.length}`);
+      // ── Helper: resolve flat Nuxt reference array ───────────────────────
+      function resolveNuxt(arr, v, depth, seen) {
+        if (depth > 8 || !Number.isInteger(v) || seen.has(v)) return v;
+        seen = new Set(seen); seen.add(v);
+        const val = arr[v];
+        if (Array.isArray(val))      return val.map(x => resolveNuxt(arr, x, depth+1, seen));
+        if (val && typeof val === 'object')
+          return Object.fromEntries(Object.entries(val).map(([k, x]) => [k, resolveNuxt(arr, x, depth+1, seen)]));
+        return val;
       }
 
+      // ── Method 1: __NUXT_DATA__ embedded JSON ───────────────────────────
+      const nuxtScript = document.getElementById('__NUXT_DATA__');
+      if (nuxtScript) {
+        try {
+          const arr = JSON.parse(nuxtScript.textContent);
+          // Find the dict that contains the players-list key
+          const keyDict = arr.find(x => x && typeof x === 'object' && !Array.isArray(x) &&
+                                        Object.keys(x).some(k => k.startsWith('roster-') && k.includes('players-list')));
+          if (keyDict) {
+            const playersKey = Object.keys(keyDict).find(k => k.includes('players-list'));
+            const listRef    = keyDict[playersKey];
+            const listObj    = resolveNuxt(arr, listRef, 0, new Set());
+            const playerRefs = listObj && listObj.players;
+            if (Array.isArray(playerRefs) && playerRefs.length > 0) {
+              const playerList = [];
+              for (const ref of playerRefs) {
+                const p = resolveNuxt(arr, ref, 0, new Set());
+                const player = p.player || {};
+                const pos    = p.player_position || {};
+                const cls    = p.class_level || {};
+
+                const first = player.first_name || '';
+                const last  = player.last_name  || '';
+                const name  = `${first} ${last}`.trim();
+                if (!name) continue;
+
+                // jersey_number is on the roster_player entry (p), not the
+                // nested player base-object — the player object's value is 0
+                // for players whose number is only assigned at the roster level.
+                const number = p.jersey_number || 0;
+                const hFt    = p.height_feet   || player.height_feet   || '';
+                const hIn    = p.height_inches || player.height_inches || '';
+                const height = (hFt && hIn) ? `${hFt}-${hIn}` : '';
+                const wt     = p.weight || player.weight || '';
+                const weight = wt ? `${wt} lbs` : '';
+                const slug   = player.slug || '';
+
+                playerList.push({
+                  name,
+                  number,
+                  position:       pos.abbreviation || '',
+                  year:           cls.name         || '',
+                  height,
+                  weight,
+                  hometown:       player.hometown        || '',
+                  highSchool:     player.high_school     || '',
+                  previousSchool: player.previous_school || '',
+                  playerUrl:      slug ? `/sports/football/roster/player/${slug}` : ''
+                });
+              }
+              console.log(`Nuxt JSON extraction: ${playerList.length} players`);
+              return playerList;
+            }
+          }
+        } catch (e) {
+          console.warn('Nuxt JSON parse failed:', e.message);
+        }
+      }
+
+      // ── Method 2: HTML table fallback ───────────────────────────────────
+      // Used when SSR renders the full table (local dev / non-CI environments).
+      // Column order: 0=# | 1=Name | 2=Pos | 3=Year | 4=Height | 5=Weight
+      //               6=Hometown | 7=HS | 8=PrevSchool
+      console.log('Falling back to HTML table extraction');
+      const playerList = [];
       const seen = new Set();
-      playerLinks.forEach(link => {
+      const links = document.querySelectorAll('a.table__roster-name[href*="/roster/player/"]');
+      links.forEach(link => {
         const name = (link.querySelector('span')?.textContent || link.textContent || '').trim();
         if (!name || seen.has(name.toLowerCase())) return;
         seen.add(name.toLowerCase());
 
-        const playerUrl = link.getAttribute('href') || '';
-
-        // Walk up to the containing <tr>
         const row = link.closest('tr');
         if (!row) return;
 
-        // All cells in this row (td + th).
-        // gopsusports.com column order (confirmed 2026-03-25):
-        //   0=# | 1=Name(th) | 2=Position | 3=Year | 4=Height | 5=Weight
-        //   6=Hometown | 7=HS | 8=PrevSchool | 9=no-print (ignored)
         const cells = Array.from(row.querySelectorAll('td, th'));
         if (cells.length < 3) return;
 
-        const getText = (idx) => (cells[idx]?.textContent || '').trim();
-
+        const getText = (i) => (cells[i]?.textContent || '').trim();
         const numText = getText(0);
-        const number = /^\d{1,3}$/.test(numText) ? parseInt(numText, 10) : 0;
-
-        const position = getText(2);
-        const year     = getText(3);
-        const height   = getText(4);
-        const weight   = getText(5);
-
         let hometown = getText(6);
         if (hometown && !hometown.includes(',')) hometown = '';
 
-        const highSchool     = getText(7);
-        const previousSchool = getText(8);
-
-        playerList.push({ name, number, position, year, height, weight, hometown, highSchool, previousSchool, playerUrl });
+        playerList.push({
+          name,
+          number:         /^\d{1,3}$/.test(numText) ? parseInt(numText, 10) : 0,
+          position:       getText(2),
+          year:           getText(3),
+          height:         getText(4),
+          weight:         getText(5),
+          hometown,
+          highSchool:     getText(7),
+          previousSchool: getText(8),
+          playerUrl:      link.getAttribute('href') || ''
+        });
       });
-
+      console.log(`HTML table extraction: ${playerList.length} players`);
       return playerList;
     });
 

@@ -72,22 +72,24 @@ async function scrapeRoster() {
       timeout: 60000
     });
 
-    // Wait for page to fully load
+    // Wait for page to fully load, then wait for player links to appear.
+    // gopsusports.com is Vue SSR — player links are in the initial HTML, but
+    // we give a generous window for any CI network variance.
     await new Promise(resolve => setTimeout(resolve, 3000));
-
-    // Wait for the roster table to render (Vue hydration can take time in CI)
-    // gopsusports.com uses a.table__roster-name for all player name links
     try {
-      await page.waitForSelector('a.table__roster-name', { timeout: 30000 });
-      console.log('Roster table confirmed rendered.');
+      // a[href*="/roster/player/"] covers both table__roster-name and any fallback rendering
+      await page.waitForSelector('a[href*="/roster/player/"]', { timeout: 30000 });
+      console.log('Player links confirmed present in DOM.');
     } catch (e) {
-      console.warn('Timeout waiting for a.table__roster-name — proceeding anyway.');
+      console.warn('Timeout waiting for player links — proceeding anyway.');
     }
 
-    // Save page HTML for debugging
+    // Save page HTML for debugging (always save before extraction so we have
+    // the raw HTML regardless of whether extraction succeeds)
     const html = await page.content();
-    fs.writeFileSync(path.join(__dirname, '../debug-artifacts/scrape-debug/page-debug.html'), html);
-    console.log('Saved page HTML to debug-artifacts/scrape-debug/page-debug.html');
+    const debugPath = path.join(__dirname, 'page-debug.html');
+    fs.writeFileSync(debugPath, html);
+    console.log(`Saved page HTML to scripts/page-debug.html (${Math.round(html.length / 1024)} KB)`);
 
     // Extract team information
     console.log('Extracting team information...');
@@ -154,14 +156,24 @@ async function scrapeRoster() {
     const players = await page.evaluate(() => {
       const playerList = [];
 
-      // All player name links (not staff — staff links contain /staff/)
-      const playerLinks = document.querySelectorAll('a.table__roster-name[href*="/roster/player/"]');
-      console.log(`Found ${playerLinks.length} player name links`);
+      // Primary selector: confirmed gopsusports.com Vue structure (2026-03-25).
+      // Staff use the same class but /staff/ in href, so filter by /roster/player/.
+      let playerLinks = document.querySelectorAll('a.table__roster-name[href*="/roster/player/"]');
+      console.log(`table__roster-name links: ${playerLinks.length}`);
 
+      // Fallback: in case the class name changes, try any link to a player page.
+      if (playerLinks.length === 0) {
+        playerLinks = document.querySelectorAll(
+          'a[href*="/sports/football/roster/player/"], a[href*="/roster/player/"]'
+        );
+        console.log(`Fallback player links: ${playerLinks.length}`);
+      }
+
+      const seen = new Set();
       playerLinks.forEach(link => {
-        // Name is in the <span> child or direct text
         const name = (link.querySelector('span')?.textContent || link.textContent || '').trim();
-        if (!name) return;
+        if (!name || seen.has(name.toLowerCase())) return;
+        seen.add(name.toLowerCase());
 
         const playerUrl = link.getAttribute('href') || '';
 
@@ -169,37 +181,27 @@ async function scrapeRoster() {
         const row = link.closest('tr');
         if (!row) return;
 
-        // All cells in this row (td + th)
+        // All cells in this row (td + th).
+        // gopsusports.com column order (confirmed 2026-03-25):
+        //   0=# | 1=Name(th) | 2=Position | 3=Year | 4=Height | 5=Weight
+        //   6=Hometown | 7=HS | 8=PrevSchool | 9=no-print (ignored)
         const cells = Array.from(row.querySelectorAll('td, th'));
         if (cells.length < 3) return;
 
         const getText = (idx) => (cells[idx]?.textContent || '').trim();
 
-        // Col 0: jersey number — may be "-" or empty for walk-ons/staff
         const numText = getText(0);
         const number = /^\d{1,3}$/.test(numText) ? parseInt(numText, 10) : 0;
 
-        // Col 2: position abbreviation
         const position = getText(2);
+        const year     = getText(3);
+        const height   = getText(4);
+        const weight   = getText(5);
 
-        // Col 3: class/year
-        const year = getText(3);
-
-        // Col 4: height
-        const height = getText(4);
-
-        // Col 5: weight
-        const weight = getText(5);
-
-        // Col 6: hometown
         let hometown = getText(6);
-        // Sanity: hometown should contain a comma
         if (hometown && !hometown.includes(',')) hometown = '';
 
-        // Col 7: high school
-        const highSchool = getText(7);
-
-        // Col 8: previous school (transfer portal)
+        const highSchool     = getText(7);
         const previousSchool = getText(8);
 
         playerList.push({ name, number, position, year, height, weight, hometown, highSchool, previousSchool, playerUrl });
@@ -210,7 +212,7 @@ async function scrapeRoster() {
 
     if (players.length === 0) {
       console.error('No players found. The page structure may not be supported.');
-      console.error('Check debug-artifacts/scrape-debug/page-debug.html to analyze the page structure.');
+      console.error('Check scripts/page-debug.html to analyze the page structure.');
       process.exit(1);
     }
 

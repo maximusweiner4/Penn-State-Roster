@@ -210,7 +210,7 @@ async function scrapeRoster() {
 
     if (players.length === 0) {
       console.error('No players found. The page structure may not be supported.');
-      console.error('Check page-debug.html to analyze the page structure.');
+      console.error('Check debug-artifacts/scrape-debug/page-debug.html to analyze the page structure.');
       process.exit(1);
     }
 
@@ -256,6 +256,36 @@ async function scrapeRoster() {
         uniquePlayers.push(p);
       }
     }
+
+    // ── Data quality validation ──────────────────────────────────────────────
+    // Fail loudly rather than silently overwrite roster.json with broken data.
+    // If the page structure changes again, GitHub Actions will flag the run as
+    // failed and send an email instead of publishing garbage to the live site.
+    const unknownPositions = uniquePlayers.filter(p => p.position === 'Unknown').length;
+    const unknownYears     = uniquePlayers.filter(p => p.year === 'Unknown').length;
+    const unknownPct = (n) => Math.round((n / uniquePlayers.length) * 100);
+
+    console.log(`Data quality — Unknown positions: ${unknownPositions}/${uniquePlayers.length} (${unknownPct(unknownPositions)}%)`);
+    console.log(`Data quality — Unknown years:     ${unknownYears}/${uniquePlayers.length} (${unknownPct(unknownYears)}%)`);
+
+    // Thresholds: fail if more than 20% of players are missing position or year.
+    // A real roster will never have this many unknowns; it indicates selector rot.
+    const UNKNOWN_THRESHOLD = 0.20;
+    if (unknownPositions / uniquePlayers.length > UNKNOWN_THRESHOLD) {
+      console.error(`VALIDATION FAILED: ${unknownPct(unknownPositions)}% of players have Unknown position (threshold ${UNKNOWN_THRESHOLD * 100}%).`);
+      console.error('The page structure has likely changed. Roster NOT saved. Check page-debug.html.');
+      process.exit(1);
+    }
+    if (unknownYears / uniquePlayers.length > UNKNOWN_THRESHOLD) {
+      console.error(`VALIDATION FAILED: ${unknownPct(unknownYears)}% of players have Unknown year (threshold ${UNKNOWN_THRESHOLD * 100}%).`);
+      console.error('The page structure has likely changed. Roster NOT saved. Check page-debug.html.');
+      process.exit(1);
+    }
+    if (uniquePlayers.length < 50) {
+      console.error(`VALIDATION FAILED: Only ${uniquePlayers.length} players found (expected 50+). Roster NOT saved.`);
+      process.exit(1);
+    }
+    // ── End validation ───────────────────────────────────────────────────────
 
     console.log(`Successfully extracted ${uniquePlayers.length} players`);
 

@@ -48,21 +48,32 @@ test('selectClasses picks the newest class that has commits', () => {
   assert.deepStrictEqual(selectClasses([a, b]).map(c => c.year), [2027]);
 });
 
-test('selectClasses ignores an empty newer class', () => {
+test('selectClasses shows nothing when the newest class has fully enrolled', () => {
   // The real July 2026 shape: 2026 signed and enrolled, 2027 not yet in CFBD.
+  // Those players are already visible in the depth chart, so this is not news.
   const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
   const b = annotateClass({ year: 2027, commits: [] }, roster);
-  const out = selectClasses([a, b]);
-  assert.deepStrictEqual(out.map(c => c.year), [2026]);
-  assert.strictEqual(out[0].commits[0].onRoster, true, 'enrolled members stay badged');
+  assert.deepStrictEqual(selectClasses([a, b]), []);
 });
 
-test('selectClasses does not prefer an older class just because it has attrition', () => {
-  // 2025 has members who left and will never match the roster; 2026 is fully
-  // enrolled. The newer class must still win.
+test('selectClasses shows the newest class once it has unenrolled members', () => {
+  // The December shape: a freshly signed class nobody is on the roster for yet.
+  const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
+  const b = annotateClass({ year: 2027, commits: [{ name: 'Just Signed' }] }, roster);
+  const out = selectClasses([a, b]);
+  assert.deepStrictEqual(out.map(c => c.year), [2027]);
+  assert.strictEqual(out[0].commits[0].onRoster, false);
+});
+
+test('selectClasses never falls back to an older class that has attrition', () => {
+  // 2025 has members who left and will never match the roster, so it would
+  // qualify forever if we searched past the newest class. 2026 is fully
+  // enrolled, so the correct answer is nothing at all -- never 2025.
   const old = annotateClass({ year: 2025, commits: [{ name: 'Zion Tracy' }, { name: 'Transferred Away' }] }, roster);
   const recent = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
-  assert.deepStrictEqual(selectClasses([old, recent]).map(c => c.year), [2026]);
+  const years = selectClasses([old, recent]).map(c => c.year);
+  assert.ok(!years.includes(2025), 'must never surface the stale 2025 class');
+  assert.deepStrictEqual(years, []);
 });
 
 test('selectClasses returns nothing when no class has commits', () => {

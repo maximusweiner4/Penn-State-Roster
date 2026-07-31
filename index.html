@@ -1853,7 +1853,15 @@
       renderRecruits() {
         if (this.recruitsError) return `<div class="p-8 text-center text-white/80">${this.esc(this.recruitsError)}</div>`;
         if (!this.recruits) return `<div class="p-8 text-center text-white/80">Loading…</div>`;
-        if (!this.recruits.classes.length) return `<div class="p-8 text-center text-white/80">No classes to show yet.</div>`;
+        if (!this.recruits.classes.length) return `
+          <div class="p-8 text-center text-white/80 max-w-xl mx-auto">
+            <p class="font-semibold mb-2">No incoming class right now.</p>
+            <p class="text-sm opacity-80">
+              The current class appears here once it signs during the December
+              signing period. Players who have already enrolled show up in the
+              depth chart instead.
+            </p>
+          </div>`;
 
         const meta = (parts) => parts.filter(Boolean).join(' · ');
 

@@ -34,10 +34,23 @@ function shouldRenderClass(cls) {
 //
 // Members already on the roster keep their ON ROSTER badge, so the overlap with
 // the depth chart stays explicit rather than hidden.
+// ...and then only if that class has members who have not yet turned up on the
+// roster. A class whose every member is already on the depth chart is not
+// recruiting news -- those players are visible in the depth chart itself.
+//
+// This makes the section self-gating with no maintenance: it stays empty
+// through the spring and summer, then populates on its own once CFBD publishes
+// the newly signed class in December, and empties again when that class
+// enrolls the following August.
+//
+// Deliberately does NOT fall back to an older class. The 2025 class has 29
+// signees but only 15 still on the roster, so attrition would otherwise let a
+// stale class qualify forever.
 function selectClasses(annotated) {
   const withCommits = (annotated || []).filter(c => (c.commits || []).length > 0);
   if (withCommits.length === 0) return [];
-  return [withCommits.reduce((a, b) => (b.year > a.year ? b : a))];
+  const newest = withCommits.reduce((a, b) => (b.year > a.year ? b : a));
+  return shouldRenderClass(newest) ? [newest] : [];
 }
 
 module.exports = { annotateClass, shouldRenderClass, selectClasses };

@@ -42,19 +42,27 @@ test('an empty roster leaves every class visible', () => {
   assert.strictEqual(shouldRenderClass(cls), true);
 });
 
-test('selectClasses returns only the visible classes when some qualify', () => {
+test('selectClasses picks the newest class that has commits', () => {
   const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
   const b = annotateClass({ year: 2027, commits: [{ name: 'New Kid' }] }, roster);
   assert.deepStrictEqual(selectClasses([a, b]).map(c => c.year), [2027]);
 });
 
-test('selectClasses falls back to the newest class with commits when none qualify', () => {
-  // The real July 2026 shape: 2026 fully enrolled, 2027 not yet in CFBD.
+test('selectClasses ignores an empty newer class', () => {
+  // The real July 2026 shape: 2026 signed and enrolled, 2027 not yet in CFBD.
   const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
   const b = annotateClass({ year: 2027, commits: [] }, roster);
   const out = selectClasses([a, b]);
   assert.deepStrictEqual(out.map(c => c.year), [2026]);
-  assert.strictEqual(out[0].commits[0].onRoster, true);
+  assert.strictEqual(out[0].commits[0].onRoster, true, 'enrolled members stay badged');
+});
+
+test('selectClasses does not prefer an older class just because it has attrition', () => {
+  // 2025 has members who left and will never match the roster; 2026 is fully
+  // enrolled. The newer class must still win.
+  const old = annotateClass({ year: 2025, commits: [{ name: 'Zion Tracy' }, { name: 'Transferred Away' }] }, roster);
+  const recent = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
+  assert.deepStrictEqual(selectClasses([old, recent]).map(c => c.year), [2026]);
 });
 
 test('selectClasses returns nothing when no class has commits', () => {

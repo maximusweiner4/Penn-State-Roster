@@ -373,6 +373,39 @@ validation guard, which has held since March 2026.
 - Manual mobile check at 375px; screen-reader check of star labels.
 - Confirm the depth chart renders unchanged with `activeSection === 'depth'`.
 
+## Post-implementation finding: CFBD has no in-cycle commits
+
+Probed 2026-07-31 against the live API with a real key
+(`.github/workflows/probe-recruits.yml`, dispatch-only):
+
+| Query | Rows |
+|---|---|
+| `year=2024 team=Penn State classification=HighSchool` | 26 |
+| `year=2025` | 29 |
+| `year=2026` | 15 |
+| `year=2027` | **0** |
+| `year=2027` with no classification filter | **0** |
+| `year=2027` **all teams, league-wide** | **0** |
+
+**A class appears in CFBD only once it signs.** The zero is league-wide, so it
+is not a PSU gap or a malformed query. This invalidates the "show both classes"
+decision recorded above, whose premise was that CFBD carries the in-cycle class.
+
+**Revised rule: render the single newest class that has commits.** In July 2026
+that is the 2026 class that just arrived; from December it becomes the class
+that just signed. Selecting instead on "has members not yet on the roster" was
+tried and is wrong — the 2025 class has 29 signees but only 15 still on the
+roster, so transfers and attrition would let an old class outrank a newer, more
+relevant one indefinitely.
+
+Fetch window widened to `currentYear-1 .. currentYear+1` (6 calls/day, ~186/mo
+against the 1,000/mo free tier) so a populated class is always in range.
+
+**Practical consequence:** between roughly March and December the section shows
+the class that has already enrolled, every member badged `ON ROSTER`. It becomes
+a genuine "incoming class" view each December. If in-cycle verbal commits are
+required, CFBD cannot supply them and a different source would be needed.
+
 ## Known limitations
 
 - **No per-player signed status.** CFBD exposes no reliable signed flag.

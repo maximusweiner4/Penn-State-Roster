@@ -4,7 +4,8 @@
   "description": "Scraper for Penn State football roster",
   "scripts": {
     "scrape": "node scrape-roster.js",
-    "update": "node update-html.js"
+    "update": "node update-html.js",
+    "test": "node --test \"lib/*.test.js\""
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

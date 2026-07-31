@@ -1,0 +1,54 @@
+name: Update Penn State Recruits
+
+on:
+  schedule:
+    # 30 minutes after the roster job, so the two never race to push.
+    - cron: '30 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-recruits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: maximusweiner4.github.io
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Node 21+ required: `node --test` needs a glob, not a directory.
+          # A directory argument fails to load the tests AND exits 0.
+          node-version: '24'
+
+      - name: Run unit tests
+        run: cd scripts && npm test
+
+      - name: Fetch recruits
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: node scripts/fetch-recruits.js
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet scripts/recruits.json || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/recruits.json
+          git commit -m "Update recruits from CollegeFootballData
+
+          Automated update on $(date -u +%Y-%m-%d)"
+          git pull --rebase origin maximusweiner4.github.io
+          git push

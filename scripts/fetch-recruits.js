@@ -71,7 +71,15 @@ async function main() {
     }
   }
 
-  const classes = fetched.map(c => annotateClass(c, roster)).filter(shouldRenderClass);
+  const classes = fetched.map(c => annotateClass(c, roster)).filter(cls => {
+    const keep = shouldRenderClass(cls);
+    const onRoster = cls.commits.filter(r => r.onRoster).length;
+    console.log(
+      `[fetch-recruits] class ${cls.year}: ${cls.commits.length} commit(s), ` +
+      `${onRoster} already on roster, rank=${cls.rank ?? 'n/a'} -> ${keep ? 'RENDER' : 'HIDE'}`
+    );
+    return keep;
+  });
 
   const output = buildOutput(classes, readJson(OUT, null), now.toISOString().slice(0, 10));
   fs.writeFileSync(OUT, JSON.stringify(output, null, 2) + '\n');

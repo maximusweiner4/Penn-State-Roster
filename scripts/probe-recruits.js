@@ -29,6 +29,30 @@ async function main() {
 
   console.log('--- 2027 league-wide (is the whole class empty, or just PSU?) ---');
   await count('year=2027 all teams', { year: 2027 });
+
+  // Is On3 reachable from a GitHub Actions datacenter IP? This is the exact
+  // failure mode that ruled out 247Sports, so it must be tested from CI rather
+  // than from a home connection.
+  console.log('--- On3 reachability from this runner ---');
+  const url = 'https://www.on3.com/college/penn-state-nittany-lions/football/2027/commits/';
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
+        'Accept': 'text/html'
+      }
+    });
+    const html = await res.text();
+    const m = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+    let n = 'n/a';
+    if (m) {
+      try { n = JSON.parse(m[1]).props.pageProps.playerList.list.length; } catch { n = 'parse failed'; }
+    }
+    console.log(`On3 HTTP ${res.status}, ${html.length}b, __NEXT_DATA__=${!!m}, commits=${n}`);
+    if (/captcha|cf-challenge|Just a moment/i.test(html)) console.log('On3: BOT CHALLENGE detected');
+  } catch (e) {
+    console.log(`On3 ERROR: ${e.message}`);
+  }
 }
 
 main().catch(e => { console.error(e.message); process.exit(1); });

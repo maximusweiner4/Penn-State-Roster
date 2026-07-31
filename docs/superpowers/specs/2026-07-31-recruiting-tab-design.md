@@ -60,6 +60,26 @@ key-authenticated JSON API.
 No Puppeteer required — this is a plain HTTPS JSON call, roughly 2s per run
 versus the roster scraper's ~40s.
 
+### Field normalization
+
+Two CFBD fields do not match the shapes already used in this app and must be
+normalized in the fetcher, not at render time:
+
+- **`height` is inches (e.g. `75`)**, while `roster.json` stores `"6-3"`.
+  Convert to feet-inches so recruit cards and roster cards read identically.
+- **`position` is CFBD's vocabulary**, which does not necessarily match the
+  app's position codes (`index.html:1110-1112`) or the scraper's `positionMap`
+  (`scripts/scrape-roster.js:7-34`). The fetcher must map CFBD positions
+  through an equivalent table. Unmapped positions pass through verbatim rather
+  than being dropped, and log a warning so new codes surface in CI output
+  instead of silently vanishing.
+
+### Rate limits
+
+The CFBD free tier is rate-limited. Six calls once daily is far under any
+plausible ceiling, but the fetcher should treat HTTP 429 as a retryable error
+with a single backoff retry, distinct from a hard failure.
+
 ## Class window
 
 Recruiting classes are named for the year the player enrolls. The active class
@@ -205,6 +225,8 @@ before the work is considered done.
 | Non-200, network error, or malformed JSON | Exit non-zero, **do not write** `recruits.json`; last-good data keeps serving; GitHub emails the failure |
 | All three classes empty | Treated as failure — an API problem, not reality |
 | One class empty | Normal; that class simply does not render |
+| `/recruiting/teams` returns no row | Expected for a class with few or no commits. Omit `rank`/`points`; the header renders commit count only. Never a failure. |
+| HTTP 429 | One backoff retry, then treat as hard failure |
 | Client fetch fails | Fall back to `localStorage`, mirroring `index.html:784-798` |
 | Stale service worker | Prevented by the `CACHE_NAME` bump |
 

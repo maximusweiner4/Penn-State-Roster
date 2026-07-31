@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { annotateClass, shouldRenderClass } = require('./roster-match');
+const { annotateClass, shouldRenderClass, selectClasses } = require('./roster-match');
 
 const roster = [{ name: 'Zion Tracy' }, { name: "Amar'e Glover" }];
 
@@ -40,4 +40,26 @@ test('hides an empty class', () => {
 test('an empty roster leaves every class visible', () => {
   const cls = annotateClass({ year: 2027, commits: [{ name: 'Anyone' }] }, []);
   assert.strictEqual(shouldRenderClass(cls), true);
+});
+
+test('selectClasses returns only the visible classes when some qualify', () => {
+  const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
+  const b = annotateClass({ year: 2027, commits: [{ name: 'New Kid' }] }, roster);
+  assert.deepStrictEqual(selectClasses([a, b]).map(c => c.year), [2027]);
+});
+
+test('selectClasses falls back to the newest class with commits when none qualify', () => {
+  // The real July 2026 shape: 2026 fully enrolled, 2027 not yet in CFBD.
+  const a = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
+  const b = annotateClass({ year: 2027, commits: [] }, roster);
+  const out = selectClasses([a, b]);
+  assert.deepStrictEqual(out.map(c => c.year), [2026]);
+  assert.strictEqual(out[0].commits[0].onRoster, true);
+});
+
+test('selectClasses returns nothing when no class has commits', () => {
+  assert.deepStrictEqual(selectClasses([
+    annotateClass({ year: 2027, commits: [] }, roster),
+    annotateClass({ year: 2028, commits: [] }, roster)
+  ]), []);
 });

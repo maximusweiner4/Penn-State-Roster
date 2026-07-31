@@ -1,0 +1,7 @@
+{
+  "name": "Penn State - Official Athletics Website",
+  "primaryColor": "rgb(4, 30, 66)",
+  "secondaryColor": "#FFFFFF",
+  "baseUrl": "https://gopsusports.com",
+  "rosterUrl": "https://gopsusports.com/sports/football/roster"
+}

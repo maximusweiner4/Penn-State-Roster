@@ -3,7 +3,7 @@ const path = require('path');
 const { cfbdGet } = require('./lib/cfbd');
 const { heightToFeetInches, mapPosition } = require('./lib/normalize');
 const { sortCommits } = require('./lib/sort');
-const { annotateClass, shouldRenderClass } = require('./lib/roster-match');
+const { annotateClass, shouldRenderClass, selectClasses } = require('./lib/roster-match');
 const { buildOutput } = require('./lib/changed');
 
 const TEAM = 'Penn State';
@@ -49,8 +49,10 @@ async function main() {
   const currentYear = now.getUTCFullYear();
   const roster = readJson(ROSTER, []);
 
+  // currentYear-1 is included because CFBD lags: a class lands only once it
+  // signs, so in spring/summer the newest populated class is the prior year's.
   const fetched = [];
-  for (const year of [currentYear, currentYear + 1]) {
+  for (const year of [currentYear - 1, currentYear, currentYear + 1]) {
     fetched.push(await fetchClass(year));
   }
 
@@ -71,15 +73,20 @@ async function main() {
     }
   }
 
-  const classes = fetched.map(c => annotateClass(c, roster)).filter(cls => {
-    const keep = shouldRenderClass(cls);
+  const annotated = fetched.map(c => annotateClass(c, roster));
+  const classes = selectClasses(annotated);
+  const shown = new Set(classes.map(c => c.year));
+
+  for (const cls of annotated) {
     const onRoster = cls.commits.filter(r => r.onRoster).length;
+    const why = shown.has(cls.year)
+      ? (shouldRenderClass(cls) ? 'RENDER' : 'RENDER (fallback: newest with data)')
+      : 'HIDE';
     console.log(
       `[fetch-recruits] class ${cls.year}: ${cls.commits.length} commit(s), ` +
-      `${onRoster} already on roster, rank=${cls.rank ?? 'n/a'} -> ${keep ? 'RENDER' : 'HIDE'}`
+      `${onRoster} already on roster, rank=${cls.rank ?? 'n/a'} -> ${why}`
     );
-    return keep;
-  });
+  }
 
   const output = buildOutput(classes, readJson(OUT, null), now.toISOString().slice(0, 10));
   fs.writeFileSync(OUT, JSON.stringify(output, null, 2) + '\n');

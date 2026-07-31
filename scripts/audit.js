@@ -1,0 +1,11 @@
+const roster = require('./roster.json');
+const empty = (f) => roster.filter(p => !p[f] || p[f] === 'Unknown').length;
+console.log('Total players:', roster.length);
+console.log('Missing hometown:', empty('hometown'));
+console.log('Missing highSchool:', empty('highSchool'));
+console.log('Missing position:', empty('position'));
+console.log('Missing year:', empty('year'));
+console.log('Missing height:', empty('height'));
+console.log('Missing weight:', empty('weight'));
+console.log('\nSample (first 5):');
+roster.slice(0,5).forEach(p => console.log(p.name, '|', p.position, '|', p.year, '|', p.height, '|', p.weight, '|', p.hometown, '|', p.highSchool));

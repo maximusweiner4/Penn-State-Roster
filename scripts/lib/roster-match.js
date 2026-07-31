@@ -31,4 +31,22 @@ function shouldRenderClass(cls) {
   return !commits.every(c => c.onRoster === true);
 }
 
-module.exports = { annotateClass, shouldRenderClass };
+// CFBD does not carry in-cycle verbal commits: a class appears only once it
+// signs. Probed 2026-07-31 -- year=2027 returned 0 rows league-wide, not just
+// for PSU, while 2024/2025/2026 returned 26/29/15. So between roughly March and
+// December there is no unsigned class to show, and the newest signed class has
+// usually enrolled, which shouldRenderClass hides.
+//
+// Rather than render an empty section for months, fall back to the most recent
+// class that has any commits. Its members carry ON ROSTER badges, so the overlap
+// with the depth chart roster stays explicit rather than misleading.
+function selectClasses(annotated) {
+  const visible = annotated.filter(shouldRenderClass);
+  if (visible.length > 0) return visible;
+
+  const withCommits = annotated.filter(c => (c.commits || []).length > 0);
+  if (withCommits.length === 0) return [];
+  return [withCommits.reduce((a, b) => (b.year > a.year ? b : a))];
+}
+
+module.exports = { annotateClass, shouldRenderClass, selectClasses };

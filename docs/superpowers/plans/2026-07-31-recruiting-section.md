@@ -6,23 +6,38 @@
 
 **Architecture:** A Node fetcher (`scripts/fetch-recruits.js`) calls CFBD, normalizes the data, and commits `scripts/recruits.json`. A separate GitHub Actions workflow runs it daily. `index.html` gains a section switch and a lazy-loaded card grid. Class visibility is derived from `roster.json` rather than the calendar, so no dates are hardcoded.
 
-**Tech Stack:** Node 24 (global `fetch`, built-in `node:test` runner — no new dependencies), vanilla JS in `index.html`, Tailwind via CDN, GitHub Actions.
+**Tech Stack:** Node 24 (global `fetch`, built-in `node:test` — no new dependencies), vanilla JS in `index.html`, Tailwind CDN, GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-07-31-recruiting-tab-design.md`
 
-**Prerequisite (human, blocking Task 8+):** Register a free key at collegefootballdata.com/key and add it as repo secret `CFBD_API_KEY`. Tasks 1-7 can be completed without it.
+**Prerequisite (human, blocking Task 8+):** Register a free key at collegefootballdata.com/key and add it as repo secret `CFBD_API_KEY`. Tasks 1-7 need no key.
 
 ---
 
-## A note on testing strategy
+## Two standing rules for this plan
 
-Tasks 1-8 (the fetcher) are pure Node and get strict TDD with `node --test`.
+**1. The test invocation is `node --test "lib/*.test.js"` — a quoted glob, never
+a directory.** Node 24 rejects a directory argument, treats `lib` as a missing
+test file, and — verified empirically — **still exits 0**. A directory argument
+gives you a green CI run with zero tests executed. Do not "simplify" this back.
 
-Tasks 9-17 (the UI) live inside a 3,262-line `index.html` monolith with no
-browser test harness, and introducing one is out of scope. Those tasks specify
-**explicit manual verification steps with expected observations** instead. This
-is a real gap, not an oversight — do not claim a UI task passes without
-performing its stated check.
+**2. All recruit text is third-party and must pass through `esc()`.** The app
+renders by assigning a template string to the DOM in exactly one place
+(`index.html:1776`). Every task below funnels markup into that single existing
+assignment rather than adding a new one, so escaping has one chokepoint. Never
+interpolate a raw `recruits.json` field.
+
+---
+
+## Testing strategy, and its one real gap
+
+Tasks 1-8 (the fetcher) are pure Node under strict TDD.
+
+Tasks 9-16 (the UI) live in a 3,262-line `index.html` monolith with no browser
+test harness; standing one up is out of scope. Those tasks carry **explicit
+manual checks with stated expected observations**. That is a genuine coverage
+gap, not a style choice — do not report a UI task passing without performing
+its check.
 
 ---
 
@@ -30,21 +45,23 @@ performing its stated check.
 
 | Path | Status | Responsibility |
 |---|---|---|
-| `scripts/lib/normalize.js` | create | Pure functions: height, position, name normalization |
+| `scripts/lib/normalize.js` | create | Height, position, name normalization |
 | `scripts/lib/sort.js` | create | Total, null-safe recruit ordering |
-| `scripts/lib/roster-match.js` | create | Decide which classes/recruits are already on the roster |
-| `scripts/lib/cfbd.js` | create | CFBD HTTP client: auth, 429 retry, error surfacing |
-| `scripts/fetch-recruits.js` | create | Orchestration, validation guard, atomic write |
+| `scripts/lib/roster-match.js` | create | Which classes/recruits are already on the roster |
+| `scripts/lib/cfbd.js` | create | CFBD client: auth, 429 retry, error surfacing |
+| `scripts/lib/changed.js` | create | Change detection for the `updated` stamp |
+| `scripts/fetch-recruits.js` | create | Orchestration, validation guard |
 | `scripts/recruits.json` | create | Seed + committed output |
 | `scripts/lib/*.test.js` | create | Unit tests |
 | `.github/workflows/update-recruits.yml` | create | Daily CI |
 | `.github/workflows/update-roster.yml` | modify | Rebase-before-push race fix |
 | `index.html` | modify | Section switch, recruiting render, guards, `esc()` |
 | `service-worker.js` | modify | `CACHE_NAME` v5 only — no precache |
+| `sitemap.xml` | modify | Add the `#recruiting` deep link |
 
-Splitting the fetcher into `lib/` modules keeps each file small enough to hold
-in context and makes the pure logic testable without network access. This is a
-new subtree, so it does not disturb the existing flat `scripts/` convention.
+**Chunk 2 task order is dependency-driven** (`esc` → loader → grid →
+state/`setSection` → render branch → guards). Every task leaves a working
+tree; no task calls a function a later task creates.
 
 ---
 
@@ -52,28 +69,27 @@ new subtree, so it does not disturb the existing flat `scripts/` convention.
 
 ### Task 1: Test infrastructure and seed file
 
-**Files:**
-- Modify: `scripts/package.json`
-- Create: `scripts/recruits.json`
+**Files:** modify `scripts/package.json`; create `scripts/recruits.json`, `scripts/lib/`
 
-- [ ] **Step 1: Add the test script**
-
-In `scripts/package.json`, add to `"scripts"`:
+- [ ] **Step 1: Add the test script** — note the quoted glob
 
 ```json
-"test": "node --test lib/"
+"test": "node --test \"lib/*.test.js\""
 ```
 
-- [ ] **Step 2: Verify the runner works with zero tests**
+- [ ] **Step 2: Create `lib/` and verify the runner**
 
-Run: `cd scripts && npm test`
-Expected: exits 0, reports `tests 0`. (If it errors on the missing `lib/`
-directory, create it with `mkdir lib` and re-run.)
+```bash
+cd scripts && mkdir -p lib && npm test; echo "exit=$?"
+```
+
+Expected: no test files matched; `exit=0`. If you see `Cannot find module`,
+you used a directory argument — go back to Step 1.
 
 - [ ] **Step 3: Create the seed file**
 
-`scripts/recruits.json` — this must exist before the UI ships, or a missing
-`CFBD_API_KEY` on first run leaves the client with a 404 and no defined render:
+`scripts/recruits.json`. Required: without it, a missing `CFBD_API_KEY` on
+first run leaves the client with a 404 and no defined render.
 
 ```json
 {
@@ -91,11 +107,9 @@ git commit -m "chore: add node:test runner and seed recruits.json"
 
 ---
 
-### Task 2: Height and position normalization
+### Task 2: Height, position, and name normalization
 
-**Files:**
-- Create: `scripts/lib/normalize.js`
-- Test: `scripts/lib/normalize.test.js`
+**Files:** create `scripts/lib/normalize.js`, `scripts/lib/normalize.test.js`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -110,10 +124,16 @@ test('heightToFeetInches converts inches to feet-inches', () => {
   assert.strictEqual(heightToFeetInches(69), '5-9');
 });
 
-test('heightToFeetInches passes through null and garbage as empty string', () => {
+test('heightToFeetInches accepts numeric strings and rounds fractions', () => {
+  assert.strictEqual(heightToFeetInches('75'), '6-3');
+  assert.strictEqual(heightToFeetInches(75.5), '6-4');
+});
+
+test('heightToFeetInches returns empty string for null and garbage', () => {
   assert.strictEqual(heightToFeetInches(null), '');
   assert.strictEqual(heightToFeetInches(undefined), '');
   assert.strictEqual(heightToFeetInches(0), '');
+  assert.strictEqual(heightToFeetInches('tall'), '');
 });
 
 test('mapPosition maps CFBD vocabulary to roster vocabulary', () => {
@@ -123,38 +143,44 @@ test('mapPosition maps CFBD vocabulary to roster vocabulary', () => {
   assert.strictEqual(mapPosition('QB'), 'QB');
 });
 
-test('mapPosition passes unmapped positions through verbatim', () => {
-  assert.strictEqual(mapPosition('XYZ'), 'XYZ');
+test('mapPosition maps the composite QB and athlete codes', () => {
+  assert.strictEqual(mapPosition('DUAL'), 'QB');
+  assert.strictEqual(mapPosition('PRO'), 'QB');
+  assert.strictEqual(mapPosition('ATH'), 'ATH');
 });
 
-test('mapPosition returns empty string for null', () => {
+test('mapPosition passes unmapped positions through verbatim', () => {
+  assert.strictEqual(mapPosition('XYZ'), 'XYZ');
   assert.strictEqual(mapPosition(null), '');
 });
 
-test('normalizeName lowercases, strips punctuation and generational suffixes', () => {
+test('normalizeName lowercases and strips punctuation', () => {
   assert.strictEqual(normalizeName("Amar'e Glover"), 'amare glover');
+  assert.strictEqual(normalizeName('  Zion   Tracy  '), 'zion tracy');
+});
+
+test('normalizeName strips generational suffixes only at the end', () => {
   assert.strictEqual(normalizeName('John Smith Jr.'), 'john smith');
   assert.strictEqual(normalizeName('Robert Downey III'), 'robert downey');
-  assert.strictEqual(normalizeName('  Zion   Tracy  '), 'zion tracy');
+  assert.strictEqual(normalizeName('Ii Kealohanui'), 'ii kealohanui');
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+That last assertion is the point of anchoring: an unanchored `\b(ii|v)\b`
+deletes legitimate given names.
 
-Run: `cd scripts && npm test`
-Expected: FAIL — `Cannot find module './normalize'`
+- [ ] **Step 2: Run to verify failure** — `cd scripts && npm test` → `Cannot find module './normalize'`
 
 - [ ] **Step 3: Implement**
 
-`scripts/lib/normalize.js`. The position table's **values** must stay inside
-the roster vocabulary confirmed in `scripts/roster.json`:
-`QB RB WR TE OL DL DT DE LB CB S K P LS`.
+Position values must stay inside the roster vocabulary confirmed in
+`scripts/roster.json`: `QB RB WR TE OL DL DT DE LB CB S K P LS`. `ATH` is a
+deliberate documented exception — CFBD emits it constantly and there is no
+honest single-position mapping for an athlete.
 
 ```javascript
-// CFBD position codes -> the vocabulary used in roster.json.
-// Values MUST stay within: QB RB WR TE OL DL DT DE LB CB S K P LS
 const POSITION_MAP = {
-  QB: 'QB',
+  QB: 'QB', DUAL: 'QB', PRO: 'QB',
   RB: 'RB', APB: 'RB', FB: 'RB',
   WR: 'WR',
   TE: 'TE',
@@ -167,12 +193,15 @@ const POSITION_MAP = {
   S: 'S', SAF: 'S', FS: 'S', SS: 'S',
   K: 'K', PK: 'K',
   P: 'P',
-  LS: 'LS'
+  LS: 'LS',
+  ATH: 'ATH'   // documented exception: no honest single-position mapping
 };
 
 function heightToFeetInches(inches) {
-  if (!inches || typeof inches !== 'number' || inches <= 0) return '';
-  return `${Math.floor(inches / 12)}-${inches % 12}`;
+  const n = Number(inches);
+  if (!Number.isFinite(n) || n <= 0) return '';
+  const i = Math.round(n);
+  return `${Math.floor(i / 12)}-${i % 12}`;
 }
 
 function mapPosition(pos) {
@@ -188,19 +217,15 @@ function normalizeName(name) {
   return String(name)
     .toLowerCase()
     .replace(/[.'’,]/g, '')
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .replace(/\s+(jr|sr|ii|iii|iv|v)$/, '');
 }
 
 module.exports = { heightToFeetInches, mapPosition, normalizeName, POSITION_MAP };
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `cd scripts && npm test`
-Expected: PASS, 6 tests. Unmapped-position test prints a warning — that is
-intended behavior, not noise.
+- [ ] **Step 4: Run to verify pass** — Expected: PASS, 8 tests. The unmapped-position warning is intended output.
 
 - [ ] **Step 5: Commit**
 
@@ -213,12 +238,10 @@ git commit -m "feat: add height, position, and name normalization"
 
 ### Task 3: Null-safe total ordering
 
-**Files:**
-- Create: `scripts/lib/sort.js`
-- Test: `scripts/lib/sort.test.js`
+**Files:** create `scripts/lib/sort.js`, `scripts/lib/sort.test.js`
 
-Unrated recruits are common in early classes. An unstable sort would scatter
-them and produce spurious daily diffs, which in turn cause noise commits.
+Unrated recruits are common in early classes. An unstable sort scatters them
+and produces spurious daily diffs, which become noise commits.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -237,7 +260,7 @@ test('sorts by rating descending', () => {
   assert.deepStrictEqual(names(out), ['A', 'B']);
 });
 
-test('null ratings sort last regardless of input order', () => {
+test('null ratings sort last', () => {
   const out = sortCommits([
     { name: 'Unrated', rating: null, stars: null, ranking: null },
     { name: 'Rated', rating: 0.80, stars: 3, ranking: 900 }
@@ -275,23 +298,19 @@ test('does not mutate its input', () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
-
-Run: `cd scripts && npm test`
-Expected: FAIL — `Cannot find module './sort'`
+- [ ] **Step 2: Run to verify failure** — `Cannot find module './sort'`
 
 - [ ] **Step 3: Implement**
 
 ```javascript
-// Nulls always sort last. desc: higher is better. asc: lower is better.
-function cmpDesc(a, b) {
+function cmpDesc(a, b) {           // nulls last, higher is better
   if (a == null && b == null) return 0;
   if (a == null) return 1;
   if (b == null) return -1;
   return b - a;
 }
 
-function cmpAsc(a, b) {
+function cmpAsc(a, b) {            // nulls last, lower is better
   if (a == null && b == null) return 0;
   if (a == null) return 1;
   if (b == null) return -1;
@@ -310,10 +329,7 @@ function sortCommits(commits) {
 module.exports = { sortCommits };
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `cd scripts && npm test`
-Expected: PASS, 11 tests total.
+- [ ] **Step 4: Run to verify pass** — Expected: PASS, 13 tests total.
 
 - [ ] **Step 5: Commit**
 
@@ -326,13 +342,10 @@ git commit -m "feat: add null-safe deterministic recruit ordering"
 
 ### Task 4: Roster matching — replaces the calendar rule
 
-**Files:**
-- Create: `scripts/lib/roster-match.js`
-- Test: `scripts/lib/roster-match.test.js`
+**Files:** create `scripts/lib/roster-match.js`, `scripts/lib/roster-match.test.js`
 
-This is the load-bearing decision from the spec review. A class hides only once
-**every** commit appears in `roster.json`; partial matches are badged. No dates
-are involved.
+A class hides only once **every** commit appears in `roster.json`; partial
+matches are badged. No dates involved.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -345,35 +358,34 @@ const roster = [{ name: 'Zion Tracy' }, { name: "Amar'e Glover" }];
 
 test('annotateClass flags commits already on the roster', () => {
   const out = annotateClass(
-    { year: 2026, commits: [{ name: 'Zion Tracy' }, { name: 'New Kid' }] },
-    roster
-  );
+    { year: 2026, commits: [{ name: 'Zion Tracy' }, { name: 'New Kid' }] }, roster);
   assert.strictEqual(out.commits[0].onRoster, true);
   assert.strictEqual(out.commits[1].onRoster, false);
 });
 
-test('matching ignores punctuation and suffixes', () => {
-  const out = annotateClass(
-    { year: 2026, commits: [{ name: 'Amare Glover Jr.' }] },
-    roster
-  );
+test('matching ignores punctuation and trailing suffixes', () => {
+  const out = annotateClass({ year: 2026, commits: [{ name: 'Amare Glover Jr.' }] }, roster);
   assert.strictEqual(out.commits[0].onRoster, true);
 });
 
-test('shouldRenderClass hides a class fully absorbed into the roster', () => {
+test('annotateClass does not mutate its input', () => {
+  const cls = { year: 2026, commits: [{ name: 'Zion Tracy' }] };
+  annotateClass(cls, roster);
+  assert.strictEqual(cls.commits[0].onRoster, undefined);
+});
+
+test('hides a class fully absorbed into the roster', () => {
   const cls = annotateClass({ year: 2026, commits: [{ name: 'Zion Tracy' }] }, roster);
   assert.strictEqual(shouldRenderClass(cls), false);
 });
 
-test('shouldRenderClass shows a partially enrolled class', () => {
+test('shows a partially enrolled class', () => {
   const cls = annotateClass(
-    { year: 2026, commits: [{ name: 'Zion Tracy' }, { name: 'New Kid' }] },
-    roster
-  );
+    { year: 2026, commits: [{ name: 'Zion Tracy' }, { name: 'New Kid' }] }, roster);
   assert.strictEqual(shouldRenderClass(cls), true);
 });
 
-test('shouldRenderClass hides an empty class', () => {
+test('hides an empty class', () => {
   assert.strictEqual(shouldRenderClass({ year: 2028, commits: [] }), false);
 });
 
@@ -383,10 +395,7 @@ test('an empty roster leaves every class visible', () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
-
-Run: `cd scripts && npm test`
-Expected: FAIL — `Cannot find module './roster-match'`
+- [ ] **Step 2: Run to verify failure** — `Cannot find module './roster-match'`
 
 - [ ] **Step 3: Implement**
 
@@ -404,7 +413,14 @@ function annotateClass(cls, roster) {
   };
 }
 
-// Hide a class only when it is empty, or when every commit has enrolled.
+// Hide only when empty, or when every commit has enrolled.
+//
+// Known behavior: a signee who decommits, greyshirts, or fails to qualify
+// never appears in roster.json, so that class stays visible with its other
+// members badged ON ROSTER until the fetch window drops it on January 1
+// (fetch-recruits.js fetches only currentYear and currentYear+1). Accepted:
+// showing a stale class briefly is cheaper than a fuzzy percentage threshold
+// that would hide real recruits.
 function shouldRenderClass(cls) {
   const commits = cls.commits || [];
   if (commits.length === 0) return false;
@@ -414,10 +430,7 @@ function shouldRenderClass(cls) {
 module.exports = { annotateClass, shouldRenderClass };
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `cd scripts && npm test`
-Expected: PASS, 17 tests total.
+- [ ] **Step 4: Run to verify pass** — Expected: PASS, 20 tests total.
 
 - [ ] **Step 5: Commit**
 
@@ -430,13 +443,9 @@ git commit -m "feat: derive class visibility from roster instead of calendar"
 
 ### Task 5: CFBD client with 429 retry
 
-**Files:**
-- Create: `scripts/lib/cfbd.js`
-- Test: `scripts/lib/cfbd.test.js`
+**Files:** create `scripts/lib/cfbd.js`, `scripts/lib/cfbd.test.js`
 
-- [ ] **Step 1: Write the failing tests**
-
-Inject `fetch` so no network is touched.
+- [ ] **Step 1: Write the failing tests** (inject `fetch`; no network)
 
 ```javascript
 const { test } = require('node:test');
@@ -446,13 +455,12 @@ const { cfbdGet } = require('./cfbd');
 const ok = (body) => async () => ({ ok: true, status: 200, json: async () => body });
 
 test('returns parsed JSON on 200', async () => {
-  const out = await cfbdGet('/recruiting/players', { year: 2027 }, {
-    key: 'k', fetchImpl: ok([{ name: 'A' }])
-  });
+  const out = await cfbdGet('/recruiting/players', { year: 2027 },
+    { key: 'k', fetchImpl: ok([{ name: 'A' }]) });
   assert.deepStrictEqual(out, [{ name: 'A' }]);
 });
 
-test('sends the bearer token and encodes query params', async () => {
+test('sends bearer token and encodes query params', async () => {
   let seenUrl, seenHeaders;
   await cfbdGet('/recruiting/players', { team: 'Penn State' }, {
     key: 'secret',
@@ -480,38 +488,32 @@ test('retries once on 429 then succeeds', async () => {
 });
 
 test('throws after a second 429', async () => {
-  await assert.rejects(
-    cfbdGet('/x', {}, {
-      key: 'k', backoffMs: 0,
-      fetchImpl: async () => ({ ok: false, status: 429, text: async () => 'nope' })
-    }),
-    /429/
-  );
+  await assert.rejects(cfbdGet('/x', {}, {
+    key: 'k', backoffMs: 0,
+    fetchImpl: async () => ({ ok: false, status: 429, text: async () => 'nope' })
+  }), /429/);
 });
 
 test('throws immediately on 401 without retrying', async () => {
   let calls = 0;
-  await assert.rejects(
-    cfbdGet('/x', {}, {
-      key: 'bad', backoffMs: 0,
-      fetchImpl: async () => { calls++; return { ok: false, status: 401, text: async () => 'unauthorized' }; }
-    }),
-    /401/
-  );
+  await assert.rejects(cfbdGet('/x', {}, {
+    key: 'bad', backoffMs: 0,
+    fetchImpl: async () => { calls++; return { ok: false, status: 401, text: async () => 'unauthorized' }; }
+  }), /401/);
   assert.strictEqual(calls, 1);
+});
+
+test('throws when no key is configured', async () => {
+  await assert.rejects(cfbdGet('/x', {}, { key: '', fetchImpl: ok([]) }), /CFBD_API_KEY/);
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
-
-Run: `cd scripts && npm test`
-Expected: FAIL — `Cannot find module './cfbd'`
+- [ ] **Step 2: Run to verify failure** — `Cannot find module './cfbd'`
 
 - [ ] **Step 3: Implement**
 
 ```javascript
 const BASE = 'https://api.collegefootballdata.com';
-
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function cfbdGet(path, params = {}, opts = {}) {
@@ -530,11 +532,7 @@ async function cfbdGet(path, params = {}, opts = {}) {
   for (let attempt = 0; attempt < 2; attempt++) {
     const res = await fetchImpl(url, { headers });
     if (res.ok) return res.json();
-
-    if (res.status === 429 && attempt === 0) {
-      await sleep(backoffMs);
-      continue;
-    }
+    if (res.status === 429 && attempt === 0) { await sleep(backoffMs); continue; }
     const body = await res.text().catch(() => '');
     throw new Error(`CFBD ${res.status} for ${path}: ${body.slice(0, 200)}`);
   }
@@ -543,10 +541,7 @@ async function cfbdGet(path, params = {}, opts = {}) {
 module.exports = { cfbdGet, BASE };
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `cd scripts && npm test`
-Expected: PASS, 22 tests total.
+- [ ] **Step 4: Run to verify pass** — Expected: PASS, 26 tests total.
 
 - [ ] **Step 5: Commit**
 
@@ -559,9 +554,7 @@ git commit -m "feat: add CFBD client with 429 backoff"
 
 ### Task 6: Change detection that does not churn `updated`
 
-**Files:**
-- Create: `scripts/lib/changed.js`
-- Test: `scripts/lib/changed.test.js`
+**Files:** create `scripts/lib/changed.js`, `scripts/lib/changed.test.js`
 
 `update-roster.yml:51` commits only when `git diff --quiet` reports a change. A
 fresh timestamp every run makes the diff permanently dirty — 365 noise commits
@@ -574,24 +567,21 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const { buildOutput } = require('./changed');
 
-const classes = [{ year: 2027, rank: 4, points: 271.5, commits: [{ name: 'A' }] }];
+const classes = [{ year: 2027, rank: 4, commits: [{ name: 'A' }] }];
 
-test('keeps the previous updated date when classes are unchanged', () => {
-  const prev = { updated: '2026-07-01', classes };
-  const out = buildOutput(classes, prev, '2026-07-31');
+test('keeps the previous date when classes are unchanged', () => {
+  const out = buildOutput(classes, { updated: '2026-07-01', classes }, '2026-07-31');
   assert.strictEqual(out.updated, '2026-07-01');
 });
 
 test('stamps a new date when classes change', () => {
-  const prev = { updated: '2026-07-01', classes };
   const next = [{ ...classes[0], commits: [{ name: 'A' }, { name: 'B' }] }];
-  const out = buildOutput(next, prev, '2026-07-31');
+  const out = buildOutput(next, { updated: '2026-07-01', classes }, '2026-07-31');
   assert.strictEqual(out.updated, '2026-07-31');
 });
 
 test('stamps a date when there is no previous file', () => {
-  const out = buildOutput(classes, null, '2026-07-31');
-  assert.strictEqual(out.updated, '2026-07-31');
+  assert.strictEqual(buildOutput(classes, null, '2026-07-31').updated, '2026-07-31');
 });
 
 test('stamps a date when the previous file is the null seed', () => {
@@ -600,32 +590,21 @@ test('stamps a date when the previous file is the null seed', () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
-
-Run: `cd scripts && npm test`
-Expected: FAIL — `Cannot find module './changed'`
+- [ ] **Step 2: Run to verify failure** — `Cannot find module './changed'`
 
 - [ ] **Step 3: Implement**
 
 ```javascript
 function buildOutput(classes, previous, today) {
-  const unchanged =
-    previous &&
+  const unchanged = previous &&
     JSON.stringify(previous.classes) === JSON.stringify(classes);
-
-  return {
-    updated: unchanged ? previous.updated : today,
-    classes
-  };
+  return { updated: unchanged ? previous.updated : today, classes };
 }
 
 module.exports = { buildOutput };
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `cd scripts && npm test`
-Expected: PASS, 26 tests total.
+- [ ] **Step 4: Run to verify pass** — Expected: PASS, **30 tests total**.
 
 - [ ] **Step 5: Commit**
 
@@ -638,11 +617,7 @@ git commit -m "feat: stamp updated only when classes actually change"
 
 ### Task 7: Fetcher orchestration and validation guard
 
-**Files:**
-- Create: `scripts/fetch-recruits.js`
-
-The guard mirrors the roster scraper's: **on any failure, write nothing**, so
-the last-good file keeps serving and GitHub emails the failure.
+**Files:** create `scripts/fetch-recruits.js`
 
 - [ ] **Step 1: Implement**
 
@@ -669,13 +644,10 @@ async function fetchClass(year) {
   });
 
   // A thin class legitimately has no team-ranking row. Never fatal.
-  let rank = null, points = null;
+  let rank = null;
   try {
     const teams = await cfbdGet('/recruiting/teams', { year, team: TEAM });
-    if (Array.isArray(teams) && teams.length) {
-      rank = teams[0].rank ?? null;
-      points = teams[0].points ?? null;
-    }
+    if (Array.isArray(teams) && teams.length) rank = teams[0].rank ?? null;
   } catch (e) {
     console.warn(`[fetch-recruits] no team ranking for ${year}: ${e.message}`);
   }
@@ -693,36 +665,39 @@ async function fetchClass(year) {
     school: p.school || ''
   })));
 
-  return { year, rank, points, commits };
+  return { year, rank, commits };
 }
 
 async function main() {
   const now = new Date();
   const currentYear = now.getUTCFullYear();
-  const years = [currentYear, currentYear + 1];
-
   const roster = readJson(ROSTER, []);
 
   const fetched = [];
-  for (const year of years) {
+  for (const year of [currentYear, currentYear + 1]) {
     fetched.push(await fetchClass(year));
   }
 
-  // Guard: total emptiness is an API problem, not reality.
+  // Guard 1: total emptiness is an API problem, not reality.
   const total = fetched.reduce((n, c) => n + c.commits.length, 0);
   if (total === 0) {
     console.error('[fetch-recruits] every class came back empty — refusing to write');
     process.exit(1);
   }
 
-  const classes = fetched
-    .map(c => annotateClass(c, roster))
-    .filter(shouldRenderClass);
+  // Guard 2: name is the one field the UI cannot render without.
+  // Do NOT assert position/rating/stars — all are nullable in early classes.
+  for (const c of fetched) {
+    const nameless = c.commits.filter(r => !r.name).length;
+    if (nameless > 0) {
+      console.error(`[fetch-recruits] ${nameless} commit(s) in ${c.year} have no name — refusing to write`);
+      process.exit(1);
+    }
+  }
 
-  const previous = readJson(OUT, null);
-  const today = now.toISOString().slice(0, 10);
-  const output = buildOutput(classes, previous, today);
+  const classes = fetched.map(c => annotateClass(c, roster)).filter(shouldRenderClass);
 
+  const output = buildOutput(classes, readJson(OUT, null), now.toISOString().slice(0, 10));
   fs.writeFileSync(OUT, JSON.stringify(output, null, 2) + '\n');
   console.log(`[fetch-recruits] wrote ${classes.length} class(es), ${total} commit(s)`);
 }
@@ -733,17 +708,16 @@ main().catch(err => {
 });
 ```
 
-- [ ] **Step 2: Verify the failure path leaves the file untouched**
-
-This is the single most important guard. Run without a key:
+- [ ] **Step 2: Verify the failure path writes nothing** — the single most important guard
 
 ```bash
-cd scripts && cp recruits.json /tmp/before.json
+cd scripts && cp recruits.json ../recruits.before.json
 CFBD_API_KEY= node fetch-recruits.js; echo "exit=$?"
-diff recruits.json /tmp/before.json && echo "UNCHANGED - correct"
+diff recruits.json ../recruits.before.json && echo "UNCHANGED - correct"
+rm ../recruits.before.json
 ```
 
-Expected: `exit=1`, and `UNCHANGED - correct`.
+Expected: `exit=1`, then `UNCHANGED - correct`.
 
 - [ ] **Step 3: Commit**
 
@@ -756,19 +730,21 @@ git commit -m "feat: add CFBD recruiting fetcher with write-nothing-on-failure g
 
 ### Task 8: Workflows and the push-race fix
 
-**Files:**
-- Create: `.github/workflows/update-recruits.yml`
-- Modify: `.github/workflows/update-roster.yml`
+**Files:** create `.github/workflows/update-recruits.yml`; modify `.github/workflows/update-roster.yml`
 
-Both workflows push to `maximusweiner4.github.io`. Identical crons would race
-and the loser's push is rejected. The recruits job (~2s) beats the roster job
-(~40s), so the **roster** pipeline is the one that breaks — a regression in
-working code.
+Both workflows push to `maximusweiner4.github.io`. Identical crons race, and
+the loser's push is rejected. The recruits job (~2s) beats the roster job
+(~40s), so the **roster** pipeline is what breaks — a regression in working
+code.
 
 - [ ] **Step 1: Fix the existing roster workflow first**
 
-In `.github/workflows/update-roster.yml`, in the "Commit and push if changed"
-step, insert before `git push`:
+In `.github/workflows/update-roster.yml`:
+
+1. In the checkout `with:` block add `fetch-depth: 0`. `actions/checkout@v4`
+   defaults to depth 1, and rebasing a grafted repo is fragile — without this
+   the race "fix" can itself break the roster job.
+2. In "Commit and push if changed", replace `git push` with:
 
 ```yaml
           git pull --rebase origin maximusweiner4.github.io
@@ -784,7 +760,8 @@ git commit -m "fix: rebase before push to avoid concurrent workflow rejection"
 
 - [ ] **Step 3: Create the recruits workflow**
 
-Note the offset cron (`30 11` vs the roster's `0 11`).
+Note the offset cron and `node-version: '24'` — the quoted-glob test
+invocation requires Node 21+.
 
 ```yaml
 name: Update Penn State Recruits
@@ -806,11 +783,12 @@ jobs:
         with:
           ref: maximusweiner4.github.io
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Run unit tests
         run: cd scripts && npm test
@@ -838,7 +816,7 @@ jobs:
           git push
 ```
 
-- [ ] **Step 4: Commit, push, and trigger manually**
+- [ ] **Step 4: Push and trigger**
 
 ```bash
 git add .github/workflows/update-recruits.yml
@@ -851,51 +829,45 @@ gh run watch
 Expected: green. If it fails with `CFBD_API_KEY is not set`, the human
 prerequisite is outstanding — stop and report rather than working around it.
 
-- [ ] **Step 5: Verify real output**
+- [ ] **Step 5: Verify real output, then idempotence**
 
 ```bash
 git pull origin maximusweiner4.github.io
 node -e "const d=require('./scripts/recruits.json');console.log(d.updated, d.classes.map(c=>c.year+':'+c.commits.length))"
+gh workflow run update-recruits.yml --ref maximusweiner4.github.io && gh run watch
 ```
 
-Expected: a date and at least one class with a non-zero commit count.
+Expected: a date and at least one non-empty class; the second run produces
+**no new commit**. If it commits every time, `buildOutput` is not wired in.
 
 ---
 
 ## Chunk 2: UI
 
-> Reminder: no browser test harness exists. Every task below states an explicit
-> manual check. Do not mark one done without performing it.
+> No browser test harness exists. Every task states a manual check. Do not mark
+> one done without performing it. Tasks are ordered so no task references a
+> function a later task creates.
 
 ### Task 9: HTML escaping helper
 
-**Files:**
-- Modify: `index.html`
+**Files:** modify `index.html`
 
-Every render path interpolates raw into `app.innerHTML` (`index.html:1776`),
-and `recruits.json` relays third-party 247/Rivals text.
+`recruits.json` relays third-party 247/Rivals text into markup. Every recruit
+field must pass through this.
 
-- [ ] **Step 1: Add the helper**
-
-Add near the top of the app class, beside the other utility methods:
+- [ ] **Step 1: Add the helper** beside the other utility methods on the app class
 
 ```javascript
 esc(s) {
   if (s == null) return '';
   return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 ```
 
-- [ ] **Step 2: Verify in the browser console**
-
-Serve locally (`npx serve .`), open the site, and run:
-`app.esc('<img src=x onerror=alert(1)>')`
-Expected: the fully escaped string, no dialog.
+- [ ] **Step 2: Verify** — serve locally (`npx serve .`), console:
+`app.esc('<img src=x onerror=alert(1)>')` → fully escaped string, no dialog.
 
 - [ ] **Step 3: Commit**
 
@@ -906,38 +878,206 @@ git commit -m "feat: add esc() helper for interpolated strings"
 
 ---
 
-### Task 10: Section state, persistence, deep link
+### Task 10: Recruit state and lazy loader
 
-**Files:**
-- Modify: `index.html` (state init near `:611`, reset near `:1166-1169`, team purge near `:684-689`)
+**Files:** modify `index.html` (state near `:611`)
 
-- [ ] **Step 1: Add state and hash handling**
+Must **not** join `init()`'s await chain — that gates `this.loading`
+(`:663-677`), so a slow file would delay the depth chart for every visitor.
 
-Beside `this.activeTab = 'offense';`:
+- [ ] **Step 1: Add state fields** beside `this.activeTab = 'offense';`
+
+```javascript
+this.recruits = null;
+this.recruitsError = null;
+```
+
+- [ ] **Step 2: Add the loader**
+
+The cache path is itself wrapped — a corrupt `psu-recruits` would otherwise
+throw inside `catch`, skipping `render()` and stranding the spinner forever.
+
+```javascript
+async loadRecruits() {
+  try {
+    const res = await fetch('scripts/recruits.json?t=' + Date.now());
+    if (!res.ok) throw new Error(res.status);
+    this.recruits = await res.json();
+    this.recruitsError = null;
+    try { localStorage.setItem('psu-recruits', JSON.stringify(this.recruits)); } catch (_) {}
+  } catch (_) {
+    try {
+      const cached = localStorage.getItem('psu-recruits');
+      if (!cached) throw new Error('no cache');
+      this.recruits = JSON.parse(cached);
+      this.recruitsError = null;
+    } catch (_) {
+      this.recruits = null;
+      this.recruitsError = 'Recruiting data unavailable — check back shortly.';
+    }
+  }
+  this.render();
+}
+```
+
+- [ ] **Step 3: Verify all three paths** in the console
+
+`await app.loadRecruits()` → `app.recruits` populated. Go offline, reload,
+call again → cached data. Then `localStorage.removeItem('psu-recruits')`
+offline → `app.recruitsError` set, `app.recruits` null.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add index.html
+git commit -m "feat: add lazy recruit loader with cache and error fallbacks"
+```
+
+---
+
+### Task 11: Class grid and recruit cards
+
+**Files:** modify `index.html`
+
+- [ ] **Step 1: Implement**
+
+`renderStars` must clamp. Verified: `'★'.repeat(5 - 6)` throws `RangeError`
+**inside a template literal**, which blanks the entire page — depth chart
+included. And `stars: 0` (which CFBD does emit) must render `NR`, not five
+empty stars, which would imply a real 0-star evaluation.
+
+These functions **return strings**; they never touch the DOM. Rendering
+happens through the app's single existing assignment.
+
+```javascript
+renderStars(n) {
+  if (n == null || !(n >= 1)) return `<span class="text-xs text-gray-400">NR</span>`;
+  const k = Math.min(5, Math.round(n));
+  return `<span aria-label="${k}-star recruit">${'★'.repeat(k)}${'☆'.repeat(5 - k)}</span>`;
+}
+
+renderRecruits() {
+  if (this.recruitsError) return `<div class="p-8 text-center">${this.esc(this.recruitsError)}</div>`;
+  if (!this.recruits) return `<div class="p-8 text-center">Loading…</div>`;
+  if (!this.recruits.classes.length) return `<div class="p-8 text-center">No classes to show yet.</div>`;
+
+  const meta = (parts) => parts.filter(Boolean).join(' · ');
+
+  return `<div class="no-print">` + this.recruits.classes.map(c => `
+    <section class="mb-8">
+      <h2 class="font-display text-xl mb-3">
+        CLASS OF ${c.year}
+        <span class="text-sm font-normal">· ${meta([
+          `${c.commits.length} commits`,
+          c.rank ? `Composite #${c.rank} national` : '',
+          this.recruits.updated ? `Updated ${this.esc(this.recruits.updated)}` : ''
+        ])}</span>
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        ${c.commits.map(r => `
+          <div class="rounded-lg p-3 bg-white dark:bg-gray-800 border-2"
+               style="border-color:${this.team.primaryColor}">
+            <div class="flex justify-between text-xs">
+              <span>${this.renderStars(r.stars)}</span>
+              <span class="font-bold">${this.esc(r.position)}</span>
+            </div>
+            <div class="font-semibold mt-1">${this.esc(r.name)}</div>
+            <div class="text-xs opacity-75">${meta([this.esc(r.height), r.weight ? `${r.weight} lbs` : ''])}</div>
+            <div class="text-xs opacity-75">${meta([this.esc(r.city), this.esc(r.state)])}</div>
+            <div class="text-xs opacity-75">${this.esc(r.school)}</div>
+            <div class="text-xs mt-1">${r.rating != null ? r.rating.toFixed(4) : 'NR'}</div>
+            ${r.onRoster ? `<div class="text-xs mt-1 font-bold">ON ROSTER</div>` : ''}
+          </div>`).join('')}
+      </div>
+    </section>`).join('') + `</div>`;
+}
+```
+
+Every recruit-derived field goes through `this.esc()`. `c.year`,
+`c.commits.length`, `c.rank`, and `r.rating` are numbers from our own fetcher
+and are safe unescaped.
+
+`no-print` avoids white-on-white: `index.html:171` forces
+`[class*="dark:bg-gray"]` to a white background, and hiding the Print *button*
+does not stop `Ctrl+P`.
+
+- [ ] **Step 2: Add the print rule** to the existing `@media print` block
+
+```css
+.no-print { display: none !important; }
+```
+
+- [ ] **Step 3: Verify the string output** in the console — no DOM writes needed
+
+```javascript
+app.recruits = { updated: '2026-07-31', classes: [{ year: 2027, rank: 4, commits: [
+  { name: 'Rated', position: 'QB', stars: 4, rating: 0.9421, height: '6-3', weight: 195, city: 'Lewis Center', state: 'OH', school: 'Berlin', onRoster: false },
+  { name: 'Unrated', position: 'ATH', stars: null, rating: null, height: '', weight: null, city: '', state: '', school: '', onRoster: true },
+  { name: '<script>x</script>', position: 'WR', stars: 0, rating: null, height: '6-0', weight: null, city: 'Erie', state: '', school: '', onRoster: false }
+]}]};
+const html = app.renderRecruits();
+console.log(html.includes('&lt;script&gt;'));  // must be true — escaping works
+console.log(/·\s*·|>\s*,/.test(html));         // must be false — no stray separators
+app.renderStars(6);                            // must return a string, not throw
+```
+
+Expected: `true`, then `false`, then a string. Both `Unrated` and the
+zero-star row show `NR` with **no** star row.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add index.html
+git commit -m "feat: render recruiting class grid"
+```
+
+---
+
+### Task 12: Section state, deep link, and cold load
+
+**Files:** modify `index.html` (state `:611`, `init()` `:663-677`, reset `:1166-1169`, team purge after `:689`)
+
+- [ ] **Step 1: Add state** beside `this.activeTab`
 
 ```javascript
 this.activeSection = (location.hash === '#recruiting')
   ? 'recruiting'
   : (localStorage.getItem('psu-active-section') || 'depth');
-this.recruits = null;        // lazy-loaded
-this.recruitsError = null;
 ```
 
-Add the setter:
+- [ ] **Step 2: Add the setter**
 
 ```javascript
 setSection(section) {
   this.activeSection = section;
   localStorage.setItem('psu-active-section', section);
   history.replaceState(null, '', section === 'recruiting' ? '#recruiting' : ' ');
-  if (section === 'recruiting' && !this.recruits) this.loadRecruits();
+  if (section === 'recruiting' && !this.recruits && !this.recruitsError) this.loadRecruits();
   this.render();
 }
 ```
 
-- [ ] **Step 2: Add to both cleanup paths**
+- [ ] **Step 3: Trigger the cold load in `init()`**
 
-In `confirmAppReset()` (`:1166-1169`) and the team-change purge (`:684-689`):
+**Required.** Without this, a cold load of `/#recruiting` — or any returning
+visitor whose saved section is `recruiting` — never calls `loadRecruits()` and
+sits on `Loading…` forever, because `setSection()` is the only other call site.
+
+After `this.loading = false;` in `init()` (`index.html:672`):
+
+```javascript
+if (this.activeSection === 'recruiting') this.loadRecruits();
+```
+
+- [ ] **Step 4: Add a `hashchange` listener** so browser back/forward works
+
+```javascript
+window.addEventListener('hashchange', () => {
+  this.setSection(location.hash === '#recruiting' ? 'recruiting' : 'depth');
+});
+```
+
+- [ ] **Step 5: Add to both cleanup paths** — `confirmAppReset()` (`:1166-1169`) and the team purge (after `:689`)
 
 ```javascript
 localStorage.removeItem('psu-active-section');
@@ -945,68 +1085,26 @@ localStorage.removeItem('psu-active-section');
 
 Omitting this strands a user in RECRUITING with an otherwise-reset app.
 
-- [ ] **Step 3: Verify**
+- [ ] **Step 6: Verify** — `app.setSection('recruiting')` → URL shows
+`#recruiting`. **Hard-reload `/#recruiting` in a fresh tab** → data loads, no
+permanent spinner. Reload plain URL → still recruiting. Run reset → back to
+depth chart. Browser back after following an external `#recruiting` link →
+returns to depth chart.
 
-In the console: `app.setSection('recruiting')` → URL shows `#recruiting`.
-Reload → still recruiting. Run reset → returns to depth chart.
-
-- [ ] **Step 4: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add index.html
-git commit -m "feat: add activeSection state with persistence and deep link"
+git commit -m "feat: add activeSection state, deep link, and cold load"
 ```
 
 ---
 
-### Task 11: Guard the keyboard shortcuts
+### Task 13: Section switch and render branch
 
-**Files:**
-- Modify: `index.html:1426-1462`
+**Files:** modify `index.html` (`render()` `:1768-1807`, `renderHeader()` `:2145`, `renderLoadingState()` `:1809`)
 
-Verified live: handlers are bound once to `document` and never torn down.
-`Ctrl+Z` currently calls `this.undo()` and mutates `this.depthChart` **with no
-visible feedback** when the field isn't rendered — silent data loss.
-
-- [ ] **Step 1: Add the guard**
-
-Wrap the undo, redo, and arrow-key branches (leave `d` for dark mode active):
-
-```javascript
-if (this.activeSection === 'depth' && (e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-```
-
-Apply the same `this.activeSection === 'depth' &&` prefix to the redo branch
-and to the arrow-key block's outer condition at `:1441`.
-
-- [ ] **Step 2: Verify the silent-mutation path is closed**
-
-```javascript
-app.setSection('depth');
-// place a player, then:
-app.setSection('recruiting');
-const before = JSON.stringify(app.depthChart);
-// press Ctrl+Z, then:
-JSON.stringify(app.depthChart) === before   // must be true
-```
-
-Also press Left/Right and confirm `app.activeTab` is unchanged.
-
-- [ ] **Step 3: Commit**
-
-```bash
-git add index.html
-git commit -m "fix: guard keyboard shortcuts against silent depth chart mutation"
-```
-
----
-
-### Task 12: Section switch UI
-
-**Files:**
-- Modify: `index.html` (`render()` at `:1768-1807`)
-
-- [ ] **Step 1: Add `renderSectionSwitch()`**
+- [ ] **Step 1: Add the switch**
 
 ```javascript
 renderSectionSwitch() {
@@ -1024,145 +1122,118 @@ renderSectionSwitch() {
 }
 ```
 
-- [ ] **Step 2: Branch `render()` per the spec's render tree**
+- [ ] **Step 2: Make `renderHeader()` compactable**
 
-Render the switch always. When `activeSection === 'recruiting'`, skip
-`renderTabs()`, `renderMobileControls()`, `renderField()`,
-`renderKeyboardHints()`, the Export/Share/Print/Undo/Redo/Reset buttons, and
-the header's depth-chart progress bar and roster pills (`:2190-2238`).
+`renderHeader()` (`:2145`) takes no parameters. The roster-stats block is a
+**ternary spanning `:2190` to `:2246`** — it does not end at 2238; there is an
+`: \`No roster imported yet…\`` else-branch. Suppressing only the true-branch
+would leave an unbalanced template literal.
 
-- [ ] **Step 3: Verify**
+Change the signature to `renderHeader(compact = false)` and wrap the **entire
+ternary** `:2190-2246` in `${!compact ? \`...\` : ''}`.
 
-Toggle both ways. Depth chart must look **byte-identical** to before —
-formation dropdown, field, and all buttons present. Recruiting shows only the
-header identity and the switch.
+Also change the subtitle at `:2161` to:
 
-- [ ] **Step 4: Commit**
+```javascript
+${compact ? 'RECRUITING CLASSES' : 'INTERACTIVE DEPTH CHART BUILDER'}
+```
+
+- [ ] **Step 3: Branch `render()` by composing a string**
+
+Do **not** add a second DOM assignment. Build the markup and let the app's
+existing single assignment (`:1776`) render it. Immediately after the
+loading-state early-return, before the depth chart's markup is composed:
+
+```javascript
+if (this.activeSection === 'recruiting') {
+  html = `
+    ${this.renderHeader(true)}
+    ${this.renderSectionSwitch()}
+    ${this.renderRecruits()}
+  `;
+} else {
+  // ...existing depth chart composition, with renderSectionSwitch()
+  //    inserted immediately above renderTabs()
+}
+```
+
+(If the existing code assigns directly rather than building a variable, hoist
+it to a `html` variable first so there remains exactly one assignment.)
+
+This is what implements the spec's render-tree table: `renderTabs()`,
+`renderMobileControls()`, `renderField()`, `renderKeyboardHints()`, and the
+Export/Share/Print/Undo/Redo/Reset row are simply never called on the
+recruiting branch.
+
+- [ ] **Step 4: Guard the loading skeleton**
+
+`renderLoadingState()` (`:1809`) draws depth-chart skeletons regardless of
+section. Return a plain centered "Loading…" when
+`this.activeSection === 'recruiting'`.
+
+- [ ] **Step 5: Verify**
+
+Toggle both ways. The depth chart must be **visually identical** to before —
+formation dropdown, field, every button. Recruiting shows only compact header,
+switch, and grid. No console errors on either. Confirm with
+`document.querySelectorAll('#app').length === 1` that you did not introduce a
+second render root.
+
+- [ ] **Step 6: Commit**
 
 ```bash
 git add index.html
-git commit -m "feat: add DEPTH CHART / RECRUITING section switch"
+git commit -m "feat: add section switch and recruiting render branch"
 ```
 
 ---
 
-### Task 13: Lazy load with explicit states
+### Task 14: Guard the keyboard shortcuts
 
-**Files:**
-- Modify: `index.html`
+**Files:** modify `index.html:1426-1462`
 
-Must **not** go in `init()` — that awaits before clearing `this.loading`
-(`:663-677`), so a slow file would delay the depth chart for every visitor.
+Verified: handlers bind once to `document` and are never torn down. `Ctrl+Z`
+currently calls `this.undo()` and mutates `this.depthChart` **with no visible
+feedback** when the field isn't rendered — silent data loss.
 
-- [ ] **Step 1: Implement**
+- [ ] **Step 1: Add the guard**
+
+Prefix `this.activeSection === 'depth' &&` to three conditions:
+
+1. the undo branch (`:1426`)
+2. the redo branch (`:1431`)
+3. **the arrow-key block's outer condition at `:1440`** — not `:1441`, which
+   is the inner `ArrowUp` check; guarding there would leave ArrowLeft/Right
+   unguarded
+
+Leave the `d` dark-mode branch (`:1436`) active deliberately.
+
+- [ ] **Step 2: Verify the silent-mutation path is closed**
 
 ```javascript
-async loadRecruits() {
-  try {
-    const res = await fetch('scripts/recruits.json?t=' + Date.now());
-    if (!res.ok) throw new Error(res.status);
-    this.recruits = await res.json();
-    this.recruitsError = null;
-    try { localStorage.setItem('psu-recruits', JSON.stringify(this.recruits)); } catch (_) {}
-  } catch (_) {
-    const cached = localStorage.getItem('psu-recruits');
-    if (cached) {
-      this.recruits = JSON.parse(cached);
-    } else {
-      this.recruitsError = 'Recruiting data unavailable — check back shortly.';
-    }
-  }
-  this.render();
-}
+app.setSection('depth');
+// place a player in a slot, then:
+app.setSection('recruiting');
+const before = JSON.stringify(app.depthChart);
+// press Ctrl+Z, then:
+JSON.stringify(app.depthChart) === before   // must be true
 ```
 
-- [ ] **Step 2: Verify all three paths**
-
-Normal load; offline reload (cached data renders); `localStorage.removeItem('psu-recruits')`
-plus offline (error message renders, no blank page).
+Also press Left/Right/Up/Down and confirm `app.activeTab` and `app.depthLevel`
+are unchanged.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add index.html
-git commit -m "feat: lazy-load recruits with cache and error fallbacks"
+git commit -m "fix: guard keyboard shortcuts against silent depth chart mutation"
 ```
 
 ---
 
-### Task 14: Class grid and recruit cards
+### Task 15: Service worker and sitemap
 
-**Files:**
-- Modify: `index.html`
-
-- [ ] **Step 1: Implement the render**
-
-Every interpolated field goes through `this.esc()`. Unrated recruits render
-`NR` and **no** star row — drawing zero stars would imply a 0-star evaluation.
-
-```javascript
-renderStars(n) {
-  if (n == null) return `<span class="text-xs text-gray-400">NR</span>`;
-  return `<span aria-label="${n}-star recruit">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</span>`;
-}
-
-renderRecruits() {
-  if (this.recruitsError) return `<div class="p-8 text-center">${this.esc(this.recruitsError)}</div>`;
-  if (!this.recruits) return `<div class="p-8 text-center">Loading…</div>`;
-  if (!this.recruits.classes.length) return `<div class="p-8 text-center">No classes to show yet.</div>`;
-
-  return this.recruits.classes.map(c => `
-    <section class="mb-8">
-      <h2 class="font-display text-xl mb-3">
-        CLASS OF ${c.year}
-        <span class="text-sm font-normal">· ${c.commits.length} commits${
-          c.rank ? ` · Composite #${c.rank} national` : ''
-        }${this.recruits.updated ? ` · Updated ${this.esc(this.recruits.updated)}` : ''}</span>
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        ${c.commits.map(r => `
-          <div class="rounded-lg p-3 bg-white dark:bg-gray-800 border-2"
-               style="border-color:${this.team.primaryColor}">
-            <div class="flex justify-between text-xs">
-              <span>${this.renderStars(r.stars)}</span>
-              <span class="font-bold">${this.esc(r.position)}</span>
-            </div>
-            <div class="font-semibold mt-1">${this.esc(r.name)}</div>
-            <div class="text-xs opacity-75">
-              ${this.esc(r.height)}${r.weight ? ` · ${r.weight}` : ''}
-            </div>
-            <div class="text-xs opacity-75">
-              ${this.esc(r.city)}${r.state ? `, ${this.esc(r.state)}` : ''}
-            </div>
-            <div class="text-xs mt-1">${r.rating != null ? r.rating.toFixed(4) : 'NR'}</div>
-            ${r.onRoster ? `<div class="text-xs mt-1 font-bold">ON ROSTER</div>` : ''}
-          </div>`).join('')}
-      </div>
-    </section>`).join('');
-}
-```
-
-- [ ] **Step 2: Verify against real data and a null fixture**
-
-Confirm rated and unrated recruits both render sanely, and that an
-`onRoster: true` recruit shows the badge.
-
-- [ ] **Step 3: Commit**
-
-```bash
-git add index.html
-git commit -m "feat: render recruiting class grid"
-```
-
----
-
-### Task 15: Service worker — bump only, no precache
-
-**Files:**
-- Modify: `service-worker.js:1`
-
-`service-worker.js:62-79` is cache-first for static assets. Precaching
-`recruits.json` would serve the install-time copy forever.
+**Files:** modify `service-worker.js:1`, `sitemap.xml`
 
 - [ ] **Step 1: Bump the cache name**
 
@@ -1170,59 +1241,74 @@ git commit -m "feat: render recruiting class grid"
 const CACHE_NAME = 'psu-depth-chart-v5';
 ```
 
-- [ ] **Step 2: Confirm you did NOT touch `urlsToCache`**
+- [ ] **Step 2: Confirm you did NOT precache the JSON**
+
+`service-worker.js:62-79` is cache-first for static assets; precaching
+`recruits.json` would serve the install-time copy forever.
 
 ```bash
 grep -A8 'urlsToCache' service-worker.js
 ```
 
-Expected: **no** `recruits.json` entry. The `?t=` cache-buster in Task 13 is
-what keeps it fresh.
+Expected: **no** `recruits.json`. The `?t=` cache-buster in Task 10 keeps it
+fresh.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Add the deep link to `sitemap.xml`**
+
+```xml
+  <url>
+    <loc>https://psudepthchart.com/#recruiting</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+```
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git add service-worker.js
-git commit -m "chore: bump service worker cache to v5"
+git add service-worker.js sitemap.xml
+git commit -m "chore: bump service worker cache to v5, add recruiting to sitemap"
 ```
 
 ---
 
-### Task 16: Mobile and accessibility verification
+### Task 16: Mobile, accessibility, and live verification
 
-**Files:** none (verification only)
+**Files:** none unless fixes are needed
 
-- [ ] **Step 1: Mobile at 375px**
+- [ ] **Step 1: Mobile at 375px** — DevTools → iPhone SE. Grid is single
+column; section switch full-width and tappable; no horizontal scroll; depth
+chart still works.
 
-DevTools → iPhone SE. Confirm: grid is single-column; section switch is
-full-width and tappable; no horizontal scroll; depth chart still works.
+- [ ] **Step 2: Accessibility** — confirm `role="tablist"` / `aria-selected`
+on the switch, and `aria-label` on star glyphs. Without the label the primary
+datum on every card is invisible to screen readers.
 
-- [ ] **Step 2: Accessibility**
+- [ ] **Step 3: Fix anything found, and commit the fixes** — this must happen
+**before** the push in Step 4.
 
-Confirm `role="tablist"` / `aria-selected` on the switch, and that star glyphs
-expose `aria-label` (VoiceOver/NVDA, or inspect the DOM). Without it the
-primary datum on every card is invisible to screen readers.
-
-- [ ] **Step 3: Deploy and verify live**
+- [ ] **Step 4: Deploy and verify live**
 
 ```bash
 git push origin maximusweiner4.github.io
 ```
 
-Wait for Pages, then hard-reload psudepthchart.com (Ctrl+Shift+R) and confirm
-the section switch appears and the depth chart is unchanged.
-
-- [ ] **Step 4: Commit any fixes found**
+Wait for Pages, hard-reload psudepthchart.com (Ctrl+Shift+R), confirm the
+switch appears and the depth chart is unchanged. Then load
+`psudepthchart.com/#recruiting` in a **private window** and confirm it renders
+from cold with no stale service worker.
 
 ---
 
 ## Definition of done
 
-- [ ] `cd scripts && npm test` passes (26+ tests)
+- [ ] `cd scripts && npm test` reports **30 tests, 30 pass** (not "0 tests")
 - [ ] Killing the API key leaves `recruits.json` byte-identical
 - [ ] `update-recruits.yml` has run green at least once
-- [ ] Two consecutive runs with no roster change produce **no** commit
-- [ ] Depth chart behavior is unchanged in every respect
+- [ ] A second identical run produces **no** commit
+- [ ] Depth chart behavior and appearance are unchanged
 - [ ] `Ctrl+Z` is a no-op while RECRUITING is active
+- [ ] `renderStars(6)` and `renderStars(0)` neither throw nor show 0 stars
+- [ ] A recruit named `<script>x</script>` renders escaped
 - [ ] 375px mobile verified
-- [ ] `#recruiting` deep link works from a cold load
+- [ ] `/#recruiting` renders from a cold load in a private window

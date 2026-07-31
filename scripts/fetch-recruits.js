@@ -80,7 +80,7 @@ async function main() {
   for (const cls of annotated) {
     const onRoster = cls.commits.filter(r => r.onRoster).length;
     const why = shown.has(cls.year)
-      ? (shouldRenderClass(cls) ? 'RENDER' : 'RENDER (fallback: newest with data)')
+      ? `RENDER (newest with data${shouldRenderClass(cls) ? '' : '; fully enrolled, members badged'})`
       : 'HIDE';
     console.log(
       `[fetch-recruits] class ${cls.year}: ${cls.commits.length} commit(s), ` +

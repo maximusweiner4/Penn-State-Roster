@@ -19,6 +19,7 @@ jobs:
         with:
           ref: maximusweiner4.github.io
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -59,4 +60,5 @@ jobs:
           git commit -m "Update roster from gopsusports.com
 
           Automated update on $(date -u +%Y-%m-%d)"
+          git pull --rebase origin maximusweiner4.github.io
           git push

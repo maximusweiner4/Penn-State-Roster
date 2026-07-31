@@ -679,10 +679,10 @@
           this.render();
           this.setupKeyboardShortcuts();
 
-          // Required: setSection() is the only other call site, so without this
-          // a cold load of /#recruiting (or a returning visitor whose saved
-          // section is recruiting) would sit on "Loading…" forever.
-          if (this.activeSection === 'recruiting') this.loadRecruits();
+          // Deliberately NOT awaited: the depth chart has already painted, and
+          // this only decides whether the RECRUITING switch appears. A slow or
+          // missing recruits.json must never hold up the page.
+          this.loadRecruits();
 
           window.addEventListener('hashchange', () => {
             this.setSection(location.hash === '#recruiting' ? 'recruiting' : 'depth');
@@ -1807,6 +1807,13 @@
             this.recruitsError = 'Recruiting data unavailable — check back shortly.';
           }
         }
+        // With no class to show there is no switch to navigate back with, so a
+        // stale saved section or a bookmarked #recruiting would be a dead end.
+        if (!this.hasRecruits() && this.activeSection === 'recruiting') {
+          this.activeSection = 'depth';
+          localStorage.setItem('psu-active-section', 'depth');
+          if (location.hash === '#recruiting') history.replaceState(null, '', ' ');
+        }
         this.render();
       }
 
@@ -1827,7 +1834,14 @@
           .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       }
 
+      hasRecruits() {
+        return !!(this.recruits && this.recruits.classes && this.recruits.classes.length);
+      }
+
       renderSectionSwitch() {
+        // Nothing to show -> no switch at all, rather than a tab that leads to
+        // an empty page. The button reappears on its own once a class lands.
+        if (!this.hasRecruits()) return '';
         const btn = (key, label) => `
           <button role="tab" aria-selected="${this.activeSection === key}"
             onclick="app.setSection('${key}')"
@@ -1904,7 +1918,7 @@
 
         app.innerHTML = `
           <div class="max-w-7xl mx-auto p-4">
-            ${this.activeSection === 'recruiting' ? `
+            ${this.activeSection === 'recruiting' && this.hasRecruits() ? `
               ${this.renderHeader(true)}
               ${this.renderSectionSwitch()}
               ${this.renderRecruits()}

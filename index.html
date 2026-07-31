@@ -1862,7 +1862,7 @@
             <h2 class="font-display text-xl mb-3 text-white">
               CLASS OF ${c.year}
               <span class="text-sm font-normal opacity-80">· ${meta([
-                `${c.commits.length} commits`,
+                `${c.commits.length} ${c.commits.length === 1 ? 'commit' : 'commits'}`,
                 c.rank ? `Composite #${c.rank} national` : '',
                 this.recruits.updated ? `Updated ${this.esc(this.recruits.updated)}` : ''
               ])}</span>

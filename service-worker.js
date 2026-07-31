@@ -1,4 +1,8 @@
-const CACHE_NAME = 'psu-depth-chart-v4';
+// NOTE: do NOT add scripts/recruits.json (or roster.json) to urlsToCache.
+// The fetch handler below is cache-first for static assets, so precaching a
+// data file would serve the install-time copy forever. Both JSONs are fetched
+// with a ?t= cache-buster instead.
+const CACHE_NAME = 'psu-depth-chart-v5';
 const urlsToCache = [
   '/',
   '/index.html',

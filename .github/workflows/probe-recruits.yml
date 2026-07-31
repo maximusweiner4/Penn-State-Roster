@@ -1,0 +1,24 @@
+name: Probe CFBD Recruiting (diagnostic)
+
+# Manual only -- no schedule. Writes nothing, commits nothing.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: maximusweiner4.github.io
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Probe
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: node scripts/probe-recruits.js

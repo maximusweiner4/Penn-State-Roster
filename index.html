@@ -609,6 +609,11 @@
         this.roster = DEFAULT_ROSTER;
         this.team = DEFAULT_TEAM;
         this.activeTab = 'offense';
+        this.activeSection = (location.hash === '#recruiting')
+          ? 'recruiting'
+          : (localStorage.getItem('psu-active-section') || 'depth');
+        this.recruits = null;
+        this.recruitsError = null;
         this.depthLevel = 0;
         this.selectedSlot = null;
         this.showPlayerModal = false;
@@ -673,6 +678,15 @@
           this.applyTeamColors();
           this.render();
           this.setupKeyboardShortcuts();
+
+          // Required: setSection() is the only other call site, so without this
+          // a cold load of /#recruiting (or a returning visitor whose saved
+          // section is recruiting) would sit on "Loading…" forever.
+          if (this.activeSection === 'recruiting') this.loadRecruits();
+
+          window.addEventListener('hashchange', () => {
+            this.setSection(location.hash === '#recruiting' ? 'recruiting' : 'depth');
+          });
         }, 500);
       }
 
@@ -687,6 +701,7 @@
             localStorage.removeItem('psu-team-config');
             localStorage.removeItem('generic-roster');
             localStorage.removeItem('psu-depth-chart');
+            localStorage.removeItem('psu-active-section');
             this.team = { ...DEFAULT_TEAM };
             this.roster = [...DEFAULT_ROSTER];
             this.initializeEmptyChart();
@@ -1167,6 +1182,8 @@
         localStorage.removeItem('psu-roster');
         localStorage.removeItem('psu-depth-chart');
         localStorage.removeItem('psu-dark-mode');
+        localStorage.removeItem('psu-active-section');
+        localStorage.removeItem('psu-recruits');
 
         // Reset app state
         this.depthChart = {};
@@ -1423,12 +1440,15 @@
             }
           }
 
-          if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+          // Section guards: these handlers are bound once to document and never
+          // torn down. Without the guard, Ctrl+Z mutates depthChart with no
+          // visible feedback while the recruiting view is up — silent data loss.
+          if (this.activeSection === 'depth' && (e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
             e.preventDefault();
             this.undo();
           }
 
-          if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+          if (this.activeSection === 'depth' && (e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
             e.preventDefault();
             this.redo();
           }
@@ -1437,7 +1457,7 @@
             this.toggleDarkMode();
           }
 
-          if (!this.showPlayerModal && !this.showResetModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+          if (this.activeSection === 'depth' && !this.showPlayerModal && !this.showResetModal && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             if (e.key === 'ArrowUp' && this.depthLevel > 0) {
               this.depthLevel--;
               this.render();
@@ -1765,6 +1785,107 @@
         this.render();
       }
 
+      // Lazy — deliberately NOT part of init()'s await chain, which gates
+      // this.loading. A slow recruits.json must not delay the depth chart.
+      async loadRecruits() {
+        try {
+          const res = await fetch('scripts/recruits.json?t=' + Date.now());
+          if (!res.ok) throw new Error(res.status);
+          this.recruits = await res.json();
+          this.recruitsError = null;
+          try { localStorage.setItem('psu-recruits', JSON.stringify(this.recruits)); } catch (_) {}
+        } catch (_) {
+          // The cache read is itself wrapped: a corrupt psu-recruits would
+          // otherwise throw inside catch, skip render(), and strand the spinner.
+          try {
+            const cached = localStorage.getItem('psu-recruits');
+            if (!cached) throw new Error('no cache');
+            this.recruits = JSON.parse(cached);
+            this.recruitsError = null;
+          } catch (_) {
+            this.recruits = null;
+            this.recruitsError = 'Recruiting data unavailable — check back shortly.';
+          }
+        }
+        this.render();
+      }
+
+      setSection(section) {
+        this.activeSection = section;
+        localStorage.setItem('psu-active-section', section);
+        history.replaceState(null, '', section === 'recruiting' ? '#recruiting' : ' ');
+        if (section === 'recruiting' && !this.recruits && !this.recruitsError) this.loadRecruits();
+        this.render();
+      }
+
+      // recruits.json relays third-party 247/Rivals text. Every recruit-derived
+      // field must pass through this before it reaches markup.
+      esc(s) {
+        if (s == null) return '';
+        return String(s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      renderSectionSwitch() {
+        const btn = (key, label) => `
+          <button role="tab" aria-selected="${this.activeSection === key}"
+            onclick="app.setSection('${key}')"
+            class="flex-1 sm:flex-none px-6 py-3 rounded-lg font-display font-semibold tracking-wide transition-all ${
+              this.activeSection === key
+                ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-lg'
+                : 'bg-gray-200/50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+            }">${label}</button>`;
+        return `<div role="tablist" class="flex gap-2 mb-4">
+          ${btn('depth', 'DEPTH CHART')}${btn('recruiting', 'RECRUITING')}
+        </div>`;
+      }
+
+      // Must clamp: '★'.repeat(5 - 6) throws RangeError inside a template
+      // literal, which blanks the whole page. And stars:0 (which CFBD emits)
+      // must read NR, not five empty stars implying a real 0-star evaluation.
+      renderStars(n) {
+        if (n == null || !(n >= 1)) return `<span class="text-xs text-gray-400">NR</span>`;
+        const k = Math.min(5, Math.round(n));
+        return `<span aria-label="${k}-star recruit">${'★'.repeat(k)}${'☆'.repeat(5 - k)}</span>`;
+      }
+
+      renderRecruits() {
+        if (this.recruitsError) return `<div class="p-8 text-center text-white/80">${this.esc(this.recruitsError)}</div>`;
+        if (!this.recruits) return `<div class="p-8 text-center text-white/80">Loading…</div>`;
+        if (!this.recruits.classes.length) return `<div class="p-8 text-center text-white/80">No classes to show yet.</div>`;
+
+        const meta = (parts) => parts.filter(Boolean).join(' · ');
+
+        return `<div class="no-print">` + this.recruits.classes.map(c => `
+          <section class="mb-8">
+            <h2 class="font-display text-xl mb-3 text-white">
+              CLASS OF ${c.year}
+              <span class="text-sm font-normal opacity-80">· ${meta([
+                `${c.commits.length} commits`,
+                c.rank ? `Composite #${c.rank} national` : '',
+                this.recruits.updated ? `Updated ${this.esc(this.recruits.updated)}` : ''
+              ])}</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              ${c.commits.map(r => `
+                <div class="rounded-lg p-3 bg-white dark:bg-gray-800 border-2"
+                     style="border-color:${this.team.primaryColor}">
+                  <div class="flex justify-between text-xs">
+                    <span>${this.renderStars(r.stars)}</span>
+                    <span class="font-bold">${this.esc(r.position)}</span>
+                  </div>
+                  <div class="font-semibold mt-1">${this.esc(r.name)}</div>
+                  <div class="text-xs opacity-75">${meta([this.esc(r.height), r.weight ? `${r.weight} lbs` : ''])}</div>
+                  <div class="text-xs opacity-75">${meta([this.esc(r.city), this.esc(r.state)])}</div>
+                  <div class="text-xs opacity-75">${this.esc(r.school)}</div>
+                  <div class="text-xs mt-1">${r.rating != null ? r.rating.toFixed(4) : 'NR'}</div>
+                  ${r.onRoster ? `<div class="text-xs mt-1 font-bold">ON ROSTER</div>` : ''}
+                </div>`).join('')}
+            </div>
+          </section>`).join('') + `</div>`;
+      }
+
       render() {
         const app = document.getElementById('app');
 
@@ -1775,22 +1896,29 @@
 
         app.innerHTML = `
           <div class="max-w-7xl mx-auto p-4">
-            ${this.renderHeader()}
-            ${this.renderButtons()}
-            ${this.renderTabs()}
-            ${this.renderMobileControls()}
-            <div class="desktop-only">
-              ${this.activeTab === 'special' ? `
-                <div class="bg-white/10 rounded-lg px-4 py-2 mb-2 text-white/70 text-sm text-center italic">
-                  Special teams — no formation or depth selection needed
-                </div>
-              ` : `
-                ${this.renderDepthSelector()}
-                ${this.renderFormationSelector()}
-              `}
-            </div>
-            ${this.renderField()}
-            ${this.renderKeyboardHints()}
+            ${this.activeSection === 'recruiting' ? `
+              ${this.renderHeader(true)}
+              ${this.renderSectionSwitch()}
+              ${this.renderRecruits()}
+            ` : `
+              ${this.renderHeader()}
+              ${this.renderButtons()}
+              ${this.renderSectionSwitch()}
+              ${this.renderTabs()}
+              ${this.renderMobileControls()}
+              <div class="desktop-only">
+                ${this.activeTab === 'special' ? `
+                  <div class="bg-white/10 rounded-lg px-4 py-2 mb-2 text-white/70 text-sm text-center italic">
+                    Special teams — no formation or depth selection needed
+                  </div>
+                ` : `
+                  ${this.renderDepthSelector()}
+                  ${this.renderFormationSelector()}
+                `}
+              </div>
+              ${this.renderField()}
+              ${this.renderKeyboardHints()}
+            `}
           </div>
           ${this.showPlayerModal ? this.renderPlayerModal() : ''}
           ${this.showResetModal ? this.renderResetModal() : ''}
@@ -2142,7 +2270,9 @@
         this.render();
       }
 
-      renderHeader() {
+      // compact=true is the recruiting view: same team identity, but the
+      // depth-chart progress bar and roster pills are suppressed.
+      renderHeader(compact = false) {
         const stats = this.getRosterStats();
         const progress = this.getProgressStats();
         const mismatches = this.getPositionMismatches();
@@ -2158,7 +2288,7 @@
                 </div>
                 <div>
                   <h1 class="font-display text-4xl font-bold mb-1 uppercase" style="letter-spacing: 0.05em;">${this.team.name}</h1>
-                  <p class="text-gray-500 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">Interactive Depth Chart Builder</p>
+                  <p class="text-gray-500 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">${compact ? 'Recruiting Classes' : 'Interactive Depth Chart Builder'}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
@@ -2187,7 +2317,7 @@
               </div>
             </div>
 
-            ${totalPlayers > 0 ? `
+            ${compact ? '' : `${totalPlayers > 0 ? `
               <!-- Roster Stats & Progress -->
               <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <!-- Progress Bar -->
@@ -2243,7 +2373,7 @@
                   No roster imported yet. Click <strong>Import</strong> to add players.
                 </p>
               </div>
-            `}
+            `}`}
           </div>
         `;
       }

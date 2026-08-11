@@ -505,7 +505,7 @@
   },
   {
     "name": "Jahmir Joseph",
-    "number": 23,
+    "number": 0,
     "position": "CB",
     "year": "R-Fr.",
     "height": "",
@@ -554,7 +554,7 @@
   {
     "name": "Xxavier Thomas",
     "number": 12,
-    "position": "CB",
+    "position": "S",
     "year": "R-Fr.",
     "height": "5-11",
     "weight": "180 lbs",
@@ -566,7 +566,7 @@
   {
     "name": "Max Heffner",
     "number": 37,
-    "position": "CB",
+    "position": "WR",
     "year": "R-Fr.",
     "height": "5-11",
     "weight": "176 lbs",
@@ -1070,7 +1070,7 @@
   {
     "name": "Ibn McDaniels",
     "number": 24,
-    "position": "S",
+    "position": "CB",
     "year": "R-So.",
     "height": "6-3",
     "weight": "202 lbs",
@@ -1118,7 +1118,7 @@
   {
     "name": "Christian Askew",
     "number": 30,
-    "position": "S",
+    "position": "CB",
     "year": "Fr.",
     "height": "6-4",
     "weight": "199 lbs",
@@ -1130,7 +1130,7 @@
   {
     "name": "Tyrell Chatman",
     "number": 20,
-    "position": "CB",
+    "position": "S",
     "year": "Fr.",
     "height": "6-2",
     "weight": "196 lbs",
@@ -1165,7 +1165,7 @@
   },
   {
     "name": "Amarion Jackson",
-    "number": 19,
+    "number": 9,
     "position": "WR",
     "year": "Fr.",
     "height": "6-2",
@@ -1203,7 +1203,7 @@
     "name": "Connor Barry",
     "number": 10,
     "position": "QB",
-    "year": "Sr.",
+    "year": "R-Sr.",
     "height": "6-1",
     "weight": "211 lbs",
     "hometown": "Vienna, Va.",
@@ -1298,7 +1298,7 @@
   {
     "name": "Jake Lukac",
     "number": 40,
-    "position": "LB",
+    "position": "TE",
     "year": "Fr.",
     "height": "6-1",
     "weight": "210 lbs",

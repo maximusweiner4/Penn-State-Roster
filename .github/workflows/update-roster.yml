@@ -29,7 +29,10 @@ jobs:
       - name: Install dependencies
         run: |
           cd scripts
-          npm install puppeteer cheerio
+          # npm ci, not npm install: puppeteer floats on ^24, so `npm install`
+          # rewrote the tracked package-lock.json on every run and left the
+          # tree dirty. Deps are already declared in package.json.
+          npm ci
 
       - name: Scrape roster
         run: node scripts/scrape-roster.js
@@ -56,11 +59,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # team.json is rewritten by the scraper too. Leaving it unstaged makes
-          # the pull --rebase below abort with "You have unstaged changes".
+          # The scraper rewrites team.json alongside roster.json, so stage both.
           git add scripts/roster.json scripts/team.json
           git commit -m "Update roster from gopsusports.com
 
           Automated update on $(date -u +%Y-%m-%d)"
-          git pull --rebase origin maximusweiner4.github.io
+          # --autostash: any other incidental dirt must never abort the push again.
+          git pull --rebase --autostash origin maximusweiner4.github.io
           git push

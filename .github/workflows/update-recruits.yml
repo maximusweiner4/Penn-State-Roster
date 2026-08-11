@@ -50,5 +50,6 @@ jobs:
           git commit -m "Update recruits from CollegeFootballData
 
           Automated update on $(date -u +%Y-%m-%d)"
-          git pull --rebase origin maximusweiner4.github.io
+          # --autostash: incidental dirt must never abort the push (see update-roster.yml).
+          git pull --rebase --autostash origin maximusweiner4.github.io
           git push
